@@ -5,61 +5,61 @@ export const CANVAS = {
 } as const;
 
 export const BATTLE_LAYOUT = {
-  COMBAT_ZONE: { x: 0, y: 0, w: 160, h: 96 },
-  GROUND_STRIP: { x: 0, y: 96, w: 160, h: 8 },
-  UI_PANEL: { x: 0, y: 104, w: 160, h: 40 },
+  COMBAT_ZONE: { x: 0, y: 0, w: 320, h: 160 },
+  GROUND_STRIP: { x: 0, y: 160, w: 320, h: 16 },
+  UI_PANEL: { x: 0, y: 176, w: 320, h: 64 },
   RIVAL: {
-    SPRITE_POS: { x: 128, y: 36 },
+    SPRITE_POS: { x: 208, y: 32 },   // top-left; sprite ocupa (208,32)→(304,128)
     SPRITE_SIZE: 96,
-    INFO_POS: { x: 4, y: 4 },
-    HP_BAR_OFFSET_Y: 10,
-    HP_TEXT_OFFSET_Y: 18,
+    INFO_POS: { x: 8, y: 8 },
+    HP_BAR_OFFSET_Y: 14,
+    HP_TEXT_OFFSET_Y: 26,
   },
   ALLY: {
-    SPRITE_POS: { x: 36, y: 76 },
+    SPRITE_POS: { x: 16, y: 96 },    // top-left; sprite ocupa (16,96)→(112,192), sentado sobre la franja de suelo
     SPRITE_SIZE: 96,
-    INFO_POS: { x: 88, y: 70 },
-    HP_BAR_OFFSET_Y: 10,
-    HP_TEXT_OFFSET_Y: 18,
+    INFO_POS: { x: 176, y: 120 },
+    HP_BAR_OFFSET_Y: 14,
+    HP_TEXT_OFFSET_Y: 26,
   },
 } as const;
 
 export const DIALOG_LAYOUT = {
-  BOX_Y: 104,
+  BOX_Y: 176,
   TEXT_OFFSET_X: 8,
-  TEXT_OFFSET_Y: 6,
-  WORD_WRAP_WIDTH: 144,
+  TEXT_OFFSET_Y: 8,
+  WORD_WRAP_WIDTH: 300,
   CHAR_DELAY_MS: 30,
 } as const;
 
 export const BATTLE_MENU_LAYOUT = {
-  ITEM_X: 70,
-  CURSOR_X: 62,
-  ITEM_Y0: 107,
-  ITEM_STEP: 9,
+  ITEM_X: 220,
+  CURSOR_X: 210,
+  ITEM_Y0: 184,
+  ITEM_STEP: 14,
 } as const;
 
 export const MOVE_MENU_LAYOUT = {
-  ROW0_Y: 107,
-  ROW_STEP: 16,
-  COL0_X: 10,
-  COL_STEP: 80,
-  CURSOR_OFFSET_X: -6,
+  ROW0_Y: 184,
+  ROW_STEP: 26,
+  COL0_X: 8,
+  COL_STEP: 156,
+  CURSOR_OFFSET_X: -8,
 } as const;
 
 export const ITEM_MENU_LAYOUT = {
-  ITEM_X: 14,
-  CURSOR_X: 4,
-  ITEM_Y0: 107,
-  ITEM_STEP: 11,
+  ITEM_X: 16,
+  CURSOR_X: 8,
+  ITEM_Y0: 184,
+  ITEM_STEP: 16,
 } as const;
 
 export const OVERWORLD_LAYOUT = {
   DEBUG_TEXT_POS: { x: 2, y: 2 },
-  DIALOG_BOX: { x: 0, y: 104, w: 160, h: 40 },
-  DIALOG_TEXT_POS: { x: 4, y: 108 },
-  SHOP_OPTION_SI: { x: 96, y: 130 },
-  SHOP_OPTION_NO: { x: 120, y: 130 },
+  DIALOG_BOX: { x: 0, y: 176, w: 320, h: 64 },
+  DIALOG_TEXT_POS: { x: 8, y: 184 },
+  SHOP_OPTION_SI: { x: 224, y: 216 },
+  SHOP_OPTION_NO: { x: 268, y: 216 },
 } as const;
 
 export const MENU_LAYOUT = {

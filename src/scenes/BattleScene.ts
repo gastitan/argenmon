@@ -127,9 +127,11 @@ export class BattleScene extends Phaser.Scene {
     const rivalKey = rival.especie.spriteKey;
     if (this.textures.exists(rivalKey)) {
       this.add.image(RIVAL.SPRITE_POS.x, RIVAL.SPRITE_POS.y, rivalKey)
+        .setOrigin(0, 0)
         .setFlipX(true);
     } else {
-      this.add.rectangle(RIVAL.SPRITE_POS.x, RIVAL.SPRITE_POS.y, RIVAL.SPRITE_SIZE, RIVAL.SPRITE_SIZE, 0x306230);
+      this.add.rectangle(RIVAL.SPRITE_POS.x, RIVAL.SPRITE_POS.y, RIVAL.SPRITE_SIZE, RIVAL.SPRITE_SIZE, 0x306230)
+        .setOrigin(0, 0);
     }
 
     this.actualizarSpriteJugador(jugador);
@@ -176,9 +178,11 @@ export class BattleScene extends Phaser.Scene {
     const key = criatura.especie.spriteKey;
     if (this.textures.exists(key)) {
       this.spriteJugador = this.add.image(ALLY.SPRITE_POS.x, ALLY.SPRITE_POS.y, key)
+        .setOrigin(0, 0)
         .setDepth(50);
     } else {
       this.spriteJugador = this.add.rectangle(ALLY.SPRITE_POS.x, ALLY.SPRITE_POS.y, ALLY.SPRITE_SIZE, ALLY.SPRITE_SIZE, 0x0f380f)
+        .setOrigin(0, 0)
         .setDepth(50);
     }
   }

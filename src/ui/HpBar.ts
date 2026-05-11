@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { PALETA } from '@/config';
 
-const BAR_W = 48;
+const BAR_W = 80;
 const BAR_H = 4;
 
 export class HpBar {
