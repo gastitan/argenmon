@@ -145,7 +145,7 @@ export class BattleScene extends Phaser.Scene {
     if (rivalKey === 'placeholder') {
       this.add.rectangle(96, 4, 64, 64, 0x306230).setOrigin(0, 0);
     } else {
-      this.add.image(128, 36, rivalKey).setDisplaySize(64, 64);
+      this.add.image(128, 36, rivalKey).setDisplaySize(64, 64).setFlipX(true);
     }
 
     this.actualizarSpriteJugador(jugador);
@@ -192,7 +192,7 @@ export class BattleScene extends Phaser.Scene {
     if (key === 'placeholder') {
       this.spriteJugador = this.add.rectangle(8, 48, 56, 56, 0x0f380f).setOrigin(0, 0).setDepth(50);
     } else {
-      this.spriteJugador = this.add.image(36, 76, key).setDisplaySize(56, 56).setFlipX(true).setDepth(50);
+      this.spriteJugador = this.add.image(36, 76, key).setDisplaySize(56, 56).setDepth(50);
     }
   }
 

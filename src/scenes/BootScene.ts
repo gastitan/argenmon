@@ -22,14 +22,6 @@ export class BootScene extends Phaser.Scene {
   }
 
   create(): void {
-    const spriteKeys = [
-      'sprite_hornero', 'sprite_yarara', 'sprite_mara',
-      'sprite_peludo', 'sprite_nandu', 'sprite_vizcacha',
-      'player_sprite',
-    ];
-    spriteKeys.forEach((key) => {
-      this.textures.get(key).setFilter(Phaser.Textures.FilterMode.LINEAR);
-    });
     this.scene.start(SCENE_KEYS.Menu);
   }
 

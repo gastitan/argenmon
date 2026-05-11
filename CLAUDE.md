@@ -69,7 +69,7 @@ La paleta de 4 colores aplica a tiles, UI y overworld. **Excepción deliberada: 
 
 **Resolución base:** 160×144 píxeles (la del Game Boy original), escalada por enteros (×2, ×3, ×4) para pantallas modernas.
 
-**Filtro de texturas:** los tiles y gráficos generados usan nearest-neighbor (`pixelArt: true`). Los sprites de criaturas y el sprite del jugador usan `FilterMode.LINEAR` (aplicado en `BootScene.create()`) para una mejor calidad al escalar imágenes de alta resolución.
+**Filtro de texturas:** todos los gráficos usan nearest-neighbor (`pixelArt: true`), incluyendo los sprites de criaturas y el jugador. No se aplica `FilterMode.LINEAR`.
 
 **Paneles de texto (UI):** fondo `clarisimo` (#9bbc0f) con texto `oscurisimo` (#0f380f). Esta combinación da ~8:1 de contraste, mucho más legible que el esquema invertido anterior.
 
@@ -247,4 +247,4 @@ Cosas que el desarrollador (humano) todavía tiene que definir. Marcar con [x] c
 
 ---
 
-*Última actualización: mayo 2026 — Fases 1–4 completas, Fase 5 en progreso. Visual: sprites de criaturas con filtro LINEAR, paneles de texto clarisimo/oscurisimo.*
+*Última actualización: mayo 2026 — Fases 1–4 completas, Fase 5 en progreso. Visual: todos los sprites con nearest-neighbor (sin LINEAR), paneles de texto clarisimo/oscurisimo.*
