@@ -1,15 +1,11 @@
 import Phaser from 'phaser';
-import { PALETA_HEX, SCENE_KEYS, FONT, GAME_HEIGHT } from '@/config';
+import { PALETA_HEX, SCENE_KEYS, FONT, GAME_WIDTH, GAME_HEIGHT } from '@/config';
+import { CATALOG_LAYOUT } from '@/config/layout';
 import { ESPECIES } from '@/data/creatures';
 import type { EspecieId } from '@/data/creatures';
 import { GameState } from '@/state/GameState';
 
 const ORDEN_CATALOGO: EspecieId[] = ['hornero', 'mara', 'vizcacha', 'nandu', 'peludo', 'yarara'];
-const COLS = 2;
-const CELL_W = 72;
-const CELL_H = 40;
-const START_X = 8;
-const START_Y = 32;
 
 export class CatalogScene extends Phaser.Scene {
   private keyZ!: Phaser.Input.Keyboard.Key;
@@ -20,12 +16,13 @@ export class CatalogScene extends Phaser.Scene {
 
   create(): void {
     this.cameras.main.setBackgroundColor(PALETA_HEX.clarisimo);
+    const { COLS, CELL_W, CELL_H, START_X, START_Y, TITLE_Y, SUBTITLE_Y, FOOTER_OFFSET_FROM_BOTTOM, FOOTER2_OFFSET_FROM_BOTTOM } = CATALOG_LAYOUT;
 
-    this.add.text(80, 8, '¡Catálogo pampeano!', {
+    this.add.text(GAME_WIDTH / 2, TITLE_Y, '¡Catálogo pampeano!', {
       fontFamily: FONT, fontSize: '8px', color: PALETA_HEX.oscurisimo,
     }).setOrigin(0.5, 0);
 
-    this.add.text(80, 18, '¡Venciste al Capataz!', {
+    this.add.text(GAME_WIDTH / 2, SUBTITLE_Y, '¡Venciste al Capataz!', {
       fontFamily: FONT, fontSize: '6px', color: PALETA_HEX.oscuro,
     }).setOrigin(0.5, 0);
 
@@ -66,11 +63,11 @@ export class CatalogScene extends Phaser.Scene {
       }
     });
 
-    this.add.text(80, GAME_HEIGHT - 20, `Capturadas: ${capturadas}/${ORDEN_CATALOGO.length}`, {
+    this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - FOOTER_OFFSET_FROM_BOTTOM, `Capturadas: ${capturadas}/${ORDEN_CATALOGO.length}`, {
       fontFamily: FONT, fontSize: '6px', color: PALETA_HEX.oscurisimo,
     }).setOrigin(0.5, 0);
 
-    this.add.text(80, GAME_HEIGHT - 10, 'Z para continuar', {
+    this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - FOOTER2_OFFSET_FROM_BOTTOM, 'Z para continuar', {
       fontFamily: FONT, fontSize: '6px', color: PALETA_HEX.oscuro,
     }).setOrigin(0.5, 0);
 

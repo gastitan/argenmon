@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { PALETA_HEX, SCENE_KEYS, TILE_SIZE, FONT } from '@/config';
+import { OVERWORLD_LAYOUT } from '@/config/layout';
 import { Player } from '@/entities/Player';
 import { mapaPampaInicial } from '@/data/maps';
 import { GameState } from '@/state/GameState';
@@ -67,7 +68,7 @@ export class OverworldScene extends Phaser.Scene {
     this.crearMarcadoresEntrenadores();
 
     this.debugText = this.add
-      .text(2, 2, '', {
+      .text(OVERWORLD_LAYOUT.DEBUG_TEXT_POS.x, OVERWORLD_LAYOUT.DEBUG_TEXT_POS.y, '', {
         fontFamily: FONT,
         fontSize: '6px',
         color: PALETA_HEX.oscurisimo,
@@ -177,23 +178,24 @@ export class OverworldScene extends Phaser.Scene {
 
   private mostrarDialogoAlmacenero(): void {
     this.dialogoActivo = true;
+    const { DIALOG_BOX, DIALOG_TEXT_POS, SHOP_OPTION_SI, SHOP_OPTION_NO } = OVERWORLD_LAYOUT;
 
     const fondo = this.add
-      .rectangle(0, 104, 160, 40, 0x9bbc0f)
+      .rectangle(DIALOG_BOX.x, DIALOG_BOX.y, DIALOG_BOX.w, DIALOG_BOX.h, 0x9bbc0f)
       .setOrigin(0).setScrollFactor(0).setDepth(200);
 
-    const texto = this.add.text(4, 108, '¡Bienvenido!\n¿Querés que cure a tus animales?', {
+    const texto = this.add.text(DIALOG_TEXT_POS.x, DIALOG_TEXT_POS.y, '¡Bienvenido!\n¿Querés que cure a tus animales?', {
       fontFamily: FONT, fontSize: '6px', color: PALETA_HEX.oscurisimo,
-      wordWrap: { width: 152 },
+      wordWrap: { width: DIALOG_BOX.w - 8 },
     }).setScrollFactor(0).setDepth(201);
 
     let seleccion = 0;
 
-    const opSi = this.add.text(96, 130, '>Sí', {
+    const opSi = this.add.text(SHOP_OPTION_SI.x, SHOP_OPTION_SI.y, '>Sí', {
       fontFamily: FONT, fontSize: '6px', color: PALETA_HEX.oscurisimo,
     }).setScrollFactor(0).setDepth(201);
 
-    const opNo = this.add.text(120, 130, ' No', {
+    const opNo = this.add.text(SHOP_OPTION_NO.x, SHOP_OPTION_NO.y, ' No', {
       fontFamily: FONT, fontSize: '6px', color: PALETA_HEX.oscurisimo,
     }).setScrollFactor(0).setDepth(201);
 

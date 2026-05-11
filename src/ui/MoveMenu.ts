@@ -1,12 +1,7 @@
 import Phaser from 'phaser';
 import { PALETA_HEX, FONT } from '@/config';
+import { MOVE_MENU_LAYOUT } from '@/config/layout';
 import type { EstadoMovimiento } from '@/entities/Criatura';
-
-const ROW0_Y = 107;
-const ROW_STEP = 16;
-const COL0_X = 10;
-const COL_STEP = 80;
-const CURSOR_OFFSET_X = -6;
 
 export class MoveMenu {
   private items: Phaser.GameObjects.Text[] = [];
@@ -25,6 +20,7 @@ export class MoveMenu {
   };
 
   constructor(scene: Phaser.Scene) {
+    const { COL0_X, COL_STEP, ROW0_Y, ROW_STEP, CURSOR_OFFSET_X } = MOVE_MENU_LAYOUT;
     for (let i = 0; i < 4; i++) {
       const col = i % 2;
       const row = Math.floor(i / 2);
@@ -123,6 +119,7 @@ export class MoveMenu {
   }
 
   private actualizarCursor(): void {
+    const { COL0_X, COL_STEP, ROW0_Y, ROW_STEP, CURSOR_OFFSET_X } = MOVE_MENU_LAYOUT;
     const col = this.seleccion % 2;
     const row = Math.floor(this.seleccion / 2);
     this.cursor.setPosition(COL0_X + CURSOR_OFFSET_X + col * COL_STEP, ROW0_Y + row * ROW_STEP);

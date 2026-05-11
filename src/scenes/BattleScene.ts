@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { PALETA_HEX, SCENE_KEYS, FONT } from '@/config';
+import { BATTLE_LAYOUT } from '@/config/layout';
 import { Criatura } from '@/entities/Criatura';
 import { ESPECIES } from '@/data/creatures';
 import type { EspecieId } from '@/data/creatures';
@@ -15,25 +16,6 @@ import { EquipoMenu } from '@/ui/EquipoMenu';
 import { HpBar } from '@/ui/HpBar';
 import type { BattleConfig } from '@/data/trainers';
 import { encontrarEntrenador } from '@/data/trainers';
-
-const SPRITE_MAP: Partial<Record<string, string>> = {
-  hornero: 'sprite_hornero',
-  yarara: 'sprite_yarara',
-  mara: 'sprite_mara',
-  peludo: 'sprite_peludo',
-  nandu: 'sprite_nandu',
-  vizcacha: 'sprite_vizcacha',
-};
-
-function getSpriteKey(especieId: string): string {
-  return SPRITE_MAP[especieId] ?? 'placeholder';
-}
-
-const RIVAL_INFO_X = 4;
-const RIVAL_INFO_Y = 4;
-
-const ALIADO_INFO_X = 88;
-const ALIADO_INFO_Y = 70;
 
 type FaseUI = 'animando' | 'menu' | 'movimientos' | 'trampa' | 'equipo' | 'idle';
 
@@ -134,37 +116,40 @@ export class BattleScene extends Phaser.Scene {
   // ── Layout ──────────────────────────────────────────────────────────────────
 
   private crearLayout(): void {
+    const { COMBAT_ZONE, GROUND_STRIP, UI_PANEL, RIVAL, ALLY } = BATTLE_LAYOUT;
     const jugador = this.sistema.estado.jugador;
     const rival = this.sistema.estado.rival;
 
-    this.add.rectangle(0, 0, 160, 96, 0x8bac0f).setOrigin(0, 0);
-    this.add.rectangle(0, 96, 160, 8, 0x306230).setOrigin(0, 0);
-    this.add.rectangle(0, 104, 160, 40, 0x9bbc0f).setOrigin(0, 0);
+    this.add.rectangle(COMBAT_ZONE.x, COMBAT_ZONE.y, COMBAT_ZONE.w, COMBAT_ZONE.h, 0x8bac0f).setOrigin(0, 0);
+    this.add.rectangle(GROUND_STRIP.x, GROUND_STRIP.y, GROUND_STRIP.w, GROUND_STRIP.h, 0x306230).setOrigin(0, 0);
+    this.add.rectangle(UI_PANEL.x, UI_PANEL.y, UI_PANEL.w, UI_PANEL.h, 0x9bbc0f).setOrigin(0, 0);
 
-    const rivalKey = getSpriteKey(rival.especie.id);
-    if (rivalKey === 'placeholder') {
-      this.add.rectangle(96, 4, 64, 64, 0x306230).setOrigin(0, 0);
+    const rivalKey = rival.especie.spriteKey;
+    if (this.textures.exists(rivalKey)) {
+      this.add.image(RIVAL.SPRITE_POS.x, RIVAL.SPRITE_POS.y, rivalKey)
+        .setDisplaySize(RIVAL.SPRITE_SIZE, RIVAL.SPRITE_SIZE)
+        .setFlipX(true);
     } else {
-      this.add.image(128, 36, rivalKey).setDisplaySize(64, 64).setFlipX(true);
+      this.add.rectangle(RIVAL.SPRITE_POS.x, RIVAL.SPRITE_POS.y, RIVAL.SPRITE_SIZE, RIVAL.SPRITE_SIZE, 0x306230);
     }
 
     this.actualizarSpriteJugador(jugador);
 
-    this.nomRival = this.add.text(RIVAL_INFO_X, RIVAL_INFO_Y, `${rival.especie.nombre} Lv${rival.nivel}`, {
+    this.nomRival = this.add.text(RIVAL.INFO_POS.x, RIVAL.INFO_POS.y, `${rival.especie.nombre} Lv${rival.nivel}`, {
       fontFamily: FONT, fontSize: '6px', color: PALETA_HEX.oscurisimo,
     }).setScrollFactor(0).setDepth(150);
-    this.hpBarRival = new HpBar(this, RIVAL_INFO_X, RIVAL_INFO_Y + 10, rival.hpMax);
+    this.hpBarRival = new HpBar(this, RIVAL.INFO_POS.x, RIVAL.INFO_POS.y + RIVAL.HP_BAR_OFFSET_Y, rival.hpMax);
     this.hpBarRival.reiniciar(rival.hpMax, rival.hpActual);
-    this.hpTextRival = this.add.text(RIVAL_INFO_X, RIVAL_INFO_Y + 18, `${rival.hpActual}/${rival.hpMax}`, {
+    this.hpTextRival = this.add.text(RIVAL.INFO_POS.x, RIVAL.INFO_POS.y + RIVAL.HP_TEXT_OFFSET_Y, `${rival.hpActual}/${rival.hpMax}`, {
       fontFamily: FONT, fontSize: '6px', color: PALETA_HEX.oscurisimo,
     }).setScrollFactor(0).setDepth(150);
 
-    this.nomAliado = this.add.text(ALIADO_INFO_X, ALIADO_INFO_Y, `${jugador.especie.nombre} Lv${jugador.nivel}`, {
+    this.nomAliado = this.add.text(ALLY.INFO_POS.x, ALLY.INFO_POS.y, `${jugador.especie.nombre} Lv${jugador.nivel}`, {
       fontFamily: FONT, fontSize: '6px', color: PALETA_HEX.oscurisimo,
     }).setScrollFactor(0).setDepth(150);
-    this.hpBarAliado = new HpBar(this, ALIADO_INFO_X, ALIADO_INFO_Y + 10, jugador.hpMax);
+    this.hpBarAliado = new HpBar(this, ALLY.INFO_POS.x, ALLY.INFO_POS.y + ALLY.HP_BAR_OFFSET_Y, jugador.hpMax);
     this.hpBarAliado.reiniciar(jugador.hpMax, jugador.hpActual);
-    this.hpTextAliado = this.add.text(ALIADO_INFO_X, ALIADO_INFO_Y + 18, `${jugador.hpActual}/${jugador.hpMax}`, {
+    this.hpTextAliado = this.add.text(ALLY.INFO_POS.x, ALLY.INFO_POS.y + ALLY.HP_TEXT_OFFSET_Y, `${jugador.hpActual}/${jugador.hpMax}`, {
       fontFamily: FONT, fontSize: '6px', color: PALETA_HEX.oscurisimo,
     }).setScrollFactor(0).setDepth(150);
   }
@@ -187,12 +172,16 @@ export class BattleScene extends Phaser.Scene {
   }
 
   private actualizarSpriteJugador(criatura: Criatura): void {
+    const { ALLY } = BATTLE_LAYOUT;
     if (this.spriteJugador) this.spriteJugador.destroy();
-    const key = getSpriteKey(criatura.especie.id);
-    if (key === 'placeholder') {
-      this.spriteJugador = this.add.rectangle(8, 48, 56, 56, 0x0f380f).setOrigin(0, 0).setDepth(50);
+    const key = criatura.especie.spriteKey;
+    if (this.textures.exists(key)) {
+      this.spriteJugador = this.add.image(ALLY.SPRITE_POS.x, ALLY.SPRITE_POS.y, key)
+        .setDisplaySize(ALLY.SPRITE_SIZE, ALLY.SPRITE_SIZE)
+        .setDepth(50);
     } else {
-      this.spriteJugador = this.add.image(36, 76, key).setDisplaySize(56, 56).setDepth(50);
+      this.spriteJugador = this.add.rectangle(ALLY.SPRITE_POS.x, ALLY.SPRITE_POS.y, ALLY.SPRITE_SIZE, ALLY.SPRITE_SIZE, 0x0f380f)
+        .setDepth(50);
     }
   }
 

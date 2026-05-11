@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, PALETA_HEX, SCENE_KEYS, FONT } from '@/config';
+import { MENU_LAYOUT } from '@/config/layout';
 
 export class MenuScene extends Phaser.Scene {
   private parpadeo?: Phaser.Time.TimerEvent;
@@ -13,7 +14,7 @@ export class MenuScene extends Phaser.Scene {
     this.cameras.main.setBackgroundColor(PALETA_HEX.clarisimo);
 
     this.add
-      .text(GAME_WIDTH / 2, 40, 'ARGENMON', {
+      .text(GAME_WIDTH / 2, MENU_LAYOUT.TITLE_Y, 'ARGENMON', {
         fontFamily: FONT,
         fontSize: '8px',
         color: PALETA_HEX.oscurisimo,
@@ -22,7 +23,7 @@ export class MenuScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     this.add
-      .text(GAME_WIDTH / 2, 70, 'fauna pampeana', {
+      .text(GAME_WIDTH / 2, MENU_LAYOUT.SUBTITLE_Y, 'fauna pampeana', {
         fontFamily: FONT,
         fontSize: '6px',
         color: PALETA_HEX.oscuro,
@@ -30,7 +31,7 @@ export class MenuScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     this.textoStart = this.add
-      .text(GAME_WIDTH / 2, GAME_HEIGHT - 40, 'PRESS START', {
+      .text(GAME_WIDTH / 2, GAME_HEIGHT - MENU_LAYOUT.PRESS_START_OFFSET_FROM_BOTTOM, 'PRESS START', {
         fontFamily: FONT,
         fontSize: '6px',
         color: PALETA_HEX.oscurisimo,

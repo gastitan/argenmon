@@ -1,14 +1,11 @@
 import Phaser from 'phaser';
 import { PALETA_HEX, FONT } from '@/config';
+import { ITEM_MENU_LAYOUT } from '@/config/layout';
 import type { TrampaId } from '@/data/items';
 import { TRAMPAS } from '@/data/items';
 import type { Inventario } from '@/state/GameState';
 
 const ORDEN: TrampaId[] = ['trampaComun', 'trampaMonte', 'trampaFina'];
-const ITEM_X = 14;
-const CURSOR_X = 4;
-const ITEM_Y0 = 107;
-const ITEM_STEP = 11;
 
 export class TrampaMenu {
   private items: Phaser.GameObjects.Text[] = [];
@@ -25,6 +22,7 @@ export class TrampaMenu {
   };
 
   constructor(scene: Phaser.Scene) {
+    const { ITEM_X, ITEM_Y0, ITEM_STEP, CURSOR_X } = ITEM_MENU_LAYOUT;
     for (let i = 0; i < ORDEN.length; i++) {
       const t = scene.add
         .text(ITEM_X, ITEM_Y0 + i * ITEM_STEP, '', {
@@ -114,6 +112,6 @@ export class TrampaMenu {
   }
 
   private actualizarCursor(): void {
-    this.cursor.setY(ITEM_Y0 + this.seleccion * ITEM_STEP);
+    this.cursor.setY(ITEM_MENU_LAYOUT.ITEM_Y0 + this.seleccion * ITEM_MENU_LAYOUT.ITEM_STEP);
   }
 }

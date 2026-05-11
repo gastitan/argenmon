@@ -1,13 +1,9 @@
 import Phaser from 'phaser';
 import { PALETA_HEX, FONT } from '@/config';
+import { BATTLE_MENU_LAYOUT } from '@/config/layout';
 
 const OPCIONES = ['Atacar', 'Trampa', 'Cambiar', 'Huir'] as const;
 export type OpcionBattle = (typeof OPCIONES)[number];
-
-const ITEM_X = 70;
-const CURSOR_X = 62;
-const ITEM_Y0 = 107;
-const ITEM_STEP = 9;
 
 export class BattleMenu {
   private items: Phaser.GameObjects.Text[] = [];
@@ -17,6 +13,7 @@ export class BattleMenu {
   private keys!: { up: Phaser.Input.Keyboard.Key; down: Phaser.Input.Keyboard.Key; confirm: Phaser.Input.Keyboard.Key };
 
   constructor(scene: Phaser.Scene) {
+    const { ITEM_X, ITEM_Y0, ITEM_STEP, CURSOR_X } = BATTLE_MENU_LAYOUT;
     OPCIONES.forEach((op, i) => {
       const t = scene.add
         .text(ITEM_X, ITEM_Y0 + i * ITEM_STEP, op, {
@@ -77,6 +74,6 @@ export class BattleMenu {
   }
 
   private actualizarCursor(): void {
-    this.cursor.setY(ITEM_Y0 + this.seleccion * ITEM_STEP);
+    this.cursor.setY(BATTLE_MENU_LAYOUT.ITEM_Y0 + this.seleccion * BATTLE_MENU_LAYOUT.ITEM_STEP);
   }
 }
