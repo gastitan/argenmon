@@ -62,6 +62,9 @@ export class OverworldScene extends Phaser.Scene {
     const { x: startTileX, y: startTileY } = GameState.datos.posicion;
     this.player = new Player(this, startTileX, startTileY, this.esBloqueado.bind(this));
 
+    // Opción A: cámara sigue al jugador con follow inmediato (lerp=1).
+    // El mapa (480×320) es solo un poco más grande que el canvas (320×240),
+    // así que el scroll es mínimo. Dead zone no aporta beneficio aquí.
     this.cameras.main.startFollow(this.player.sprite, true, 1, 1);
     this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
 
@@ -70,7 +73,7 @@ export class OverworldScene extends Phaser.Scene {
     this.debugText = this.add
       .text(OVERWORLD_LAYOUT.DEBUG_TEXT_POS.x, OVERWORLD_LAYOUT.DEBUG_TEXT_POS.y, '', {
         fontFamily: FONT,
-        fontSize: '6px',
+        fontSize: '8px',
         color: PALETA_HEX.oscurisimo,
         backgroundColor: PALETA_HEX.clarisimo,
       })
@@ -185,18 +188,18 @@ export class OverworldScene extends Phaser.Scene {
       .setOrigin(0).setScrollFactor(0).setDepth(200);
 
     const texto = this.add.text(DIALOG_TEXT_POS.x, DIALOG_TEXT_POS.y, '¡Bienvenido!\n¿Querés que cure a tus animales?', {
-      fontFamily: FONT, fontSize: '6px', color: PALETA_HEX.oscurisimo,
-      wordWrap: { width: DIALOG_BOX.w - 8 },
+      fontFamily: FONT, fontSize: '8px', color: PALETA_HEX.oscurisimo,
+      wordWrap: { width: DIALOG_BOX.w - 16 },
     }).setScrollFactor(0).setDepth(201);
 
     let seleccion = 0;
 
     const opSi = this.add.text(SHOP_OPTION_SI.x, SHOP_OPTION_SI.y, '>Sí', {
-      fontFamily: FONT, fontSize: '6px', color: PALETA_HEX.oscurisimo,
+      fontFamily: FONT, fontSize: '8px', color: PALETA_HEX.oscurisimo,
     }).setScrollFactor(0).setDepth(201);
 
     const opNo = this.add.text(SHOP_OPTION_NO.x, SHOP_OPTION_NO.y, ' No', {
-      fontFamily: FONT, fontSize: '6px', color: PALETA_HEX.oscurisimo,
+      fontFamily: FONT, fontSize: '8px', color: PALETA_HEX.oscurisimo,
     }).setScrollFactor(0).setDepth(201);
 
     const destruir = () => {

@@ -23,7 +23,7 @@ export class CatalogScene extends Phaser.Scene {
     }).setOrigin(0.5, 0);
 
     this.add.text(GAME_WIDTH / 2, SUBTITLE_Y, '¡Venciste al Capataz!', {
-      fontFamily: FONT, fontSize: '6px', color: PALETA_HEX.oscuro,
+      fontFamily: FONT, fontSize: '8px', color: PALETA_HEX.oscuro,
     }).setOrigin(0.5, 0);
 
     const catalogo = GameState.datos.catalogo;
@@ -44,31 +44,31 @@ export class CatalogScene extends Phaser.Scene {
       if (estado) {
         // Fondo claro (capturado) → texto oscuro; fondo oscuro (visto) → texto claro
         const colorTexto = estado === 'capturado' ? PALETA_HEX.oscurisimo : PALETA_HEX.clarisimo;
-        this.add.text(x + 4, y + 4, especie.nombre, {
-          fontFamily: FONT, fontSize: '6px', color: colorTexto,
+        this.add.text(x + 6, y + 6, especie.nombre, {
+          fontFamily: FONT, fontSize: '8px', color: colorTexto,
         });
         const tipoStr = especie.tipos.join('/');
-        this.add.text(x + 4, y + 14, tipoStr, {
-          fontFamily: FONT, fontSize: '6px', color: colorTexto,
+        this.add.text(x + 6, y + 20, tipoStr, {
+          fontFamily: FONT, fontSize: '8px', color: colorTexto,
         });
-        const etiqueta = estado === 'capturado' ? '★ Capturado' : '? Visto';
-        this.add.text(x + 4, y + 24, etiqueta, {
-          fontFamily: FONT, fontSize: '6px', color: colorTexto,
+        const etiqueta = estado === 'capturado' ? '* Capturado' : '? Visto';
+        this.add.text(x + 6, y + 34, etiqueta, {
+          fontFamily: FONT, fontSize: '8px', color: colorTexto,
         });
         if (estado === 'capturado') capturadas++;
       } else {
-        this.add.text(x + 4, y + 14, '???', {
-          fontFamily: FONT, fontSize: '6px', color: PALETA_HEX.claro,
+        this.add.text(x + 6, y + 20, '???', {
+          fontFamily: FONT, fontSize: '8px', color: PALETA_HEX.claro,
         });
       }
     });
 
     this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - FOOTER_OFFSET_FROM_BOTTOM, `Capturadas: ${capturadas}/${ORDEN_CATALOGO.length}`, {
-      fontFamily: FONT, fontSize: '6px', color: PALETA_HEX.oscurisimo,
+      fontFamily: FONT, fontSize: '8px', color: PALETA_HEX.oscurisimo,
     }).setOrigin(0.5, 0);
 
     this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - FOOTER2_OFFSET_FROM_BOTTOM, 'Z para continuar', {
-      fontFamily: FONT, fontSize: '6px', color: PALETA_HEX.oscuro,
+      fontFamily: FONT, fontSize: '8px', color: PALETA_HEX.oscuro,
     }).setOrigin(0.5, 0);
 
     this.keyZ = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.Z);

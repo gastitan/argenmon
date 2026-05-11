@@ -58,24 +58,24 @@ export const OVERWORLD_LAYOUT = {
   DEBUG_TEXT_POS: { x: 2, y: 2 },
   DIALOG_BOX: { x: 0, y: 176, w: 320, h: 64 },
   DIALOG_TEXT_POS: { x: 8, y: 184 },
-  SHOP_OPTION_SI: { x: 224, y: 216 },
-  SHOP_OPTION_NO: { x: 268, y: 216 },
+  SHOP_OPTION_SI: { x: 196, y: 222 },
+  SHOP_OPTION_NO: { x: 256, y: 222 },
 } as const;
 
 export const MENU_LAYOUT = {
-  TITLE_Y: 40,
-  SUBTITLE_Y: 70,
+  TITLE_Y: 90,
+  SUBTITLE_Y: 120,
   PRESS_START_OFFSET_FROM_BOTTOM: 40,
 } as const;
 
 export const CATALOG_LAYOUT = {
   COLS: 2,
-  CELL_W: 72,
-  CELL_H: 40,
-  START_X: 8,
-  START_Y: 32,
+  CELL_W: 154,        // paso entre columnas; celda real = 150px de ancho
+  CELL_H: 60,         // paso entre filas; celda real = 56px de alto
+  START_X: 6,
+  START_Y: 36,
   TITLE_Y: 8,
-  SUBTITLE_Y: 18,
+  SUBTITLE_Y: 22,
   FOOTER_OFFSET_FROM_BOTTOM: 20,
   FOOTER2_OFFSET_FROM_BOTTOM: 10,
 } as const;
