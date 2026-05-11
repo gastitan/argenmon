@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { PALETA_HEX, FONT } from '@/config';
 import type { TrampaId } from '@/data/items';
 import { TRAMPAS } from '@/data/items';
-import type { Inventario } from '@/data/playerState';
+import type { Inventario } from '@/state/GameState';
 
 const ORDEN: TrampaId[] = ['trampaComun', 'trampaMonte', 'trampaFina'];
 const ITEM_X = 14;
@@ -28,7 +28,7 @@ export class TrampaMenu {
     for (let i = 0; i < ORDEN.length; i++) {
       const t = scene.add
         .text(ITEM_X, ITEM_Y0 + i * ITEM_STEP, '', {
-          fontFamily: FONT, fontSize: '6px', color: PALETA_HEX.clarisimo,
+          fontFamily: FONT, fontSize: '6px', color: PALETA_HEX.oscurisimo,
         })
         .setScrollFactor(0).setDepth(202);
       this.items.push(t);
@@ -36,7 +36,7 @@ export class TrampaMenu {
 
     this.cursor = scene.add
       .text(CURSOR_X, ITEM_Y0, '▶', {
-        fontFamily: FONT, fontSize: '6px', color: PALETA_HEX.clarisimo,
+        fontFamily: FONT, fontSize: '6px', color: PALETA_HEX.oscurisimo,
       })
       .setScrollFactor(0).setDepth(202);
 

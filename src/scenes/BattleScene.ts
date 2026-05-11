@@ -4,7 +4,7 @@ import { Criatura } from '@/entities/Criatura';
 import { ESPECIES } from '@/data/creatures';
 import type { EspecieId } from '@/data/creatures';
 import { TRAMPAS } from '@/data/items';
-import { playerState } from '@/data/playerState';
+import { GameState, crearCriaturaGuardada } from '@/state/GameState';
 import { BattleSystem } from '@/systems/BattleSystem';
 import type { AccionJugador } from '@/systems/BattleSystem';
 import { DialogBox } from '@/ui/DialogBox';
@@ -57,6 +57,7 @@ export class BattleScene extends Phaser.Scene {
 
   private faseUI: FaseUI = 'idle';
   private keyZ!: Phaser.Input.Keyboard.Key;
+  private spriteJugador: Phaser.GameObjects.Image | Phaser.GameObjects.Rectangle | null = null;
 
   constructor() {
     super(SCENE_KEYS.Battle);
@@ -69,7 +70,13 @@ export class BattleScene extends Phaser.Scene {
   create(): void {
     this.cameras.main.setBackgroundColor(PALETA_HEX.clarisimo);
 
-    let equipo = playerState.equipo.map((d) => new Criatura(ESPECIES[d.especieId], d.nivel));
+    const guardados = GameState.datos.equipo;
+    let equipo = guardados.map((g) => {
+      const c = new Criatura(ESPECIES[g.especieId], g.nivel);
+      c.hpActual = g.hpActual;
+      g.ppActuales.forEach((pp, i) => { if (c.movimientos[i]) c.movimientos[i].ppActual = pp; });
+      return c;
+    });
     if (equipo.length === 0) equipo = [new Criatura(ESPECIES.hornero, 5)];
     this.equipoJugador = equipo;
 
@@ -92,10 +99,7 @@ export class BattleScene extends Phaser.Scene {
     this.keyZ = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
 
     if (this.config.tipo === 'wild') {
-      const id = this.config.especieId;
-      if (playerState.catalogo[id] !== 'capturado') {
-        playerState.catalogo[id] = 'visto';
-      }
+      GameState.marcarVisto(this.config.especieId);
     }
 
     const eventos = this.sistema.iniciar();
@@ -135,7 +139,7 @@ export class BattleScene extends Phaser.Scene {
 
     this.add.rectangle(0, 0, 160, 96, 0x8bac0f).setOrigin(0, 0);
     this.add.rectangle(0, 96, 160, 8, 0x306230).setOrigin(0, 0);
-    this.add.rectangle(0, 104, 160, 40, 0x306230).setOrigin(0, 0);
+    this.add.rectangle(0, 104, 160, 40, 0x9bbc0f).setOrigin(0, 0);
 
     const rivalKey = getSpriteKey(rival.especie.id);
     if (rivalKey === 'placeholder') {
@@ -144,17 +148,13 @@ export class BattleScene extends Phaser.Scene {
       this.add.image(128, 36, rivalKey).setDisplaySize(64, 64);
     }
 
-    const jugadorKey = getSpriteKey(jugador.especie.id);
-    if (jugadorKey === 'placeholder') {
-      this.add.rectangle(8, 48, 56, 56, 0x0f380f).setOrigin(0, 0);
-    } else {
-      this.add.image(36, 76, jugadorKey).setDisplaySize(56, 56).setFlipX(true);
-    }
+    this.actualizarSpriteJugador(jugador);
 
     this.nomRival = this.add.text(RIVAL_INFO_X, RIVAL_INFO_Y, `${rival.especie.nombre} Lv${rival.nivel}`, {
       fontFamily: FONT, fontSize: '6px', color: PALETA_HEX.oscurisimo,
     }).setScrollFactor(0).setDepth(150);
     this.hpBarRival = new HpBar(this, RIVAL_INFO_X, RIVAL_INFO_Y + 10, rival.hpMax);
+    this.hpBarRival.reiniciar(rival.hpMax, rival.hpActual);
     this.hpTextRival = this.add.text(RIVAL_INFO_X, RIVAL_INFO_Y + 18, `${rival.hpActual}/${rival.hpMax}`, {
       fontFamily: FONT, fontSize: '6px', color: PALETA_HEX.oscurisimo,
     }).setScrollFactor(0).setDepth(150);
@@ -163,6 +163,7 @@ export class BattleScene extends Phaser.Scene {
       fontFamily: FONT, fontSize: '6px', color: PALETA_HEX.oscurisimo,
     }).setScrollFactor(0).setDepth(150);
     this.hpBarAliado = new HpBar(this, ALIADO_INFO_X, ALIADO_INFO_Y + 10, jugador.hpMax);
+    this.hpBarAliado.reiniciar(jugador.hpMax, jugador.hpActual);
     this.hpTextAliado = this.add.text(ALIADO_INFO_X, ALIADO_INFO_Y + 18, `${jugador.hpActual}/${jugador.hpMax}`, {
       fontFamily: FONT, fontSize: '6px', color: PALETA_HEX.oscurisimo,
     }).setScrollFactor(0).setDepth(150);
@@ -181,6 +182,18 @@ export class BattleScene extends Phaser.Scene {
     this.nomAliado.setText(`${jugador.especie.nombre} Lv${jugador.nivel}`);
     this.hpBarAliado.reiniciar(jugador.hpMax, jugador.hpActual);
     this.hpTextAliado.setText(`${jugador.hpActual}/${jugador.hpMax}`);
+
+    this.actualizarSpriteJugador(jugador);
+  }
+
+  private actualizarSpriteJugador(criatura: Criatura): void {
+    if (this.spriteJugador) this.spriteJugador.destroy();
+    const key = getSpriteKey(criatura.especie.id);
+    if (key === 'placeholder') {
+      this.spriteJugador = this.add.rectangle(8, 48, 56, 56, 0x0f380f).setOrigin(0, 0).setDepth(50);
+    } else {
+      this.spriteJugador = this.add.image(36, 76, key).setDisplaySize(56, 56).setFlipX(true).setDepth(50);
+    }
   }
 
   // ── Flujo de mensajes ───────────────────────────────────────────────────────
@@ -227,7 +240,7 @@ export class BattleScene extends Phaser.Scene {
   }
 
   private mostrarTrampas(): void {
-    const inv = playerState.inventario;
+    const inv = GameState.datos.inventario;
     const hayTrampas = (Object.values(inv) as number[]).some((n) => n > 0);
     if (!hayTrampas) {
       this.mostrarMensajesSecuenciales(['¡No tenés trampas!'], () => this.mostrarMenu());
@@ -237,7 +250,7 @@ export class BattleScene extends Phaser.Scene {
     this.trampaMenu.mostrar(
       inv,
       (trampaId) => {
-        playerState.inventario[trampaId]--;
+        GameState.usarTrampa(trampaId);
         this.ejecutarTurno({ tipo: 'trampa', trampa: TRAMPAS[trampaId] });
       },
       () => this.mostrarMenu(),
@@ -283,15 +296,13 @@ export class BattleScene extends Phaser.Scene {
 
     if (resultado === 'captura') {
       const id = rival.especie.id as EspecieId;
-      playerState.catalogo[id] = 'capturado';
-      if (playerState.equipo.length < 3) {
-        playerState.equipo.push({ especieId: id, nivel: rival.nivel });
+      GameState.marcarCapturado(id);
+      const agregada = GameState.agregarAlEquipo(crearCriaturaGuardada(id, rival.nivel));
+      if (!agregada) {
+        // equipo lleno — futura pantalla de reemplazo
       }
     } else if (resultado === 'victoria' && this.config.tipo === 'entrenador') {
-      const id = this.config.entrenadorId;
-      if (!playerState.entrenadoresDerrotados.includes(id)) {
-        playerState.entrenadoresDerrotados.push(id);
-      }
+      GameState.derrotarEntrenador(this.config.entrenadorId);
     }
 
     const msgs: Record<string, string> = {
@@ -304,6 +315,17 @@ export class BattleScene extends Phaser.Scene {
 
     this.faseUI = 'animando';
     this.dialogo.mostrar(msg, () => {
+      const guardados = GameState.datos.equipo;
+      this.equipoJugador.forEach((criatura, i) => {
+        if (!guardados[i]) return;
+        GameState.actualizarCriatura(guardados[i].uid, {
+          hpActual: criatura.hpActual,
+          ppActuales: criatura.movimientos.map((m) => m.ppActual) as [number, number, number, number],
+          estadoAlterado: criatura.estadoAlterado === 'envenenado' ? 'envenenado' : 'ninguno',
+        });
+      });
+      GameState.resetearModificadoresCombate();
+      GameState.guardar();
       if (resultado === 'victoria' && this.config.tipo === 'entrenador') {
         const datos = encontrarEntrenador(this.config.entrenadorId);
         if (datos?.esJefeFinal) {

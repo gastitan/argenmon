@@ -19,7 +19,7 @@ export class DialogBox {
       .text(8, BOX_Y + 6, '', {
         fontFamily: FONT,
         fontSize: '8px',
-        color: PALETA_HEX.clarisimo,
+        color: PALETA_HEX.oscurisimo,
         wordWrap: { width: 144 },
         lineSpacing: 2,
       })

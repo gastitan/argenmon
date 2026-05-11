@@ -32,7 +32,7 @@ export class MoveMenu {
         .text(COL0_X + col * COL_STEP, ROW0_Y + row * ROW_STEP, '', {
           fontFamily: FONT,
           fontSize: '5px',
-          color: PALETA_HEX.clarisimo,
+          color: PALETA_HEX.oscurisimo,
         })
         .setScrollFactor(0)
         .setDepth(202);
@@ -43,7 +43,7 @@ export class MoveMenu {
       .text(COL0_X + CURSOR_OFFSET_X, ROW0_Y, '▶', {
         fontFamily: FONT,
         fontSize: '5px',
-        color: PALETA_HEX.clarisimo,
+        color: PALETA_HEX.oscurisimo,
       })
       .setScrollFactor(0)
       .setDepth(202);

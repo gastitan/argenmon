@@ -65,13 +65,17 @@ tests/          # Tests unitarios de systems/
 - `#8bac0f` — verde claro (highlights, vegetación)
 - `#9bbc0f` — verde más claro (fondos, cielo)
 
-Ningún asset puede usar colores fuera de esta paleta. Todo el arte se diseña pensando en estos 4 valores.
+La paleta de 4 colores aplica a tiles, UI y overworld. **Excepción deliberada: los sprites de criaturas en combate no están restringidos a esta paleta** — deben verse lo más fiel posible al animal real.
 
-**Resolución base:** 160×144 píxeles (la del Game Boy original), escalada por enteros (×2, ×3, ×4) para pantallas modernas. Nunca escalar con interpolación: pixel-perfect siempre.
+**Resolución base:** 160×144 píxeles (la del Game Boy original), escalada por enteros (×2, ×3, ×4) para pantallas modernas.
+
+**Filtro de texturas:** los tiles y gráficos generados usan nearest-neighbor (`pixelArt: true`). Los sprites de criaturas y el sprite del jugador usan `FilterMode.LINEAR` (aplicado en `BootScene.create()`) para una mejor calidad al escalar imágenes de alta resolución.
+
+**Paneles de texto (UI):** fondo `clarisimo` (#9bbc0f) con texto `oscurisimo` (#0f380f). Esta combinación da ~8:1 de contraste, mucho más legible que el esquema invertido anterior.
 
 **Sprites:**
 - Personajes overworld: 16×16
-- Criaturas en combate: 56×56 (área del enemigo) y 64×64 (área del aliado, espalda)
+- Criaturas en combate: 56×56 (área del jugador, espalda) y 64×64 (área del rival, frente)
 - Tiles del mundo: 16×16
 
 **Animación:** frames limitados, estilo GameBoy. Caminar = 2 frames. Combate = 1-2 frames de animación de ataque por movimiento. No usar tweens suaves; todo movimiento es discreto.
@@ -187,7 +191,7 @@ si la criatura tiene estado alterado (envenenada, dormida): bonus ×1.5
 - **BattleSystem** completo: daño con fórmula estándar, STAB, efectividad de tipos, críticos, estados alterados (veneno, sueño), captura con trampas
 - **6 criaturas** con sprites PNG integrados: Hornero, Mara, Vizcacha, Ñandú, Peludo, Yarará
 - **Overworld**: mapa de la Pampa con colisiones, zonas de pasto alto para encuentros aleatorios, 3 NPCs entrenadores, boss (Capataz)
-- **BattleScene**: layout GameBoy auténtico — zona de combate (y:0–96), franja de suelo (y:96–104), zona de UI unificada (y:104–144) en color oscuro constante
+- **BattleScene**: layout GameBoy auténtico — zona de combate (y:0–96, fondo claro), franja de suelo (y:96–104, oscuro), zona de UI (y:104–144, clarisimo con texto oscurisimo para máximo contraste)
 - **UI de combate**: BattleMenu, MoveMenu, TrampaMenu, EquipoMenu, DialogBox, HpBar — todos sin fondo propio (usan el fondo permanente de la escena)
 - **CatalogScene**: pantalla de catálogo al completar el juego
 - **Tests unitarios**: BattleSystem, CaptureSystem, formulas
@@ -243,4 +247,4 @@ Cosas que el desarrollador (humano) todavía tiene que definir. Marcar con [x] c
 
 ---
 
-*Última actualización: mayo 2026 — Fases 1–4 completas, Fase 5 en progreso.*
+*Última actualización: mayo 2026 — Fases 1–4 completas, Fase 5 en progreso. Visual: sprites de criaturas con filtro LINEAR, paneles de texto clarisimo/oscurisimo.*
