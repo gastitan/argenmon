@@ -17,7 +17,7 @@ export class BattleMenu {
     OPCIONES.forEach((op, i) => {
       const t = scene.add
         .text(ITEM_X, ITEM_Y0 + i * ITEM_STEP, op, {
-          fontFamily: FONT, fontSize: '6px', color: PALETA_HEX.oscurisimo,
+          fontFamily: FONT, fontSize: '8px', color: PALETA_HEX.oscurisimo,
         })
         .setScrollFactor(0).setDepth(202);
       this.items.push(t);
@@ -25,7 +25,7 @@ export class BattleMenu {
 
     this.cursor = scene.add
       .text(CURSOR_X, ITEM_Y0, '▶', {
-        fontFamily: FONT, fontSize: '6px', color: PALETA_HEX.oscurisimo,
+        fontFamily: FONT, fontSize: '8px', color: PALETA_HEX.oscurisimo,
       })
       .setScrollFactor(0).setDepth(202);
 

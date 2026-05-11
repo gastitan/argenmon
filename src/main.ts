@@ -13,6 +13,7 @@ const config: Phaser.Types.Core.GameConfig = {
   height: GAME_HEIGHT,
   zoom: SCALE,
   pixelArt: true,
+  antialias: false,
   roundPixels: true,
   backgroundColor: PALETA_HEX.clarisimo,
   scale: {

@@ -127,7 +127,6 @@ export class BattleScene extends Phaser.Scene {
     const rivalKey = rival.especie.spriteKey;
     if (this.textures.exists(rivalKey)) {
       this.add.image(RIVAL.SPRITE_POS.x, RIVAL.SPRITE_POS.y, rivalKey)
-        .setDisplaySize(RIVAL.SPRITE_SIZE, RIVAL.SPRITE_SIZE)
         .setFlipX(true);
     } else {
       this.add.rectangle(RIVAL.SPRITE_POS.x, RIVAL.SPRITE_POS.y, RIVAL.SPRITE_SIZE, RIVAL.SPRITE_SIZE, 0x306230);
@@ -136,21 +135,21 @@ export class BattleScene extends Phaser.Scene {
     this.actualizarSpriteJugador(jugador);
 
     this.nomRival = this.add.text(RIVAL.INFO_POS.x, RIVAL.INFO_POS.y, `${rival.especie.nombre} Lv${rival.nivel}`, {
-      fontFamily: FONT, fontSize: '6px', color: PALETA_HEX.oscurisimo,
+      fontFamily: FONT, fontSize: '8px', color: PALETA_HEX.oscurisimo,
     }).setScrollFactor(0).setDepth(150);
     this.hpBarRival = new HpBar(this, RIVAL.INFO_POS.x, RIVAL.INFO_POS.y + RIVAL.HP_BAR_OFFSET_Y, rival.hpMax);
     this.hpBarRival.reiniciar(rival.hpMax, rival.hpActual);
     this.hpTextRival = this.add.text(RIVAL.INFO_POS.x, RIVAL.INFO_POS.y + RIVAL.HP_TEXT_OFFSET_Y, `${rival.hpActual}/${rival.hpMax}`, {
-      fontFamily: FONT, fontSize: '6px', color: PALETA_HEX.oscurisimo,
+      fontFamily: FONT, fontSize: '8px', color: PALETA_HEX.oscurisimo,
     }).setScrollFactor(0).setDepth(150);
 
     this.nomAliado = this.add.text(ALLY.INFO_POS.x, ALLY.INFO_POS.y, `${jugador.especie.nombre} Lv${jugador.nivel}`, {
-      fontFamily: FONT, fontSize: '6px', color: PALETA_HEX.oscurisimo,
+      fontFamily: FONT, fontSize: '8px', color: PALETA_HEX.oscurisimo,
     }).setScrollFactor(0).setDepth(150);
     this.hpBarAliado = new HpBar(this, ALLY.INFO_POS.x, ALLY.INFO_POS.y + ALLY.HP_BAR_OFFSET_Y, jugador.hpMax);
     this.hpBarAliado.reiniciar(jugador.hpMax, jugador.hpActual);
     this.hpTextAliado = this.add.text(ALLY.INFO_POS.x, ALLY.INFO_POS.y + ALLY.HP_TEXT_OFFSET_Y, `${jugador.hpActual}/${jugador.hpMax}`, {
-      fontFamily: FONT, fontSize: '6px', color: PALETA_HEX.oscurisimo,
+      fontFamily: FONT, fontSize: '8px', color: PALETA_HEX.oscurisimo,
     }).setScrollFactor(0).setDepth(150);
   }
 
@@ -177,7 +176,6 @@ export class BattleScene extends Phaser.Scene {
     const key = criatura.especie.spriteKey;
     if (this.textures.exists(key)) {
       this.spriteJugador = this.add.image(ALLY.SPRITE_POS.x, ALLY.SPRITE_POS.y, key)
-        .setDisplaySize(ALLY.SPRITE_SIZE, ALLY.SPRITE_SIZE)
         .setDepth(50);
     } else {
       this.spriteJugador = this.add.rectangle(ALLY.SPRITE_POS.x, ALLY.SPRITE_POS.y, ALLY.SPRITE_SIZE, ALLY.SPRITE_SIZE, 0x0f380f)

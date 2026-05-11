@@ -26,7 +26,7 @@ export class TrampaMenu {
     for (let i = 0; i < ORDEN.length; i++) {
       const t = scene.add
         .text(ITEM_X, ITEM_Y0 + i * ITEM_STEP, '', {
-          fontFamily: FONT, fontSize: '6px', color: PALETA_HEX.oscurisimo,
+          fontFamily: FONT, fontSize: '8px', color: PALETA_HEX.oscurisimo,
         })
         .setScrollFactor(0).setDepth(202);
       this.items.push(t);
@@ -34,7 +34,7 @@ export class TrampaMenu {
 
     this.cursor = scene.add
       .text(CURSOR_X, ITEM_Y0, '▶', {
-        fontFamily: FONT, fontSize: '6px', color: PALETA_HEX.oscurisimo,
+        fontFamily: FONT, fontSize: '8px', color: PALETA_HEX.oscurisimo,
       })
       .setScrollFactor(0).setDepth(202);
 

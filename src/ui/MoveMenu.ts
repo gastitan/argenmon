@@ -27,7 +27,7 @@ export class MoveMenu {
       const t = scene.add
         .text(COL0_X + col * COL_STEP, ROW0_Y + row * ROW_STEP, '', {
           fontFamily: FONT,
-          fontSize: '5px',
+          fontSize: '8px',
           color: PALETA_HEX.oscurisimo,
         })
         .setScrollFactor(0)
@@ -38,7 +38,7 @@ export class MoveMenu {
     this.cursor = scene.add
       .text(COL0_X + CURSOR_OFFSET_X, ROW0_Y, '▶', {
         fontFamily: FONT,
-        fontSize: '5px',
+        fontSize: '8px',
         color: PALETA_HEX.oscurisimo,
       })
       .setScrollFactor(0)

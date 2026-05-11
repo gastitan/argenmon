@@ -1,7 +1,7 @@
 export const CANVAS = {
-  WIDTH: 160,
-  HEIGHT: 144,
-  SCALE: 4,
+  WIDTH: 320,
+  HEIGHT: 240,
+  SCALE: 3,
 } as const;
 
 export const BATTLE_LAYOUT = {
@@ -10,14 +10,14 @@ export const BATTLE_LAYOUT = {
   UI_PANEL: { x: 0, y: 104, w: 160, h: 40 },
   RIVAL: {
     SPRITE_POS: { x: 128, y: 36 },
-    SPRITE_SIZE: 64,
+    SPRITE_SIZE: 96,
     INFO_POS: { x: 4, y: 4 },
     HP_BAR_OFFSET_Y: 10,
     HP_TEXT_OFFSET_Y: 18,
   },
   ALLY: {
     SPRITE_POS: { x: 36, y: 76 },
-    SPRITE_SIZE: 56,
+    SPRITE_SIZE: 96,
     INFO_POS: { x: 88, y: 70 },
     HP_BAR_OFFSET_Y: 10,
     HP_TEXT_OFFSET_Y: 18,
