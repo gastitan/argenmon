@@ -1,7 +1,7 @@
 export const CANVAS = {
   WIDTH: 320,
   HEIGHT: 240,
-  SCALE: 3,
+  SCALE: 2,
 } as const;
 
 export const BATTLE_LAYOUT = {
@@ -16,7 +16,7 @@ export const BATTLE_LAYOUT = {
     HP_TEXT_OFFSET_Y: 26,
   },
   ALLY: {
-    SPRITE_POS: { x: 16, y: 96 },    // top-left; sprite ocupa (16,96)→(112,192), sentado sobre la franja de suelo
+    SPRITE_POS: { x: 16, y: 64 },    // top-left; sprite ocupa (16,64)→(112,160), borde inferior sobre la franja de suelo
     SPRITE_SIZE: 96,
     INFO_POS: { x: 176, y: 120 },
     HP_BAR_OFFSET_Y: 14,
