@@ -8,6 +8,10 @@ RPG 2D por turnos estilo Game Boy con fauna autóctona de la Pampa argentina. Ex
 - **Lenguaje:** TypeScript (strict)
 - **Build:** Vite
 - **Tests:** Vitest
+- **Canvas lógico:** 320×240 px, escalado ×3 → 960×720 en pantalla
+- **Render:** pixel-perfect (`pixelArt: true`, `roundPixels: true`)
+- **Fuente:** Press Start 2P (Google Fonts)
+- **Guardado:** localStorage — clave `pampamon_save_v1`
 
 ## Instalación
 
@@ -53,16 +57,22 @@ public/
 | X | Cancelar / Volver |
 | Z (combate, texto) | Avanzar / Saltar animación |
 
-## Paleta visual
+## Pipeline de assets
 
-4 colores estilo Game Boy original:
+- **Sprites de criatura:** generados con Nano Banana (Gemini 2.5 Flash Image) a 512×512, procesados con un script Python (Pillow) que aplica la paleta master de 20 colores y downscalea a 96×96 con LANCZOS.
+- **Paleta master:** 20 colores definidos en `palette.json`. Aplicada a todos los assets visuales.
+- **Estética:** "moderno con vibe retro", inspirada en la era Game Boy Advance.
 
-| Color | Hex | Uso |
-|-------|-----|-----|
-| Verde más oscuro | `#0f380f` | Sombras, contornos |
-| Verde oscuro | `#306230` | Fondos, tierra |
-| Verde claro | `#8bac0f` | Highlights, zonas de combate |
-| Verde más claro | `#9bbc0f` | Fondos claros |
+## Paleta master (20 colores)
+
+| Grupo | Colores |
+|-------|---------|
+| Neutrales | `#1a1410` `#2d2419` `#f5e6c8` `#ffffff` |
+| Marrones | `#4a3520` `#7a5a3a` `#a87b4f` `#c9a576` |
+| Verdes | `#2d3d1f` `#4a6b3a` `#7a9b5a` `#b8c97a` |
+| Ocres/amarillos | `#8a6a2a` `#c9a23a` `#e8c870` |
+| Acentos | `#a8442a` `#3d5a7a` `#6a4a7a` |
+| Grises | `#5a5a55` `#8a8a85` |
 
 ## Estado actual
 
@@ -70,7 +80,10 @@ public/
 - Fase 2 ✅ Combate por turnos completo: daño, tipos, estados, captura, entrenadores
 - Fase 3 ✅ Las 6 criaturas con sprites, sistema de captura con trampas
 - Fase 4 ✅ Encuentros aleatorios en pasto alto, 3 NPCs entrenadores, boss (Capataz)
-- Fase 5 🔄 Sprites finales integrados, pulido visual en progreso
+- Fase 5 ✅ Migración estética y pipeline de assets (paleta master 20 colores, Press Start 2P)
+- Fase 6 ✅ Refactor canvas 320×240, SCALE ×3, todas las escenas rediseñadas
+- Fase 7 ✅ Flujo de eventos de batalla secuencial, animaciones de daño/desmayo, invariante primera criatura viva
+- Fase 8 🔄 Audio, polish, contenido pendiente
 
 ## Licencia
 
