@@ -7,7 +7,8 @@ import type { EspecieId } from '@/data/creatures';
 import { TRAMPAS } from '@/data/items';
 import { GameState, crearCriaturaGuardada } from '@/state/GameState';
 import { BattleSystem } from '@/systems/BattleSystem';
-import type { AccionJugador } from '@/systems/BattleSystem';
+import type { AccionJugador, EventoBatalla } from '@/systems/BattleSystem';
+import { hayAlgunaViva, primeraVivaIdx } from '@/state/equipoUtils';
 import { DialogBox } from '@/ui/DialogBox';
 import { BattleMenu } from '@/ui/BattleMenu';
 import { MoveMenu } from '@/ui/MoveMenu';
@@ -31,6 +32,10 @@ export class BattleScene extends Phaser.Scene {
   private nomRival!: Phaser.GameObjects.Text;
   private nomAliado!: Phaser.GameObjects.Text;
 
+  // Tracked hpMax for the currently-displayed creature on each side
+  private hpMaxRivalDisplay = 1;
+  private hpMaxJugadorDisplay = 1;
+
   private dialogo!: DialogBox;
   private menu!: BattleMenu;
   private moveMenu!: MoveMenu;
@@ -40,6 +45,7 @@ export class BattleScene extends Phaser.Scene {
   private faseUI: FaseUI = 'idle';
   private keyZ!: Phaser.Input.Keyboard.Key;
   private spriteJugador: Phaser.GameObjects.Image | Phaser.GameObjects.Rectangle | null = null;
+  private spriteRival: Phaser.GameObjects.Image | Phaser.GameObjects.Rectangle | null = null;
 
   constructor() {
     super(SCENE_KEYS.Battle);
@@ -51,6 +57,7 @@ export class BattleScene extends Phaser.Scene {
 
   create(): void {
     this.cameras.main.setBackgroundColor(PALETA_HEX.clarisimo);
+    this.keyZ = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
 
     const guardados = GameState.datos.equipo;
     let equipo = guardados.map((g) => {
@@ -62,13 +69,25 @@ export class BattleScene extends Phaser.Scene {
     if (equipo.length === 0) equipo = [new Criatura(ESPECIES.hornero, 5)];
     this.equipoJugador = equipo;
 
+    if (!hayAlgunaViva(this.equipoJugador)) {
+      this.dialogo = new DialogBox(this);
+      this.faseUI = 'animando';
+      this.dialogo.mostrar('¡No tenés criaturas en condiciones de pelear!', () => {
+        this.dialogo.mostrar('Visitá al Almacenero.', () => {
+          this.scene.start(SCENE_KEYS.Overworld);
+        });
+      });
+      return;
+    }
+
+    const iniciarDesde = primeraVivaIdx(this.equipoJugador);
     const equipoRival = this.construirEquipoRival();
     const esWild = this.config.tipo !== 'entrenador';
     const entrenadorNombre = this.config.tipo === 'entrenador'
       ? (encontrarEntrenador(this.config.entrenadorId)?.nombre ?? 'El rival')
       : undefined;
 
-    this.sistema = new BattleSystem(this.equipoJugador, equipoRival, { esWild, entrenadorNombre });
+    this.sistema = new BattleSystem(this.equipoJugador, equipoRival, { esWild, entrenadorNombre, iniciarDesde });
 
     this.crearLayout();
 
@@ -78,26 +97,23 @@ export class BattleScene extends Phaser.Scene {
     this.trampaMenu = new TrampaMenu(this);
     this.equipoMenu = new EquipoMenu(this);
 
-    this.keyZ = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
-
     if (this.config.tipo === 'wild') {
       GameState.marcarVisto(this.config.especieId);
     }
 
     const eventos = this.sistema.iniciar();
-    const mensajes = eventos.filter((e) => e.tipo === 'mensaje').map((e) => e.mensaje ?? '');
-    this.mostrarMensajesSecuenciales(mensajes, () => this.mostrarMenu());
+    this.procesarEventos(eventos, () => this.mostrarMenu());
   }
 
   update(): void {
+    if (this.faseUI === 'animando' && this.dialogo && Phaser.Input.Keyboard.JustDown(this.keyZ)) {
+      this.dialogo.skip();
+    }
+    if (!this.menu) return;
     this.menu.update();
     this.moveMenu.update();
     this.trampaMenu.update();
     this.equipoMenu.update();
-
-    if (this.faseUI === 'animando' && Phaser.Input.Keyboard.JustDown(this.keyZ)) {
-      this.dialogo.skip();
-    }
   }
 
   // ── Construcción de equipos ─────────────────────────────────────────────────
@@ -124,21 +140,13 @@ export class BattleScene extends Phaser.Scene {
     this.add.rectangle(GROUND_STRIP.x, GROUND_STRIP.y, GROUND_STRIP.w, GROUND_STRIP.h, 0x306230).setOrigin(0, 0);
     this.add.rectangle(UI_PANEL.x, UI_PANEL.y, UI_PANEL.w, UI_PANEL.h, 0x9bbc0f).setOrigin(0, 0);
 
-    const rivalKey = rival.especie.spriteKey;
-    if (this.textures.exists(rivalKey)) {
-      this.add.image(RIVAL.SPRITE_POS.x, RIVAL.SPRITE_POS.y, rivalKey)
-        .setOrigin(0, 0)
-        .setFlipX(true);
-    } else {
-      this.add.rectangle(RIVAL.SPRITE_POS.x, RIVAL.SPRITE_POS.y, RIVAL.SPRITE_SIZE, RIVAL.SPRITE_SIZE, 0x306230)
-        .setOrigin(0, 0);
-    }
-
+    this.actualizarSpriteRival(rival);
     this.actualizarSpriteJugador(jugador);
 
     this.nomRival = this.add.text(RIVAL.INFO_POS.x, RIVAL.INFO_POS.y, `${rival.especie.nombre} Lv${rival.nivel}`, {
       fontFamily: FONT, fontSize: '8px', color: PALETA_HEX.oscurisimo,
     }).setScrollFactor(0).setDepth(150);
+    this.hpMaxRivalDisplay = rival.hpMax;
     this.hpBarRival = new HpBar(this, RIVAL.INFO_POS.x, RIVAL.INFO_POS.y + RIVAL.HP_BAR_OFFSET_Y, rival.hpMax);
     this.hpBarRival.reiniciar(rival.hpMax, rival.hpActual);
     this.hpTextRival = this.add.text(RIVAL.INFO_POS.x, RIVAL.INFO_POS.y + RIVAL.HP_TEXT_OFFSET_Y, `${rival.hpActual}/${rival.hpMax}`, {
@@ -148,6 +156,7 @@ export class BattleScene extends Phaser.Scene {
     this.nomAliado = this.add.text(ALLY.INFO_POS.x, ALLY.INFO_POS.y, `${jugador.especie.nombre} Lv${jugador.nivel}`, {
       fontFamily: FONT, fontSize: '8px', color: PALETA_HEX.oscurisimo,
     }).setScrollFactor(0).setDepth(150);
+    this.hpMaxJugadorDisplay = jugador.hpMax;
     this.hpBarAliado = new HpBar(this, ALLY.INFO_POS.x, ALLY.INFO_POS.y + ALLY.HP_BAR_OFFSET_Y, jugador.hpMax);
     this.hpBarAliado.reiniciar(jugador.hpMax, jugador.hpActual);
     this.hpTextAliado = this.add.text(ALLY.INFO_POS.x, ALLY.INFO_POS.y + ALLY.HP_TEXT_OFFSET_Y, `${jugador.hpActual}/${jugador.hpMax}`, {
@@ -157,19 +166,22 @@ export class BattleScene extends Phaser.Scene {
 
   // ── Actualizar HUD ──────────────────────────────────────────────────────────
 
-  private actualizarUI(): void {
+  private actualizarUIJugador(): void {
     const jugador = this.sistema.estado.jugador;
-    const rival = this.sistema.estado.rival;
-
-    this.nomRival.setText(`${rival.especie.nombre} Lv${rival.nivel}`);
-    this.hpBarRival.reiniciar(rival.hpMax, rival.hpActual);
-    this.hpTextRival.setText(`${rival.hpActual}/${rival.hpMax}`);
-
     this.nomAliado.setText(`${jugador.especie.nombre} Lv${jugador.nivel}`);
+    this.hpMaxJugadorDisplay = jugador.hpMax;
     this.hpBarAliado.reiniciar(jugador.hpMax, jugador.hpActual);
     this.hpTextAliado.setText(`${jugador.hpActual}/${jugador.hpMax}`);
-
     this.actualizarSpriteJugador(jugador);
+  }
+
+  private actualizarUIRival(): void {
+    const rival = this.sistema.estado.rival;
+    this.nomRival.setText(`${rival.especie.nombre} Lv${rival.nivel}`);
+    this.hpMaxRivalDisplay = rival.hpMax;
+    this.hpBarRival.reiniciar(rival.hpMax, rival.hpActual);
+    this.hpTextRival.setText(`${rival.hpActual}/${rival.hpMax}`);
+    this.actualizarSpriteRival(rival);
   }
 
   private actualizarSpriteJugador(criatura: Criatura): void {
@@ -187,18 +199,150 @@ export class BattleScene extends Phaser.Scene {
     }
   }
 
-  // ── Flujo de mensajes ───────────────────────────────────────────────────────
+  private actualizarSpriteRival(criatura: Criatura): void {
+    const { RIVAL } = BATTLE_LAYOUT;
+    if (this.spriteRival) this.spriteRival.destroy();
+    const key = criatura.especie.spriteKey;
+    if (this.textures.exists(key)) {
+      this.spriteRival = this.add.image(RIVAL.SPRITE_POS.x, RIVAL.SPRITE_POS.y, key)
+        .setOrigin(0, 0)
+        .setFlipX(true)
+        .setDepth(50);
+    } else {
+      this.spriteRival = this.add.rectangle(RIVAL.SPRITE_POS.x, RIVAL.SPRITE_POS.y, RIVAL.SPRITE_SIZE, RIVAL.SPRITE_SIZE, 0x306230)
+        .setOrigin(0, 0)
+        .setDepth(50);
+    }
+  }
 
-  private mostrarMensajesSecuenciales(mensajes: string[], onFin: () => void): void {
-    if (mensajes.length === 0) {
+  // ── Procesamiento secuencial de eventos ─────────────────────────────────────
+
+  private procesarEventos(eventos: EventoBatalla[], onFin: () => void): void {
+    if (eventos.length === 0) {
       onFin();
       return;
     }
+    const [ev, ...resto] = eventos;
+    const continuar = () => this.procesarEventos(resto, onFin);
+
+    switch (ev.tipo) {
+      case 'mensaje':
+      case 'evasion_sube':
+      case 'envenenado':
+      case 'captura_sacudida':
+      case 'captura_exito':
+      case 'captura_fallo':
+        this.faseUI = 'animando';
+        if (ev.mensaje) {
+          this.dialogo.mostrar(ev.mensaje, continuar);
+        } else {
+          continuar();
+        }
+        break;
+
+      case 'danio_rival':
+      case 'danio_veneno_rival': {
+        const nuevoHp = ev.nuevoHp ?? 0;
+        const hpMax = this.hpMaxRivalDisplay;
+        const procesarMensaje = () => {
+          this.hpTextRival.setText(`${nuevoHp}/${hpMax}`);
+          if (ev.mensaje) {
+            this.faseUI = 'animando';
+            this.dialogo.mostrar(ev.mensaje, continuar);
+          } else {
+            continuar();
+          }
+        };
+        this.hpBarRival.actualizar(this, nuevoHp, 500, procesarMensaje);
+        break;
+      }
+
+      case 'danio_jugador':
+      case 'danio_veneno_jugador': {
+        const nuevoHp = ev.nuevoHp ?? 0;
+        const hpMax = this.hpMaxJugadorDisplay;
+        const procesarMensaje = () => {
+          this.hpTextAliado.setText(`${nuevoHp}/${hpMax}`);
+          if (ev.mensaje) {
+            this.faseUI = 'animando';
+            this.dialogo.mostrar(ev.mensaje, continuar);
+          } else {
+            continuar();
+          }
+        };
+        this.hpBarAliado.actualizar(this, nuevoHp, 500, procesarMensaje);
+        break;
+      }
+
+      case 'desmayo_rival':
+        this.faseUI = 'animando';
+        if (ev.mensaje) {
+          this.dialogo.mostrar(ev.mensaje, () => this.animarDesmayo(this.spriteRival, continuar));
+        } else {
+          this.animarDesmayo(this.spriteRival, continuar);
+        }
+        break;
+
+      case 'desmayo_jugador':
+        this.faseUI = 'animando';
+        if (ev.mensaje) {
+          this.dialogo.mostrar(ev.mensaje, () => this.animarDesmayo(this.spriteJugador, continuar));
+        } else {
+          this.animarDesmayo(this.spriteJugador, continuar);
+        }
+        break;
+
+      case 'cambio_jugador':
+        this.faseUI = 'animando';
+        if (ev.mensaje) {
+          this.dialogo.mostrar(ev.mensaje, () => { this.actualizarUIJugador(); continuar(); });
+        } else {
+          this.actualizarUIJugador();
+          continuar();
+        }
+        break;
+
+      case 'cambio_rival':
+        this.faseUI = 'animando';
+        if (ev.mensaje) {
+          this.dialogo.mostrar(ev.mensaje, () => { this.actualizarUIRival(); continuar(); });
+        } else {
+          this.actualizarUIRival();
+          continuar();
+        }
+        break;
+
+      case 'batalla_fin':
+        continuar();
+        break;
+
+      default:
+        continuar();
+    }
+  }
+
+  private animarDesmayo(
+    sprite: Phaser.GameObjects.Image | Phaser.GameObjects.Rectangle | null,
+    onFin: () => void,
+  ): void {
+    if (!sprite) { onFin(); return; }
+    this.tweens.add({
+      targets: sprite,
+      alpha: 0,
+      y: sprite.y + 8,
+      duration: 600,
+      ease: 'Linear',
+      onComplete: onFin,
+    });
+  }
+
+  // ── Flujo de mensajes simples ───────────────────────────────────────────────
+
+  private mostrarMensajesSecuenciales(mensajes: string[], onFin: () => void): void {
+    if (mensajes.length === 0) { onFin(); return; }
     this.faseUI = 'animando';
     const [primero, ...resto] = mensajes;
-    this.dialogo.mostrar(primero, () => {
-      this.mostrarMensajesSecuenciales(resto, onFin);
-    });
+    this.dialogo.mostrar(primero, () => this.mostrarMensajesSecuenciales(resto, onFin));
   }
 
   // ── Menú principal ──────────────────────────────────────────────────────────
@@ -255,7 +399,14 @@ export class BattleScene extends Phaser.Scene {
     this.equipoMenu.mostrar(
       this.equipoJugador,
       activoIdx,
-      (idx) => this.ejecutarTurno({ tipo: 'cambiar', idx }),
+      (idx) => {
+        const criatura = this.equipoJugador[idx];
+        if (!criatura || !criatura.estaVivo) {
+          this.mostrarMensajesSecuenciales(['¡Esta criatura no puede pelear!'], () => this.mostrarMenu());
+          return;
+        }
+        this.ejecutarTurno({ tipo: 'cambiar', idx });
+      },
       () => this.mostrarMenu(),
     );
   }
@@ -264,16 +415,8 @@ export class BattleScene extends Phaser.Scene {
 
   private ejecutarTurno(accion: AccionJugador): void {
     const eventos = this.sistema.ejecutarTurno(accion);
-
-    const mensajes: string[] = [];
-    for (const ev of eventos) {
-      if (ev.mensaje) mensajes.push(ev.mensaje);
-    }
-
-    this.actualizarUI();
-
     const esFin = this.sistema.estado.fase === 'fin';
-    this.mostrarMensajesSecuenciales(mensajes, () => {
+    this.procesarEventos(eventos, () => {
       if (esFin) this.mostrarFinBatalla();
       else this.mostrarMenu();
     });
