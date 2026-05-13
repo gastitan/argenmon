@@ -47,7 +47,7 @@ src/
   scenes/       # BootScene, MenuScene, OverworldScene, BattleScene, etc.
   entities/     # Player, Creature, NPC, Trainer
   systems/      # BattleSystem, CaptureSystem, EncounterSystem, SaveSystem
-  data/         # creatures.ts, moves.ts, types.ts, items.ts (datos estáticos)
+  data/         # json/ + schemas/ + loaders/ (ver sección Arquitectura de datos)
   ui/           # Componentes de menú, diálogos, HUD de combate
   utils/        # Helpers, constantes, fórmulas
   assets/       # Sprites, tilesets, audio (organizados por subcarpetas)
@@ -174,14 +174,32 @@ si la criatura tiene estado alterado (envenenada, dormida): bonus ×1.5
 
 - **TypeScript estricto:** `strict: true` en `tsconfig.json`. Nada de `any`.
 - **Nombres en español para entidades del dominio del juego:** `Criatura`, `Movimiento`, `Trampa`, `Entrenador`. Nombres en inglés para conceptos técnicos: `Scene`, `System`, `Manager`.
-- **Datos del juego en archivos `.ts` exportando `as const`** para que TypeScript infiera literales y dé autocompletado.
+- **Datos del juego en archivos JSON** (`src/data/json/`), validados con Zod (`src/data/schemas/`), cargados por loaders en `src/data/loaders/`. No agregar datos hardcodeados en TypeScript.
 - **Una clase/sistema por archivo.** Archivos chicos y enfocados.
 - **Comentarios solo cuando el código no se explica solo.** No comentar lo obvio.
 - **Sin estado global mutable fuera de los sistemas.** Cada sistema gestiona su propio estado.
 
 ---
 
-## 12. Roadmap por fases
+## 12. Arquitectura de datos
+
+Todos los datos del juego (criaturas, movimientos, tipos, NPCs, encuentros, items) están en archivos JSON en `src/data/json/`, validados con schemas Zod en `src/data/schemas/` y cargados al iniciar el juego por loaders en `src/data/loaders/`.
+
+**Para agregar contenido nuevo:**
+- Nueva criatura: editar `creatures.json` + generar sprite con el pipeline + dropear PNG.
+- Nuevo movimiento: editar `moves.json`.
+- Nuevo entrenador: editar `trainers.json`.
+- Nuevo encuentro wild: editar `encounters.json`.
+
+**No tocar TypeScript para agregar contenido.** Si el JSON está malformado, el juego no arranca y la consola muestra el error Zod completo con path al campo problemático.
+
+**Lógica vs datos:** funciones puras como `calcularStat`, `efectividad`, `encontrarEntrenador` permanecen en TypeScript. JSON describe datos, TypeScript describe comportamiento.
+
+Los archivos `.ts` en `src/data/` son stubs de re-exportación que preservan la API pública (`ESPECIES`, `MOVIMIENTOS`, `TRAMPAS`, etc.) para que el resto del juego no requiera cambios al agregar contenido.
+
+---
+
+## 13. Roadmap por fases
 
 | Fase | Foco | Estado |
 |------|------|--------|
@@ -193,6 +211,7 @@ si la criatura tiene estado alterado (envenenada, dormida): bonus ×1.5
 | 6 | Refactor canvas 320×240 | ✅ Completa |
 | 7 | Refactor flujo de eventos de batalla | ✅ Completa |
 | 8 | Audio, polish, contenido pendiente | 🔄 En progreso |
+| 9 | Migración de datos a JSON con Zod | ✅ Completa |
 
 **Regla de fases:** no se avanza a la fase N+1 hasta que la fase N esté completa y testeada. Sin excepciones.
 
@@ -209,18 +228,19 @@ si la criatura tiene estado alterado (envenenada, dormida): bonus ×1.5
 - **CatalogScene**: pantalla de catálogo al completar el juego
 - **Guardado**: localStorage — clave `pampamon_save_v1`
 - **Tests unitarios**: BattleSystem, CaptureSystem, formulas (36 tests, todos verdes)
+- **Datos en JSON**: criaturas, movimientos, tipos, entrenadores, encuentros e items migrados a `src/data/json/` con schemas Zod y loaders tipados. Los stubs `.ts` preservan la API pública sin tocar el resto del juego.
 
 ### Deuda técnica conocida
 
 - Chunk de JS > 500 KB (warning Vite preexistente, no urgente).
 - `mostrarMensajesSecuenciales` coexiste con `procesarEventos`; unificable construyendo eventos `'mensaje'` ad-hoc, pero no urgente.
-- Criaturas y movimientos hardcodeados en TypeScript — candidatos a migrar a JSON en Fase 8.
+- `maps.ts` no migrado a JSON (array 2D visual; candidato para cuando se integre Tiled en Fase 8).
 - Falta sistema de aprendizaje de movimientos por nivel.
 - Falta sistema de flags general para progresión no lineal.
 
 ---
 
-## 13. Assets — política
+## 14. Assets — política
 
 - **Placeholders al inicio** desde fuentes con licencia libre (Kenney.nl, OpenGameArt) para no bloquear el desarrollo del código
 - **Arte final** se hace en una fase dedicada (Fase 5)
@@ -229,7 +249,7 @@ si la criatura tiene estado alterado (envenenada, dormida): bonus ×1.5
 
 ---
 
-## 14. Lo que NO hace este proyecto (anti-scope)
+## 15. Lo que NO hace este proyecto (anti-scope)
 
 Para mantener el prototipo enfocado:
 
@@ -246,7 +266,7 @@ Si surge la tentación de agregar algo de esta lista durante el desarrollo del p
 
 ---
 
-## 15. Decisiones pendientes
+## 16. Decisiones pendientes
 
 Cosas que el desarrollador (humano) todavía tiene que definir. Marcar con [x] cuando se resuelvan.
 
@@ -258,10 +278,10 @@ Cosas que el desarrollador (humano) todavía tiene que definir. Marcar con [x] c
 
 ---
 
-## 16. Cómo trabajar con Claude Code en este proyecto
+## 17. Cómo trabajar con Claude Code en este proyecto
 
 - **Empezar siempre en plan mode** para tareas que toquen más de un archivo
-- **Usar `/model` con la opción "Opus in plan mode, Sonnet otherwise"** para razonamiento fuerte al planear y velocidad al ejecutar
+- **Usar Claude.ai (Opus mode)** para razonamiento fuerte al planear y **Claude Code** para ejecutar.
 - **Mantener este CLAUDE.md actualizado** cuando se tomen decisiones nuevas
 - **Tests primero** para todo lo que toque la fórmula de daño o de captura
 - **Commits chicos y descriptivos**, uno por feature lógica
@@ -269,4 +289,4 @@ Cosas que el desarrollador (humano) todavía tiene que definir. Marcar con [x] c
 
 ---
 
-*Última actualización: mayo 2026 — Fases 1–7 completas, Fase 8 en progreso. Canvas 320×240 @ ×3. Paleta master 20 colores. Eventos de batalla secuenciales con animaciones de HP y desmayo.*
+*Última actualización: mayo 2026 — Fases 1–7 y 9 completas, Fase 8 en progreso. Canvas 320×240 @ ×3. Paleta master 20 colores. Eventos de batalla secuenciales con animaciones de HP y desmayo. Datos del juego en JSON con validación Zod.*
