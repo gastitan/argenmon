@@ -57,24 +57,35 @@ tests/          # Tests unitarios de systems/
 
 ---
 
-## 5. Estética visual GameBoy
+## 5. Estética visual
 
-**Paleta obligatoria (4 colores, en hex):**
-- `#0f380f` — verde más oscuro (sombras, contornos)
-- `#306230` — verde oscuro (cuerpos, tierra)
-- `#8bac0f` — verde claro (highlights, vegetación)
-- `#9bbc0f` — verde más claro (fondos, cielo)
+**Estética objetivo:** "moderno con vibe retro", inspirada en la era Game Boy Advance. No emulación literal del Game Boy original.
 
-Ningún asset puede usar colores fuera de esta paleta. Todo el arte se diseña pensando en estos 4 valores.
+**Paleta master (20 colores — definida en `palette.json`):**
 
-**Resolución base:** 160×144 píxeles (la del Game Boy original), escalada por enteros (×2, ×3, ×4) para pantallas modernas. Nunca escalar con interpolación: pixel-perfect siempre.
+| Grupo | Colores |
+|-------|---------|
+| Neutrales | `#1a1410` `#2d2419` `#f5e6c8` `#ffffff` |
+| Marrones | `#4a3520` `#7a5a3a` `#a87b4f` `#c9a576` |
+| Verdes | `#2d3d1f` `#4a6b3a` `#7a9b5a` `#b8c97a` |
+| Ocres/amarillos | `#8a6a2a` `#c9a23a` `#e8c870` |
+| Acentos | `#a8442a` `#3d5a7a` `#6a4a7a` |
+| Grises | `#5a5a55` `#8a8a85` |
+
+Esta paleta aplica a tiles, UI y overworld. Los sprites de criaturas se generan con Nano Banana (Gemini 2.5 Flash Image) y se procesan por script Python (Pillow) que fuerza la paleta y downscalea a 96×96 con LANCZOS.
+
+**Resolución base:** 320×240 px, escalado ×3 → 960×720 en pantalla.
+
+**Filtro de texturas:** `pixelArt: true`, `roundPixels: true`. No se aplica `FilterMode.LINEAR`.
+
+**Fuente:** Press Start 2P (Google Fonts).
 
 **Sprites:**
 - Personajes overworld: 16×16
-- Criaturas en combate: 56×56 (área del enemigo) y 64×64 (área del aliado, espalda)
+- Criaturas en combate: 96×96
 - Tiles del mundo: 16×16
 
-**Animación:** frames limitados, estilo GameBoy. Caminar = 2 frames. Combate = 1-2 frames de animación de ataque por movimiento. No usar tweens suaves; todo movimiento es discreto.
+**Animación:** frames limitados, estilo retro. Caminar = 2 frames. Combate = 1-2 frames de animación de ataque. No usar tweens suaves; todo movimiento es discreto. Excepción: tweens de HP bar (500 ms) y desmayo (600 ms) para feedback visual de combate.
 
 ---
 
@@ -175,22 +186,37 @@ si la criatura tiene estado alterado (envenenada, dormida): bonus ×1.5
 | Fase | Foco | Estado |
 |------|------|--------|
 | 1 | Setup + mundo base | ✅ Completa |
-| 2 | **Sistema de combate** | ✅ Completa |
+| 2 | Sistema de combate | ✅ Completa |
 | 3 | Criaturas y captura | ✅ Completa |
 | 4 | Encuentros y entrenadores | ✅ Completa |
-| 5 | Arte y pulido | 🔄 En progreso — sprites integrados, pendiente música/SFX/save |
+| 5 | Migración estética y pipeline de assets | ✅ Completa |
+| 6 | Refactor canvas 320×240 | ✅ Completa |
+| 7 | Refactor flujo de eventos de batalla | ✅ Completa |
+| 8 | Audio, polish, contenido pendiente | 🔄 En progreso |
 
 **Regla de fases:** no se avanza a la fase N+1 hasta que la fase N esté completa y testeada. Sin excepciones.
 
 ### Qué hay implementado (mayo 2026)
 
 - **BattleSystem** completo: daño con fórmula estándar, STAB, efectividad de tipos, críticos, estados alterados (veneno, sueño), captura con trampas
-- **6 criaturas** con sprites PNG integrados: Hornero, Mara, Vizcacha, Ñandú, Peludo, Yarará
+- **Eventos de batalla tipados**: `EventoBatalla` con campo `nuevoHp` en eventos de daño, procesados secuencialmente por `procesarEventos()` en BattleScene — mensaje → animación HP bar (500 ms tween) → siguiente evento
+- **Invariantes de equipo**: al iniciar batalla se activa la primera criatura viva (`primeraVivaIdx`); si todo el equipo está desmayado, no se inicia la batalla y se vuelve al overworld; en el menú de cambio, las criaturas desmayadas no son seleccionables
+- **Animaciones de desmayo**: sprite cae y se desvanece (600 ms tween `alpha: 0 + y+8`)
+- **6 criaturas** con sprites PNG integrados: Hornero, Mara, Vizcacha, Ñandú, Peludo, Yarará (96×96, paleta master aplicada)
 - **Overworld**: mapa de la Pampa con colisiones, zonas de pasto alto para encuentros aleatorios, 3 NPCs entrenadores, boss (Capataz)
-- **BattleScene**: layout GameBoy auténtico — zona de combate (y:0–96), franja de suelo (y:96–104), zona de UI unificada (y:104–144) en color oscuro constante
+- **BattleScene**: layout 320×240 — zona de combate (y:0–144), franja de suelo (y:144–160), zona de UI (y:160–240)
 - **UI de combate**: BattleMenu, MoveMenu, TrampaMenu, EquipoMenu, DialogBox, HpBar — todos sin fondo propio (usan el fondo permanente de la escena)
 - **CatalogScene**: pantalla de catálogo al completar el juego
-- **Tests unitarios**: BattleSystem, CaptureSystem, formulas
+- **Guardado**: localStorage — clave `pampamon_save_v1`
+- **Tests unitarios**: BattleSystem, CaptureSystem, formulas (36 tests, todos verdes)
+
+### Deuda técnica conocida
+
+- Chunk de JS > 500 KB (warning Vite preexistente, no urgente).
+- `mostrarMensajesSecuenciales` coexiste con `procesarEventos`; unificable construyendo eventos `'mensaje'` ad-hoc, pero no urgente.
+- Criaturas y movimientos hardcodeados en TypeScript — candidatos a migrar a JSON en Fase 8.
+- Falta sistema de aprendizaje de movimientos por nivel.
+- Falta sistema de flags general para progresión no lineal.
 
 ---
 
@@ -243,4 +269,4 @@ Cosas que el desarrollador (humano) todavía tiene que definir. Marcar con [x] c
 
 ---
 
-*Última actualización: mayo 2026 — Fases 1–4 completas, Fase 5 en progreso.*
+*Última actualización: mayo 2026 — Fases 1–7 completas, Fase 8 en progreso. Canvas 320×240 @ ×3. Paleta master 20 colores. Eventos de batalla secuenciales con animaciones de HP y desmayo.*

@@ -43,6 +43,7 @@ export interface EventoBatalla {
     | 'batalla_fin';
   mensaje?: string;
   cantidad?: number;
+  nuevoHp?: number;
   resultado?: ResultadoBatalla;
   critico?: boolean;
   efectividad?: number;
@@ -62,6 +63,7 @@ export interface OpcionesBattle {
   seed?: number;
   esWild?: boolean;
   entrenadorNombre?: string;
+  iniciarDesde?: number;
 }
 
 const MULT_EVASION = [1.0, 0.75, 0.60] as const;
@@ -83,9 +85,11 @@ export class BattleSystem {
     this.esWild = opciones.esWild ?? true;
     this.entrenadorNombre = opciones.entrenadorNombre ?? 'El rival';
 
+    const iniciarDesde = opciones.iniciarDesde ?? 0;
+    this.activoJugadorIdx = iniciarDesde;
     this._estado = {
       fase: 'inicio',
-      jugador: equipoJugador[0],
+      jugador: equipoJugador[iniciarDesde] ?? equipoJugador[0],
       rival: equipoRival[0],
       equipoJugador,
       equipoRival,
@@ -272,6 +276,7 @@ export class BattleSystem {
       tipo: esJugador ? 'danio_veneno_jugador' : 'danio_veneno_rival',
       mensaje: `${criatura.especie.nombre} sufre daño por veneno.`,
       cantidad: danio,
+      nuevoHp: criatura.hpActual,
     });
     if (!criatura.estaVivo) {
       this.emitir({
@@ -358,7 +363,10 @@ export class BattleSystem {
     this.emitir({ tipo: 'mensaje', mensaje: `${atacante.especie.nombre} usó ${movimiento.nombre}${sufijo}` });
     this.emitir({
       tipo: esJugador ? 'danio_jugador' : 'danio_rival',
-      cantidad: resultado.danio, critico: resultado.esCritico, efectividad: resultado.efectividad,
+      cantidad: resultado.danio,
+      nuevoHp: defensor.hpActual,
+      critico: resultado.esCritico,
+      efectividad: resultado.efectividad,
     });
 
     const efecto = movimiento.efecto;

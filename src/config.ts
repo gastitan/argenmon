@@ -1,6 +1,10 @@
-export const GAME_WIDTH = 160;
-export const GAME_HEIGHT = 144;
-export const SCALE = 4;
+import { CANVAS } from './config/layout';
+
+export { CANVAS } from './config/layout';
+
+export const GAME_WIDTH = CANVAS.WIDTH;
+export const GAME_HEIGHT = CANVAS.HEIGHT;
+export const SCALE = CANVAS.SCALE;
 export const TILE_SIZE = 16;
 
 export const PALETA = {

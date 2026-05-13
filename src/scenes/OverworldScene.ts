@@ -1,8 +1,9 @@
 import Phaser from 'phaser';
 import { PALETA_HEX, SCENE_KEYS, TILE_SIZE, FONT } from '@/config';
+import { OVERWORLD_LAYOUT } from '@/config/layout';
 import { Player } from '@/entities/Player';
 import { mapaPampaInicial } from '@/data/maps';
-import { playerState } from '@/data/playerState';
+import { GameState } from '@/state/GameState';
 import { ESPECIES } from '@/data/creatures';
 import { DATOS_ENTRENADORES } from '@/data/trainers';
 import type { DatosEntrenador } from '@/data/trainers';
@@ -29,6 +30,8 @@ export class OverworldScene extends Phaser.Scene {
   private debugText!: Phaser.GameObjects.Text;
   private rng!: RNG;
   private marcadores: MarcadorEntrenador[] = [];
+  private pasosSinGuardar = 0;
+  private dialogoActivo = false;
 
   constructor() {
     super(SCENE_KEYS.Overworld);
@@ -38,9 +41,10 @@ export class OverworldScene extends Phaser.Scene {
     this.cameras.main.setBackgroundColor(PALETA_HEX.clarisimo);
     this.rng = crearRNG(Math.floor(Math.random() * 0xffffffff));
 
-    // Inicializar equipo del jugador si está vacío (primera partida)
-    if (playerState.equipo.length === 0) {
-      playerState.equipo.push({ especieId: 'hornero', nivel: 5 });
+    if (GameState.haySave()) {
+      GameState.cargar();
+    } else {
+      GameState.iniciarNuevaPartida('Jugador', 'hornero');
     }
 
     this.map = this.make.tilemap({
@@ -55,19 +59,21 @@ export class OverworldScene extends Phaser.Scene {
     this.layer = layer;
     this.layer.setCollision([TILE_ARBOL, TILE_AGUA]);
 
-    const startTileX = 5;
-    const startTileY = 5;
+    const { x: startTileX, y: startTileY } = GameState.datos.posicion;
     this.player = new Player(this, startTileX, startTileY, this.esBloqueado.bind(this));
 
+    // Opción A: cámara sigue al jugador con follow inmediato (lerp=1).
+    // El mapa (480×320) es solo un poco más grande que el canvas (320×240),
+    // así que el scroll es mínimo. Dead zone no aporta beneficio aquí.
     this.cameras.main.startFollow(this.player.sprite, true, 1, 1);
     this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
 
     this.crearMarcadoresEntrenadores();
 
     this.debugText = this.add
-      .text(2, 2, '', {
+      .text(OVERWORLD_LAYOUT.DEBUG_TEXT_POS.x, OVERWORLD_LAYOUT.DEBUG_TEXT_POS.y, '', {
         fontFamily: FONT,
-        fontSize: '6px',
+        fontSize: '8px',
         color: PALETA_HEX.oscurisimo,
         backgroundColor: PALETA_HEX.clarisimo,
       })
@@ -84,7 +90,7 @@ export class OverworldScene extends Phaser.Scene {
   }
 
   update(_time: number, delta: number): void {
-    this.player.update(delta);
+    if (!this.dialogoActivo) this.player.update(delta);
   }
 
   // ── Marcadores de entrenadores ──────────────────────────────────────────────
@@ -99,7 +105,7 @@ export class OverworldScene extends Phaser.Scene {
         .setDepth(10);
 
       // Ocultar si ya fue derrotado
-      if (playerState.entrenadoresDerrotados.includes(datos.id)) {
+      if (GameState.entrenadorDerrotado(datos.id)) {
         rect.setVisible(false);
       }
 
@@ -110,11 +116,22 @@ export class OverworldScene extends Phaser.Scene {
   // ── Lógica de cada paso ─────────────────────────────────────────────────────
 
   private alPisar(tx: number, ty: number): void {
+    this.pasosSinGuardar++;
+    if (this.pasosSinGuardar >= 10) {
+      this.pasosSinGuardar = 0;
+      GameState.actualizarPosicion(tx, ty);
+      GameState.guardar();
+    }
+
     // Verificar línea de visión de entrenadores (tiene prioridad sobre encuentros)
     for (const marcador of this.marcadores) {
       if (!marcador.rect.visible) continue;
       if (this.enLineaDeVision(tx, ty, marcador.datos)) {
-        this.iniciarBatallaEntrenador(marcador.datos);
+        if (marcador.datos.id === 'almacenero') {
+          this.mostrarDialogoAlmacenero();
+        } else {
+          this.iniciarBatallaEntrenador(marcador.datos);
+        }
         return;
       }
     }
@@ -124,17 +141,14 @@ export class OverworldScene extends Phaser.Scene {
     if (tile && tile.index === TILE_PASTO_ALTO) {
       if (verificarEncuentro(this.rng)) {
         const wild = elegirWild(this.rng);
-        // Marcar como visto antes de entrar a la escena
-        if (playerState.catalogo[wild.especieId] !== 'capturado') {
-          playerState.catalogo[wild.especieId] = 'visto';
-        }
+        GameState.marcarVisto(wild.especieId);
         this.scene.start(SCENE_KEYS.Battle, { tipo: 'wild', ...wild });
         return;
       }
       this.debugText.setText(`pasto (${tx},${ty})`);
     } else {
-      const nomEspecie = playerState.equipo[0]
-        ? ESPECIES[playerState.equipo[0].especieId].nombre
+      const nomEspecie = GameState.datos.equipo[0]
+        ? ESPECIES[GameState.datos.equipo[0].especieId].nombre
         : 'Hornero';
       this.debugText.setText(`${nomEspecie} — B=debug`);
     }
@@ -158,11 +172,84 @@ export class OverworldScene extends Phaser.Scene {
   }
 
   private iniciarBatallaEntrenador(datos: DatosEntrenador): void {
-    // Ocultar marcador inmediatamente para que no se reactive al volver
     const marcador = this.marcadores.find((m) => m.datos.id === datos.id);
     if (marcador) marcador.rect.setVisible(false);
-    playerState.entrenadoresDerrotados.push(datos.id);
     this.scene.start(SCENE_KEYS.Battle, { tipo: 'entrenador', entrenadorId: datos.id });
+  }
+
+  // ── Diálogo Almacenero ──────────────────────────────────────────────────────
+
+  private mostrarDialogoAlmacenero(): void {
+    this.dialogoActivo = true;
+    const { DIALOG_BOX, DIALOG_TEXT_POS, SHOP_OPTION_SI, SHOP_OPTION_NO } = OVERWORLD_LAYOUT;
+
+    const fondo = this.add
+      .rectangle(DIALOG_BOX.x, DIALOG_BOX.y, DIALOG_BOX.w, DIALOG_BOX.h, 0x9bbc0f)
+      .setOrigin(0).setScrollFactor(0).setDepth(200);
+
+    const texto = this.add.text(DIALOG_TEXT_POS.x, DIALOG_TEXT_POS.y, '¡Bienvenido!\n¿Querés que cure a tus animales?', {
+      fontFamily: FONT, fontSize: '8px', color: PALETA_HEX.oscurisimo,
+      wordWrap: { width: DIALOG_BOX.w - 16 },
+    }).setScrollFactor(0).setDepth(201);
+
+    let seleccion = 0;
+
+    const opSi = this.add.text(SHOP_OPTION_SI.x, SHOP_OPTION_SI.y, '>Sí', {
+      fontFamily: FONT, fontSize: '8px', color: PALETA_HEX.oscurisimo,
+    }).setScrollFactor(0).setDepth(201);
+
+    const opNo = this.add.text(SHOP_OPTION_NO.x, SHOP_OPTION_NO.y, ' No', {
+      fontFamily: FONT, fontSize: '8px', color: PALETA_HEX.oscurisimo,
+    }).setScrollFactor(0).setDepth(201);
+
+    const destruir = () => {
+      fondo.destroy();
+      texto.destroy();
+      opSi.destroy();
+      opNo.destroy();
+      this.dialogoActivo = false;
+    };
+
+    const mostrarRespuesta = (msg: string) => {
+      opSi.setVisible(false);
+      opNo.setVisible(false);
+      texto.setText(msg);
+      this.input.keyboard?.once('keydown-Z', destruir);
+    };
+
+    const limpiarListeners = () => {
+      this.input.keyboard?.off('keydown-LEFT', navHandler);
+      this.input.keyboard?.off('keydown-RIGHT', navHandler);
+      this.input.keyboard?.off('keydown-Z', confirmarHandler);
+      this.input.keyboard?.off('keydown-X', cancelarHandler);
+    };
+
+    const navHandler = () => {
+      seleccion = seleccion === 0 ? 1 : 0;
+      opSi.setText(seleccion === 0 ? '>Sí' : ' Sí');
+      opNo.setText(seleccion === 1 ? '>No' : ' No');
+    };
+
+    const confirmarHandler = () => {
+      limpiarListeners();
+      if (seleccion === 0) {
+        GameState.curarEquipoCompleto();
+        GameState.guardar();
+        mostrarRespuesta('¡Tus animales están\nlistos para seguir!');
+      } else {
+        mostrarRespuesta('¡Volvé cuando los necesites!');
+      }
+    };
+
+    const cancelarHandler = () => {
+      limpiarListeners();
+      mostrarRespuesta('¡Volvé cuando los necesites!');
+    };
+
+    this.input.keyboard?.on('keydown-LEFT', navHandler);
+    this.input.keyboard?.on('keydown-RIGHT', navHandler);
+    this.input.keyboard?.on('keydown-Z', confirmarHandler);
+    this.input.keyboard?.on('keydown-X', cancelarHandler);
   }
 
   // ── Helpers ─────────────────────────────────────────────────────────────────

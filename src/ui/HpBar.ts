@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { PALETA } from '@/config';
 
-const BAR_W = 48;
+const BAR_W = 80;
 const BAR_H = 4;
 
 export class HpBar {
@@ -27,8 +27,10 @@ export class HpBar {
       .setDepth(depth + 1);
   }
 
+  get hp(): number { return this.hpActual; }
+
   /** Actualiza la barra con un tween hacia el nuevo HP. */
-  actualizar(scene: Phaser.Scene, hpNuevo: number, duracion = 300): void {
+  actualizar(scene: Phaser.Scene, hpNuevo: number, duracion = 300, onComplete?: () => void): void {
     this.hpActual = Math.max(0, hpNuevo);
     const ratio = this.hpActual / this.hpMax;
     const targetW = Math.max(1, Math.floor(BAR_W * ratio));
@@ -40,6 +42,7 @@ export class HpBar {
       width: targetW,
       duration: duracion,
       ease: 'Linear',
+      onComplete,
     });
   }
 

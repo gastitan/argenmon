@@ -1,8 +1,6 @@
 import Phaser from 'phaser';
 import { PALETA_HEX, FONT } from '@/config';
-
-const BOX_Y = 104;
-const CHAR_DELAY = 30; // ms por carácter
+import { DIALOG_LAYOUT } from '@/config/layout';
 
 export class DialogBox {
   private scene: Phaser.Scene;
@@ -16,13 +14,18 @@ export class DialogBox {
     this.scene = scene;
 
     this.text = scene.add
-      .text(8, BOX_Y + 6, '', {
-        fontFamily: FONT,
-        fontSize: '8px',
-        color: PALETA_HEX.clarisimo,
-        wordWrap: { width: 144 },
-        lineSpacing: 2,
-      })
+      .text(
+        DIALOG_LAYOUT.TEXT_OFFSET_X,
+        DIALOG_LAYOUT.BOX_Y + DIALOG_LAYOUT.TEXT_OFFSET_Y,
+        '',
+        {
+          fontFamily: FONT,
+          fontSize: '8px',
+          color: PALETA_HEX.oscurisimo,
+          wordWrap: { width: DIALOG_LAYOUT.WORD_WRAP_WIDTH },
+          lineSpacing: 2,
+        },
+      )
       .setScrollFactor(0)
       .setDepth(201);
 
@@ -38,7 +41,7 @@ export class DialogBox {
 
     if (this.timer) this.timer.remove();
     this.timer = this.scene.time.addEvent({
-      delay: CHAR_DELAY,
+      delay: DIALOG_LAYOUT.CHAR_DELAY_MS,
       repeat: mensaje.length - 1,
       callback: this.avanzarChar,
       callbackScope: this,

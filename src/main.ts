@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { GAME_WIDTH, GAME_HEIGHT, SCALE, PALETA_HEX } from './config';
+import { GAME_WIDTH, GAME_HEIGHT, PALETA_HEX } from './config';
 import { BootScene } from './scenes/BootScene';
 import { MenuScene } from './scenes/MenuScene';
 import { OverworldScene } from './scenes/OverworldScene';
@@ -11,12 +11,12 @@ const config: Phaser.Types.Core.GameConfig = {
   parent: 'game',
   width: GAME_WIDTH,
   height: GAME_HEIGHT,
-  zoom: SCALE,
   pixelArt: true,
+  antialias: false,
   roundPixels: true,
   backgroundColor: PALETA_HEX.clarisimo,
   scale: {
-    mode: Phaser.Scale.NONE,
+    mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
   scene: [BootScene, MenuScene, OverworldScene, BattleScene, CatalogScene],

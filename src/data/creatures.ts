@@ -13,6 +13,7 @@ export interface EspecieBase {
   readonly velBase: number;
   readonly tasaCaptura: number; // 0-1
   readonly movimientosIniciales: readonly MovimientoId[];
+  readonly spriteKey: string;
 }
 
 export const ESPECIES = {
@@ -22,6 +23,7 @@ export const ESPECIES = {
     hpBase: 55, atkBase: 55, defBase: 55, atkEspBase: 55, defEspBase: 55, velBase: 55,
     tasaCaptura: 0.35,
     movimientosIniciales: ['picotazo', 'vuelo_rasante', 'ala_acero', 'rafaga'],
+    spriteKey: 'sprite_hornero',
   },
   mara: {
     id: 'mara', nombre: 'Mara',
@@ -29,6 +31,7 @@ export const ESPECIES = {
     hpBase: 45, atkBase: 60, defBase: 40, atkEspBase: 35, defEspBase: 40, velBase: 80,
     tasaCaptura: 0.40,
     movimientosIniciales: ['patada_veloz', 'carrera', 'patada_doble', 'golpe_rapido'],
+    spriteKey: 'sprite_mara',
   },
   vizcacha: {
     id: 'vizcacha', nombre: 'Vizcacha',
@@ -36,6 +39,7 @@ export const ESPECIES = {
     hpBase: 60, atkBase: 45, defBase: 85, atkEspBase: 40, defEspBase: 70, velBase: 30,
     tasaCaptura: 0.35,
     movimientosIniciales: ['zarpazo', 'cuevada', 'golpe_bajo', 'escondite'],
+    spriteKey: 'sprite_vizcacha',
   },
   nandu: {
     id: 'nandu', nombre: 'Ñandú',
@@ -43,6 +47,7 @@ export const ESPECIES = {
     hpBase: 55, atkBase: 80, defBase: 45, atkEspBase: 35, defEspBase: 45, velBase: 75,
     tasaCaptura: 0.30,
     movimientosIniciales: ['patada_potente', 'ala_viento', 'embestida', 'salto'],
+    spriteKey: 'sprite_nandu',
   },
   peludo: {
     id: 'peludo', nombre: 'Peludo',
@@ -50,6 +55,7 @@ export const ESPECIES = {
     hpBase: 75, atkBase: 55, defBase: 90, atkEspBase: 30, defEspBase: 80, velBase: 20,
     tasaCaptura: 0.25,
     movimientosIniciales: ['aranazo', 'enroscada', 'golpe_cola', 'terramoto'],
+    spriteKey: 'sprite_peludo',
   },
   yarara: {
     id: 'yarara', nombre: 'Yarará',
@@ -57,6 +63,7 @@ export const ESPECIES = {
     hpBase: 40, atkBase: 50, defBase: 35, atkEspBase: 85, defEspBase: 50, velBase: 60,
     tasaCaptura: 0.30,
     movimientosIniciales: ['mordida', 'colmillo_venenoso', 'constriccion', 'ataque_acido'],
+    spriteKey: 'sprite_yarara',
   },
 } as const satisfies Record<string, EspecieBase>;
 
