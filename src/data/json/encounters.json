@@ -1,0 +1,12 @@
+{
+  "probEncuentroPorPaso": 0.10,
+  "tablas": {
+    "pampa": [
+      { "especieId": "mara",     "peso": 30, "nivelMin": 3, "nivelMax": 7 },
+      { "especieId": "vizcacha", "peso": 25, "nivelMin": 3, "nivelMax": 7 },
+      { "especieId": "nandu",    "peso": 20, "nivelMin": 4, "nivelMax": 8 },
+      { "especieId": "peludo",   "peso": 15, "nivelMin": 4, "nivelMax": 8 },
+      { "especieId": "yarara",   "peso": 10, "nivelMin": 5, "nivelMax": 9 }
+    ]
+  }
+}

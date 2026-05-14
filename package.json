@@ -12,7 +12,8 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "phaser": "^3.80.1"
+    "phaser": "^3.80.1",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/node": "^20.11.30",

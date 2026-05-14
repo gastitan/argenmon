@@ -1,5 +1,6 @@
 import type { EspecieId } from '@/data/creatures';
 import type { RNG } from '@/utils/rng';
+import { PROB_ENCUENTRO_POR_PASO, TABLAS_ENCUENTROS } from '@/data/loaders/loadEncounters';
 
 interface EntradaEncuentro {
   especieId: EspecieId;
@@ -8,15 +9,9 @@ interface EntradaEncuentro {
   nivelMax: number;
 }
 
-const TABLA_PAMPA: EntradaEncuentro[] = [
-  { especieId: 'mara',     peso: 30, nivelMin: 3, nivelMax: 7 },
-  { especieId: 'vizcacha', peso: 25, nivelMin: 3, nivelMax: 7 },
-  { especieId: 'nandu',    peso: 20, nivelMin: 4, nivelMax: 8 },
-  { especieId: 'peludo',   peso: 15, nivelMin: 4, nivelMax: 8 },
-  { especieId: 'yarara',   peso: 10, nivelMin: 5, nivelMax: 9 },
-];
+const TABLA_PAMPA: EntradaEncuentro[] = TABLAS_ENCUENTROS['pampa'] ?? [];
 
-export const PROB_ENCUENTRO_POR_PASO = 0.10;
+export { PROB_ENCUENTRO_POR_PASO };
 
 export function verificarEncuentro(rng: RNG): boolean {
   return rng.chance(PROB_ENCUENTRO_POR_PASO);

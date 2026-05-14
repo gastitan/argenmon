@@ -84,6 +84,7 @@ public/
 - Fase 6 ✅ Refactor canvas 320×240, SCALE ×3, todas las escenas rediseñadas
 - Fase 7 ✅ Flujo de eventos de batalla secuencial, animaciones de daño/desmayo, invariante primera criatura viva
 - Fase 8 🔄 Audio, polish, contenido pendiente
+- Fase 9 ✅ Migración de datos a JSON con validación Zod
 
 ## Licencia
 

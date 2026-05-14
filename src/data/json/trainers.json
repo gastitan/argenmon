@@ -1,0 +1,53 @@
+[
+  {
+    "id": "peon",
+    "nombre": "El Peón",
+    "tileX": 10,
+    "tileY": 10,
+    "direccion": "down",
+    "visionTiles": 4,
+    "equipo": [
+      { "especieId": "mara", "nivel": 7 }
+    ],
+    "esJefeFinal": false
+  },
+  {
+    "id": "maestra",
+    "nombre": "La Maestra Rural",
+    "tileX": 19,
+    "tileY": 3,
+    "direccion": "down",
+    "visionTiles": 5,
+    "equipo": [
+      { "especieId": "vizcacha", "nivel": 8 },
+      { "especieId": "hornero",  "nivel": 7 }
+    ],
+    "esJefeFinal": false
+  },
+  {
+    "id": "almacenero",
+    "nombre": "El Almacenero",
+    "tileX": 5,
+    "tileY": 15,
+    "direccion": "right",
+    "visionTiles": 5,
+    "equipo": [
+      { "especieId": "nandu", "nivel": 9 }
+    ],
+    "esJefeFinal": false
+  },
+  {
+    "id": "capataz",
+    "nombre": "El Capataz",
+    "tileX": 26,
+    "tileY": 16,
+    "direccion": "left",
+    "visionTiles": 8,
+    "equipo": [
+      { "especieId": "yarara", "nivel": 14 },
+      { "especieId": "peludo", "nivel": 15 },
+      { "especieId": "nandu",  "nivel": 15 }
+    ],
+    "esJefeFinal": true
+  }
+]

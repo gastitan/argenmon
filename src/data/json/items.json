@@ -1,0 +1,5 @@
+[
+  { "id": "trampaComun",  "nombre": "Trampa Común",    "bonusTrampa": 1   },
+  { "id": "trampaMonte",  "nombre": "Trampa de Monte",  "bonusTrampa": 1.5 },
+  { "id": "trampaFina",   "nombre": "Trampa Fina",      "bonusTrampa": 2.5 }
+]

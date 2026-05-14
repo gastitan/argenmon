@@ -1,0 +1,7 @@
+{
+  "Tierra": { "Tierra": 1,   "Aire": 0.5, "Agua": 1,   "Veneno": 2,   "Normal": 1 },
+  "Aire":   { "Tierra": 2,   "Aire": 1,   "Agua": 1,   "Veneno": 1,   "Normal": 1 },
+  "Agua":   { "Tierra": 2,   "Aire": 1,   "Agua": 0.5, "Veneno": 1,   "Normal": 1 },
+  "Veneno": { "Tierra": 1,   "Aire": 1,   "Agua": 1,   "Veneno": 0.5, "Normal": 1 },
+  "Normal": { "Tierra": 1,   "Aire": 1,   "Agua": 1,   "Veneno": 1,   "Normal": 1 }
+}
