@@ -11,7 +11,7 @@ RPG 2D por turnos estilo Game Boy con fauna autóctona de la Pampa argentina. Ex
 - **Canvas lógico:** 320×240 px, escalado ×3 → 960×720 en pantalla
 - **Render:** pixel-perfect (`pixelArt: true`, `roundPixels: true`)
 - **Fuente:** Press Start 2P (Google Fonts)
-- **Guardado:** localStorage — clave `pampamon_save_v1`
+- **Guardado:** localStorage — clave `pampamon_save_v3`
 
 ## Instalación
 
@@ -28,11 +28,12 @@ npm test         # tests unitarios
 src/
   scenes/    # BootScene, MenuScene, OverworldScene, BattleScene, CatalogScene
   entities/  # Criatura, Player
-  systems/   # BattleSystem, CaptureSystem, EncounterSystem
-  data/      # creatures, moves, types, items, trainers, playerState
-  ui/        # BattleMenu, MoveMenu, TrampaMenu, EquipoMenu, DialogBox, HpBar
+  systems/   # BattleSystem, CaptureSystem, EncounterSystem, Movepool, Progress
+  data/      # json/ + schemas/ + loaders/ (criaturas, movimientos, tipos, items, entrenadores, progresión)
+  ui/        # BattleMenu, MoveMenu, TrampaMenu, EquipoMenu, OlvidarMenu, DialogBox, HpBar
+  debug/     # DebugCommands (window.argendebug, solo dev)
   utils/     # formulas, rng
-tests/       # tests unitarios de sistemas de combate y captura
+tests/       # tests unitarios de sistemas de combate, captura, Movepool, Progress, debug
 public/
   assets/sprites/  # sprites de las 6 criaturas + jugador (PNG)
 ```
@@ -56,6 +57,7 @@ public/
 | Z | Confirmar / Interactuar |
 | X | Cancelar / Volver |
 | Z (combate, texto) | Avanzar / Saltar animación |
+| C (overworld) | Abrir catálogo de criaturas |
 
 ## Pipeline de assets
 
@@ -85,6 +87,7 @@ public/
 - Fase 7 ✅ Flujo de eventos de batalla secuencial, animaciones de daño/desmayo, invariante primera criatura viva
 - Fase 8 🔄 Audio, polish, contenido pendiente
 - Fase 9 ✅ Migración de datos a JSON con validación Zod
+- Sprints de polish ✅ Sistema de progresión (flags/contadores), aprendizaje de movimientos por nivel, popup olvidar movimiento, catálogo libre (tecla C), herramientas de debug (window.argendebug)
 
 ## Licencia
 

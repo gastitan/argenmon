@@ -3,6 +3,7 @@ import { calcularStat, calcularHP } from '@/data/creatures';
 import type { Movimiento } from '@/data/moves';
 import { MOVIMIENTOS } from '@/data/moves';
 import type { Tipo } from '@/data/types';
+import { movimientosAlNivel } from '@/systems/Movepool';
 
 export interface EstadoMovimiento {
   movimiento: Movimiento;
@@ -25,10 +26,12 @@ export class Criatura {
 
   readonly movimientos: EstadoMovimiento[];
 
-  estadoAlterado: 'envenenado' | null = null;
-  modificadorEvasion = 0; // 0 = normal, 1 = +1 etapa, 2 = +2 etapas (máx)
+  movimientosAprendidos: string[];
 
-  constructor(especie: EspecieBase, nivel: number) {
+  estadoAlterado: 'envenenado' | null = null;
+  modificadorEvasion = 0;
+
+  constructor(especie: EspecieBase, nivel: number, movimientoIds?: string[]) {
     this.especie = especie;
     this.nivel = nivel;
     this.tipos = especie.tipos;
@@ -42,10 +45,12 @@ export class Criatura {
     this.defEsp = calcularStat(especie.defEspBase, nivel);
     this.vel = calcularStat(especie.velBase, nivel);
 
-    this.movimientos = especie.movimientosIniciales.map((id) => ({
+    const ids = movimientoIds ?? movimientosAlNivel(especie.id, nivel);
+    this.movimientos = ids.map((id) => ({
       movimiento: MOVIMIENTOS[id],
       ppActual: MOVIMIENTOS[id].pp,
     }));
+    this.movimientosAprendidos = [...ids];
   }
 
   get estaVivo(): boolean {

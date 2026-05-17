@@ -1,3 +1,4 @@
+import './debug';
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, PALETA_HEX } from './config';
 import { BootScene } from './scenes/BootScene';
@@ -26,4 +27,4 @@ const config: Phaser.Types.Core.GameConfig = {
   },
 };
 
-document.fonts.ready.then(() => new Phaser.Game(config));
+document.fonts.load('16px "Press Start 2P"').then(() => new Phaser.Game(config));

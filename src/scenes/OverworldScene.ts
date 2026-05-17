@@ -84,6 +84,10 @@ export class OverworldScene extends Phaser.Scene {
       this.scene.start(SCENE_KEYS.Battle, { tipo: 'debug' });
     });
 
+    this.input.keyboard?.on('keydown-C', () => {
+      if (!this.dialogoActivo) this.scene.start(SCENE_KEYS.Catalog);
+    });
+
     this.events.on('player-step', (tx: number, ty: number) => {
       this.alPisar(tx, ty);
     });
@@ -104,8 +108,7 @@ export class OverworldScene extends Phaser.Scene {
         .setOrigin(0, 0)
         .setDepth(10);
 
-      // Ocultar si ya fue derrotado
-      if (GameState.entrenadorDerrotado(datos.id)) {
+      if (datos.flagDerrota && GameState.obtenerFlag(datos.flagDerrota)) {
         rect.setVisible(false);
       }
 
@@ -117,6 +120,7 @@ export class OverworldScene extends Phaser.Scene {
 
   private alPisar(tx: number, ty: number): void {
     this.pasosSinGuardar++;
+    GameState.incrementarContador('stats.steps_walked');
     if (this.pasosSinGuardar >= 10) {
       this.pasosSinGuardar = 0;
       GameState.actualizarPosicion(tx, ty);

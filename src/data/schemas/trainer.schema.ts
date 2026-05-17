@@ -16,6 +16,7 @@ export const EntrenadorJSONSchema = z.object({
   visionTiles: z.number().int().min(1),
   equipo: z.array(EquipoEntrenadorSchema).min(1),
   esJefeFinal: z.boolean(),
+  flagDerrota: z.string().optional(),
 });
 
 export type EntrenadorJSON = z.infer<typeof EntrenadorJSONSchema>;

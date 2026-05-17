@@ -2,9 +2,12 @@ import type { EspecieId } from '@/data/creatures';
 import { ESPECIES, calcularHP } from '@/data/creatures';
 import { MOVIMIENTOS } from '@/data/moves';
 import type { TrampaId } from '@/data/items';
+import { movimientosAlNivel } from '@/systems/Movepool';
+import * as Progress from '@/systems/Progress';
+import type { ProgressoGuardado } from '@/systems/Progress';
 
-export const VERSION_SAVE = 1;
-const SAVE_KEY = 'pampamon_save_v1';
+export const VERSION_SAVE = 3;
+const SAVE_KEY = 'pampamon_save_v3';
 
 export interface CriaturaGuardada {
   uid: string;
@@ -15,6 +18,8 @@ export interface CriaturaGuardada {
   hpActual: number;
   hpMaxCacheado: number;
   ppActuales: [number, number, number, number];
+  movimientosActuales: string[];
+  movimientosAprendidos: string[];
   estadoAlterado: 'envenenado' | 'ninguno';
   modificadores: {
     atk: number;
@@ -36,12 +41,11 @@ export interface PlayerState {
   inventario: { trampaComun: number; trampaMonte: number; trampaFina: number };
   catalogo: Partial<Record<EspecieId, 'visto' | 'capturado'>>;
   mundo: {
-    entrenadoresDerrotados: string[];
     eventosVistos: string[];
     objetosRecogidos: string[];
     tilesModificados: Record<string, number>;
-    jefeDerrotado: boolean;
   };
+  progreso: ProgressoGuardado;
   ultimoGuardado: number;
 }
 
@@ -49,19 +53,19 @@ function generarUid(): string {
   return Math.random().toString(36).substring(2) + Date.now().toString(36);
 }
 
-function calcularExpParaSiguienteNivel(nivel: number): number {
+export function calcularExpParaSiguienteNivel(nivel: number): number {
   return nivel * nivel * 4;
 }
 
-function crearCriaturaGuardada(especieId: EspecieId, nivel: number): CriaturaGuardada {
+export function crearCriaturaGuardada(especieId: EspecieId, nivel: number): CriaturaGuardada {
   const especie = ESPECIES[especieId];
   const hpMax = calcularHP(especie.hpBase, nivel);
-  const moves = especie.movimientosIniciales;
+  const movIds = movimientosAlNivel(especieId, nivel);
   const ppActuales: [number, number, number, number] = [
-    MOVIMIENTOS[moves[0]]?.pp ?? 0,
-    MOVIMIENTOS[moves[1]]?.pp ?? 0,
-    MOVIMIENTOS[moves[2]]?.pp ?? 0,
-    MOVIMIENTOS[moves[3]]?.pp ?? 0,
+    MOVIMIENTOS[movIds[0]]?.pp ?? 0,
+    MOVIMIENTOS[movIds[1]]?.pp ?? 0,
+    MOVIMIENTOS[movIds[2]]?.pp ?? 0,
+    MOVIMIENTOS[movIds[3]]?.pp ?? 0,
   ];
 
   return {
@@ -73,6 +77,8 @@ function crearCriaturaGuardada(especieId: EspecieId, nivel: number): CriaturaGua
     hpActual: hpMax,
     hpMaxCacheado: hpMax,
     ppActuales,
+    movimientosActuales: [...movIds],
+    movimientosAprendidos: [...movIds],
     estadoAlterado: 'ninguno',
     modificadores: { atk: 0, def: 0, atkEsp: 0, defEsp: 0, vel: 0, evasion: 0, precision: 0 },
   };
@@ -88,12 +94,11 @@ function crearEstadoInicial(): PlayerState {
     inventario: { trampaComun: 3, trampaMonte: 0, trampaFina: 0 },
     catalogo: {},
     mundo: {
-      entrenadoresDerrotados: [],
       eventosVistos: [],
       objetosRecogidos: [],
       tilesModificados: {},
-      jefeDerrotado: false,
     },
+    progreso: { flags: {}, counters: {}, variables: {} },
     ultimoGuardado: 0,
   };
 }
@@ -113,6 +118,7 @@ class GameStateManager {
     this.state = crearEstadoInicial();
     this.state.nombreJugador = nombre;
     this.state.equipo = [crearCriaturaGuardada(criaturaInicial, 5)];
+    Progress.inicializarProgreso();
   }
 
   cargar(): boolean {
@@ -120,8 +126,12 @@ class GameStateManager {
     if (!raw) return false;
     try {
       const parsed = JSON.parse(raw) as PlayerState;
-      if (parsed.version !== VERSION_SAVE) return false;
+      if (!parsed.version || parsed.version < VERSION_SAVE) {
+        console.log('[GameState] Save descartado: versión incompatible (se requiere v3).');
+        return false;
+      }
       this.state = parsed;
+      Progress.inicializarProgreso(parsed.progreso);
       return true;
     } catch {
       return false;
@@ -129,6 +139,7 @@ class GameStateManager {
   }
 
   guardar(): void {
+    this.state.progreso = Progress.exportarProgreso();
     this.state.ultimoGuardado = Date.now();
     localStorage.setItem(SAVE_KEY, JSON.stringify(this.state));
   }
@@ -145,16 +156,10 @@ class GameStateManager {
 
   curarEquipoCompleto(): void {
     for (const criatura of this.state.equipo) {
-      const especie = ESPECIES[criatura.especieId];
-      const moves = especie.movimientosIniciales;
       criatura.hpActual = criatura.hpMaxCacheado;
-      criatura.ppActuales = [
-        MOVIMIENTOS[moves[0]]?.pp ?? 0,
-        MOVIMIENTOS[moves[1]]?.pp ?? 0,
-        MOVIMIENTOS[moves[2]]?.pp ?? 0,
-        MOVIMIENTOS[moves[3]]?.pp ?? 0,
-      ];
       criatura.estadoAlterado = 'ninguno';
+      const pps = criatura.movimientosActuales.map((id) => MOVIMIENTOS[id]?.pp ?? 0);
+      criatura.ppActuales = [pps[0] ?? 0, pps[1] ?? 0, pps[2] ?? 0, pps[3] ?? 0];
     }
   }
 
@@ -191,17 +196,6 @@ class GameStateManager {
     this.guardar();
   }
 
-  derrotarEntrenador(id: string): void {
-    if (!this.state.mundo.entrenadoresDerrotados.includes(id)) {
-      this.state.mundo.entrenadoresDerrotados.push(id);
-    }
-    this.guardar();
-  }
-
-  entrenadorDerrotado(id: string): boolean {
-    return this.state.mundo.entrenadoresDerrotados.includes(id);
-  }
-
   modificarTile(x: number, y: number, nuevoTipo: number): void {
     const clave = `${this.state.biomaActual}:${x},${y}`;
     this.state.mundo.tilesModificados[clave] = nuevoTipo;
@@ -216,11 +210,22 @@ class GameStateManager {
     this.state.posicion = { x, y };
   }
 
+  // ── API de progresión ────────────────────────────────────────────────────────
+
+  obtenerFlag(id: string): boolean { return Progress.obtenerFlag(id); }
+  setearFlag(id: string, valor: boolean): void { Progress.setearFlag(id, valor); }
+
+  obtenerContador(id: string): number { return Progress.obtenerContador(id); }
+  setearContador(id: string, valor: number): void { Progress.setearContador(id, valor); }
+  incrementarContador(id: string, cantidad?: number): void { Progress.incrementarContador(id, cantidad); }
+
+  obtenerVariable(id: string): string { return Progress.obtenerVariable(id); }
+  setearVariable(id: string, valor: string): void { Progress.setearVariable(id, valor); }
+
   exponer(): void {
     (window as unknown as Record<string, unknown>).GameState = this;
   }
 }
 
 export const GameState = new GameStateManager();
-export { crearCriaturaGuardada };
 export type Inventario = PlayerState['inventario'];

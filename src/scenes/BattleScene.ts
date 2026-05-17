@@ -2,23 +2,27 @@ import Phaser from 'phaser';
 import { PALETA_HEX, SCENE_KEYS, FONT } from '@/config';
 import { BATTLE_LAYOUT } from '@/config/layout';
 import { Criatura } from '@/entities/Criatura';
-import { ESPECIES } from '@/data/creatures';
+import { ESPECIES, calcularHP } from '@/data/creatures';
 import type { EspecieId } from '@/data/creatures';
+import { MOVIMIENTOS } from '@/data/moves';
 import { TRAMPAS } from '@/data/items';
-import { GameState, crearCriaturaGuardada } from '@/state/GameState';
+import { GameState, crearCriaturaGuardada, calcularExpParaSiguienteNivel } from '@/state/GameState';
+import type { CriaturaGuardada } from '@/state/GameState';
 import { BattleSystem } from '@/systems/BattleSystem';
 import type { AccionJugador, EventoBatalla } from '@/systems/BattleSystem';
+import { nuevosMovimientosAlSubir } from '@/systems/Movepool';
 import { hayAlgunaViva, primeraVivaIdx } from '@/state/equipoUtils';
 import { DialogBox } from '@/ui/DialogBox';
-import { BattleMenu } from '@/ui/BattleMenu';
+import { BattleMenu, type OpcionBattle } from '@/ui/BattleMenu';
 import { MoveMenu } from '@/ui/MoveMenu';
 import { TrampaMenu } from '@/ui/TrampaMenu';
 import { EquipoMenu } from '@/ui/EquipoMenu';
+import { OlvidarMenu } from '@/ui/OlvidarMenu';
 import { HpBar } from '@/ui/HpBar';
 import type { BattleConfig } from '@/data/trainers';
 import { encontrarEntrenador } from '@/data/trainers';
 
-type FaseUI = 'animando' | 'menu' | 'movimientos' | 'trampa' | 'equipo' | 'idle';
+type FaseUI = 'animando' | 'menu' | 'movimientos' | 'trampa' | 'equipo' | 'olvidar' | 'idle';
 
 export class BattleScene extends Phaser.Scene {
   private config!: BattleConfig;
@@ -32,7 +36,6 @@ export class BattleScene extends Phaser.Scene {
   private nomRival!: Phaser.GameObjects.Text;
   private nomAliado!: Phaser.GameObjects.Text;
 
-  // Tracked hpMax for the currently-displayed creature on each side
   private hpMaxRivalDisplay = 1;
   private hpMaxJugadorDisplay = 1;
 
@@ -41,6 +44,7 @@ export class BattleScene extends Phaser.Scene {
   private moveMenu!: MoveMenu;
   private trampaMenu!: TrampaMenu;
   private equipoMenu!: EquipoMenu;
+  private olvidarMenu!: OlvidarMenu;
 
   private faseUI: FaseUI = 'idle';
   private keyZ!: Phaser.Input.Keyboard.Key;
@@ -61,8 +65,9 @@ export class BattleScene extends Phaser.Scene {
 
     const guardados = GameState.datos.equipo;
     let equipo = guardados.map((g) => {
-      const c = new Criatura(ESPECIES[g.especieId], g.nivel);
+      const c = new Criatura(ESPECIES[g.especieId], g.nivel, g.movimientosActuales);
       c.hpActual = g.hpActual;
+      c.movimientosAprendidos = [...g.movimientosAprendidos];
       g.ppActuales.forEach((pp, i) => { if (c.movimientos[i]) c.movimientos[i].ppActual = pp; });
       return c;
     });
@@ -96,6 +101,7 @@ export class BattleScene extends Phaser.Scene {
     this.moveMenu = new MoveMenu(this);
     this.trampaMenu = new TrampaMenu(this);
     this.equipoMenu = new EquipoMenu(this);
+    this.olvidarMenu = new OlvidarMenu(this);
 
     if (this.config.tipo === 'wild') {
       GameState.marcarVisto(this.config.especieId);
@@ -114,6 +120,7 @@ export class BattleScene extends Phaser.Scene {
     this.moveMenu.update();
     this.trampaMenu.update();
     this.equipoMenu.update();
+    this.olvidarMenu.update();
   }
 
   // ── Construcción de equipos ─────────────────────────────────────────────────
@@ -351,6 +358,12 @@ export class BattleScene extends Phaser.Scene {
     if (this.sistema.estado.fase === 'fin') return;
     this.faseUI = 'menu';
     this.dialogo.setVisible(false);
+
+    const deshabilitadas = new Set<OpcionBattle>();
+    if (GameState.datos.equipo.length >= 3) {
+      deshabilitadas.add('Trampa');
+    }
+
     this.menu.mostrar((opcion) => {
       if (opcion === 'Atacar') {
         this.mostrarMovimientos();
@@ -361,7 +374,7 @@ export class BattleScene extends Phaser.Scene {
       } else {
         this.ejecutarTurno({ tipo: 'huir' });
       }
-    });
+    }, deshabilitadas);
   }
 
   private mostrarMovimientos(): void {
@@ -375,6 +388,14 @@ export class BattleScene extends Phaser.Scene {
   }
 
   private mostrarTrampas(): void {
+    if (GameState.datos.equipo.length >= 3) {
+      this.mostrarMensajesSecuenciales(
+        ['Equipo lleno. No puedes capturar más criaturas.'],
+        () => this.mostrarMenu(),
+      );
+      return;
+    }
+
     const inv = GameState.datos.inventario;
     const hayTrampas = (Object.values(inv) as number[]).some((n) => n > 0);
     if (!hayTrampas) {
@@ -436,7 +457,10 @@ export class BattleScene extends Phaser.Scene {
         // equipo lleno — futura pantalla de reemplazo
       }
     } else if (resultado === 'victoria' && this.config.tipo === 'entrenador') {
-      GameState.derrotarEntrenador(this.config.entrenadorId);
+      const datosEntrenador = encontrarEntrenador(this.config.entrenadorId);
+      if (datosEntrenador?.flagDerrota) {
+        GameState.setearFlag(datosEntrenador.flagDerrota, true);
+      }
     }
 
     const msgs: Record<string, string> = {
@@ -449,25 +473,146 @@ export class BattleScene extends Phaser.Scene {
 
     this.faseUI = 'animando';
     this.dialogo.mostrar(msg, () => {
-      const guardados = GameState.datos.equipo;
-      this.equipoJugador.forEach((criatura, i) => {
-        if (!guardados[i]) return;
-        GameState.actualizarCriatura(guardados[i].uid, {
-          hpActual: criatura.hpActual,
-          ppActuales: criatura.movimientos.map((m) => m.ppActual) as [number, number, number, number],
-          estadoAlterado: criatura.estadoAlterado === 'envenenado' ? 'envenenado' : 'ninguno',
-        });
-      });
-      GameState.resetearModificadoresCombate();
-      GameState.guardar();
-      if (resultado === 'victoria' && this.config.tipo === 'entrenador') {
-        const datos = encontrarEntrenador(this.config.entrenadorId);
-        if (datos?.esJefeFinal) {
-          this.scene.start(SCENE_KEYS.Catalog);
-          return;
-        }
+      if (resultado === 'victoria') {
+        this.procesarXpYNiveles(() => this.guardarYSalir(resultado));
+      } else {
+        this.guardarYSalir(resultado);
       }
-      this.scene.start(SCENE_KEYS.Overworld);
     });
+  }
+
+  // ── XP y aprendizaje de movimientos post-batalla ────────────────────────────
+
+  private procesarXpYNiveles(onFin: () => void): void {
+    const jugador = this.sistema.estado.jugador;
+    const rival = this.sistema.estado.rival;
+    const guardados = GameState.datos.equipo;
+    const idx = this.equipoJugador.indexOf(jugador);
+    const guardada = idx !== -1 ? guardados[idx] : null;
+
+    if (!guardada) { onFin(); return; }
+
+    const xpGanada = rival.nivel * 10;
+    guardada.expActual += xpGanada;
+
+    // Calcular level-ups y movimientos nuevos antes de mostrar nada
+    const subidas: { nivelAnterior: number; nivelNuevo: number }[] = [];
+    while (guardada.nivel < 100 && guardada.expActual >= guardada.expParaSiguienteNivel) {
+      const nivelAnterior = guardada.nivel;
+      guardada.expActual -= guardada.expParaSiguienteNivel;
+      guardada.nivel++;
+      guardada.expParaSiguienteNivel = calcularExpParaSiguienteNivel(guardada.nivel);
+      guardada.hpMaxCacheado = calcularHP(jugador.especie.hpBase, guardada.nivel);
+      subidas.push({ nivelAnterior, nivelNuevo: guardada.nivel });
+    }
+
+    const subidasMsgs = subidas.map(({ nivelNuevo }) =>
+      `¡${jugador.especie.nombre} subió al nivel ${nivelNuevo}!`,
+    );
+    const introMsgs = [`¡${jugador.especie.nombre} ganó ${xpGanada} de experiencia!`, ...subidasMsgs];
+
+    // Construir lista ordenada de movimientos nuevos
+    const aprendizajes: string[] = [];
+    for (const { nivelAnterior, nivelNuevo } of subidas) {
+      aprendizajes.push(...nuevosMovimientosAlSubir(jugador.especie.id, nivelAnterior, nivelNuevo));
+    }
+
+    this.mostrarMensajesSecuenciales(introMsgs, () => {
+      this.procesarAprendizajes(jugador, guardada, aprendizajes, onFin);
+    });
+  }
+
+  private procesarAprendizajes(
+    criatura: Criatura,
+    guardada: CriaturaGuardada,
+    aprendizajes: string[],
+    onFin: () => void,
+  ): void {
+    if (aprendizajes.length === 0) { onFin(); return; }
+
+    const [movId, ...resto] = aprendizajes;
+    const mov = MOVIMIENTOS[movId];
+    const continuar = () => this.procesarAprendizajes(criatura, guardada, resto, onFin);
+
+    if (criatura.movimientos.length < 4) {
+      // Slot libre — aprendizaje automático
+      criatura.movimientos.push({ movimiento: mov, ppActual: mov.pp });
+      if (!criatura.movimientosAprendidos.includes(movId)) criatura.movimientosAprendidos.push(movId);
+      guardada.movimientosActuales.push(movId);
+      if (!guardada.movimientosAprendidos.includes(movId)) guardada.movimientosAprendidos.push(movId);
+      this.faseUI = 'animando';
+      this.dialogo.mostrar(`¡${criatura.especie.nombre} aprendió ${mov.nombre}!`, continuar);
+    } else {
+      // 4 movimientos llenos — mostrar popup
+      this.faseUI = 'animando';
+      this.dialogo.mostrar(`¡${criatura.especie.nombre} quiere aprender ${mov.nombre}!`, () => {
+        this.dialogo.setVisible(false);
+        this.faseUI = 'olvidar';
+        this.olvidarMenu.mostrar(
+          criatura.movimientos,
+          mov,
+          (slotAOlvidar: number | null) => {
+            if (slotAOlvidar !== null) {
+              const movAntiguo = criatura.movimientos[slotAOlvidar];
+              criatura.movimientos[slotAOlvidar] = { movimiento: mov, ppActual: mov.pp };
+              if (!criatura.movimientosAprendidos.includes(movId)) criatura.movimientosAprendidos.push(movId);
+              guardada.movimientosActuales[slotAOlvidar] = movId;
+              if (!guardada.movimientosAprendidos.includes(movId)) guardada.movimientosAprendidos.push(movId);
+              this.faseUI = 'animando';
+              this.dialogo.mostrar(
+                `¡${criatura.especie.nombre} aprendió ${mov.nombre}!`,
+                () => this.dialogo.mostrar(
+                  `${criatura.especie.nombre} olvidó ${movAntiguo.movimiento.nombre}.`,
+                  continuar,
+                ),
+              );
+            } else {
+              this.faseUI = 'animando';
+              this.dialogo.mostrar(`${criatura.especie.nombre} no aprendió ${mov.nombre}.`, continuar);
+            }
+          },
+        );
+      });
+    }
+  }
+
+  // ── Guardar estado y salir ──────────────────────────────────────────────────
+
+  private guardarYSalir(resultado: string | undefined): void {
+    const guardados = GameState.datos.equipo;
+    this.equipoJugador.forEach((criatura, i) => {
+      if (!guardados[i]) return;
+      GameState.actualizarCriatura(guardados[i].uid, {
+        hpActual: criatura.hpActual,
+        ppActuales: [
+          criatura.movimientos[0]?.ppActual ?? 0,
+          criatura.movimientos[1]?.ppActual ?? 0,
+          criatura.movimientos[2]?.ppActual ?? 0,
+          criatura.movimientos[3]?.ppActual ?? 0,
+        ],
+        movimientosActuales: criatura.movimientos.map((m) => m.movimiento.id),
+        movimientosAprendidos: [...criatura.movimientosAprendidos],
+        estadoAlterado: criatura.estadoAlterado === 'envenenado' ? 'envenenado' : 'ninguno',
+        nivel: guardados[i].nivel,
+        expActual: guardados[i].expActual,
+        expParaSiguienteNivel: guardados[i].expParaSiguienteNivel,
+        hpMaxCacheado: guardados[i].hpMaxCacheado,
+      });
+    });
+    GameState.resetearModificadoresCombate();
+    if (resultado === 'victoria') {
+      GameState.incrementarContador('stats.battles_won');
+    } else if (resultado === 'captura') {
+      GameState.incrementarContador('stats.captures_total');
+    }
+    GameState.guardar();
+    if (resultado === 'victoria' && this.config.tipo === 'entrenador') {
+      const datos = encontrarEntrenador(this.config.entrenadorId);
+      if (datos?.esJefeFinal) {
+        this.scene.start(SCENE_KEYS.Catalog);
+        return;
+      }
+    }
+    this.scene.start(SCENE_KEYS.Overworld);
   }
 }

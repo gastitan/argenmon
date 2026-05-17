@@ -10,7 +10,14 @@
     "defEspBase": 55,
     "velBase": 55,
     "tasaCaptura": 0.35,
-    "movimientosIniciales": ["picotazo", "vuelo_rasante", "ala_acero", "rafaga"],
+    "movepool": [
+      { "nivel": 1, "movimientoId": "picotazo" },
+      { "nivel": 1, "movimientoId": "embestida" },
+      { "nivel": 6, "movimientoId": "ala_acero" },
+      { "nivel": 10, "movimientoId": "ala_viento" },
+      { "nivel": 14, "movimientoId": "vuelo_rasante" },
+      { "nivel": 18, "movimientoId": "salto" }
+    ],
     "spriteKey": "sprite_hornero"
   },
   {
@@ -24,7 +31,13 @@
     "defEspBase": 40,
     "velBase": 80,
     "tasaCaptura": 0.40,
-    "movimientosIniciales": ["patada_veloz", "carrera", "patada_doble", "golpe_rapido"],
+    "movepool": [
+      { "nivel": 1, "movimientoId": "patada_veloz" },
+      { "nivel": 1, "movimientoId": "golpe_rapido" },
+      { "nivel": 7, "movimientoId": "patada_doble" },
+      { "nivel": 11, "movimientoId": "carrera" },
+      { "nivel": 16, "movimientoId": "patada_potente" }
+    ],
     "spriteKey": "sprite_mara"
   },
   {
@@ -38,7 +51,14 @@
     "defEspBase": 70,
     "velBase": 30,
     "tasaCaptura": 0.35,
-    "movimientosIniciales": ["zarpazo", "cuevada", "golpe_bajo", "escondite"],
+    "movepool": [
+      { "nivel": 1, "movimientoId": "aranazo" },
+      { "nivel": 1, "movimientoId": "escondite" },
+      { "nivel": 6, "movimientoId": "cuevada" },
+      { "nivel": 10, "movimientoId": "zarpazo" },
+      { "nivel": 14, "movimientoId": "golpe_bajo" },
+      { "nivel": 19, "movimientoId": "patada_potente" }
+    ],
     "spriteKey": "sprite_vizcacha"
   },
   {
@@ -52,7 +72,15 @@
     "defEspBase": 45,
     "velBase": 75,
     "tasaCaptura": 0.30,
-    "movimientosIniciales": ["patada_potente", "ala_viento", "embestida", "salto"],
+    "movepool": [
+      { "nivel": 1, "movimientoId": "picotazo" },
+      { "nivel": 1, "movimientoId": "patada_veloz" },
+      { "nivel": 6, "movimientoId": "carrera" },
+      { "nivel": 10, "movimientoId": "ala_viento" },
+      { "nivel": 14, "movimientoId": "patada_potente" },
+      { "nivel": 17, "movimientoId": "vuelo_rasante" },
+      { "nivel": 20, "movimientoId": "terramoto" }
+    ],
     "spriteKey": "sprite_nandu"
   },
   {
@@ -66,7 +94,14 @@
     "defEspBase": 80,
     "velBase": 20,
     "tasaCaptura": 0.25,
-    "movimientosIniciales": ["aranazo", "enroscada", "golpe_cola", "terramoto"],
+    "movepool": [
+      { "nivel": 1, "movimientoId": "embestida" },
+      { "nivel": 1, "movimientoId": "zarpazo" },
+      { "nivel": 6, "movimientoId": "aranazo" },
+      { "nivel": 10, "movimientoId": "cuevada" },
+      { "nivel": 14, "movimientoId": "golpe_bajo" },
+      { "nivel": 18, "movimientoId": "terramoto" }
+    ],
     "spriteKey": "sprite_peludo"
   },
   {
@@ -80,7 +115,14 @@
     "defEspBase": 50,
     "velBase": 60,
     "tasaCaptura": 0.30,
-    "movimientosIniciales": ["mordida", "colmillo_venenoso", "constriccion", "ataque_acido"],
+    "movepool": [
+      { "nivel": 1, "movimientoId": "mordida" },
+      { "nivel": 1, "movimientoId": "constriccion" },
+      { "nivel": 7, "movimientoId": "enroscada" },
+      { "nivel": 11, "movimientoId": "colmillo_venenoso" },
+      { "nivel": 15, "movimientoId": "golpe_cola" },
+      { "nivel": 19, "movimientoId": "ataque_acido" }
+    ],
     "spriteKey": "sprite_yarara"
   }
 ]

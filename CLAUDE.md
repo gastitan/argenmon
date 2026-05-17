@@ -225,18 +225,22 @@ Los archivos `.ts` en `src/data/` son stubs de re-exportación que preservan la 
 - **Overworld**: mapa de la Pampa con colisiones, zonas de pasto alto para encuentros aleatorios, 3 NPCs entrenadores, boss (Capataz)
 - **BattleScene**: layout 320×240 — zona de combate (y:0–144), franja de suelo (y:144–160), zona de UI (y:160–240)
 - **UI de combate**: BattleMenu, MoveMenu, TrampaMenu, EquipoMenu, DialogBox, HpBar — todos sin fondo propio (usan el fondo permanente de la escena)
-- **CatalogScene**: pantalla de catálogo al completar el juego
-- **Guardado**: localStorage — clave `pampamon_save_v1`
-- **Tests unitarios**: BattleSystem, CaptureSystem, formulas (36 tests, todos verdes)
+- **CatalogScene**: accesible desde inicio del juego (tecla C en Overworld, sin gate de desbloqueo). Subtítulo "¡Venciste al Capataz!" aparece solo si `biome.pampa_completed` está activo.
+- **Guardado**: localStorage — clave `pampamon_save_v3`
+- **Tests unitarios**: BattleSystem, CaptureSystem, formulas, Movepool, Progress, DebugCommands (80 tests, todos verdes)
 - **Datos en JSON**: criaturas, movimientos, tipos, entrenadores, encuentros e items migrados a `src/data/json/` con schemas Zod y loaders tipados. Los stubs `.ts` preservan la API pública sin tocar el resto del juego.
+- **Sistema de progresión** (`src/systems/Progress.ts`): flags booleanas, contadores enteros y variables string tipados y validados contra `src/data/json/progress.json`. Delegado desde `GameState` para mantener separación de responsabilidades.
+- **Aprendizaje de movimientos por nivel** (`src/systems/Movepool.ts`): cada criatura tiene un movepool definido en JSON con el nivel en que aprende cada movimiento. Al subir de nivel en batalla se muestra el popup OlvidarMenu si los 4 slots están llenos.
+- **OlvidarMenu** (`src/ui/OlvidarMenu.ts`): popup para elegir qué movimiento olvidar al aprender uno nuevo. Header en 2 líneas explícitas, 4 movimientos + "NO APRENDER" navegables, sin pantalla de confirmación SÍ/NO — Z olvida directamente, X cancela.
+- **BattleMenu con opciones deshabilitables**: patrón alpha 0.4 + cursor que saltea opciones inactivas. "TRAMPA" se deshabilita cuando el equipo está lleno (3/3). Defensa en profundidad en `mostrarTrampas()` si la opción llega igualmente.
+- **Sistema de debug** (`src/debug/`): `window.argendebug` disponible solo en desarrollo. Eliminado del bundle de producción por tree-shaking de Vite. Ver sección 18.
 
 ### Deuda técnica conocida
 
 - Chunk de JS > 500 KB (warning Vite preexistente, no urgente).
 - `mostrarMensajesSecuenciales` coexiste con `procesarEventos`; unificable construyendo eventos `'mensaje'` ad-hoc, pero no urgente.
 - `maps.ts` no migrado a JSON (array 2D visual; candidato para cuando se integre Tiled en Fase 8).
-- Falta sistema de aprendizaje de movimientos por nivel.
-- Falta sistema de flags general para progresión no lineal.
+- **Distribución de XP (decisión bloqueada):** actualmente solo la criatura activa al final del combate recibe XP (`this.sistema.estado.jugador` en `procesarXpYNiveles`). Esto perjudica a criaturas que participaron pero fueron cambiadas antes del KO final. Opciones: A) solo el activo al final (actual, simple), B1) dividir XP entre participantes, B2) XP completo a cada participante, B3) Exp Share moderno. Decisión postergada hasta tener segundo bioma y poder evaluar la curva de progresión real.
 
 ---
 
@@ -287,6 +291,20 @@ Cosas que el desarrollador (humano) todavía tiene que definir. Marcar con [x] c
 - **Commits chicos y descriptivos**, uno por feature lógica
 - **Si Claude propone agregar una librería nueva, justificarla en el commit**
 
+
+## 18. Comandos de Debug
+
+`window.argendebug` disponible en `npm run dev`. No existe en el bundle de producción (tree-shaking de Vite elimina `src/debug/` por completo).
+
+| Comando | Descripción |
+|---------|-------------|
+| `argendebug.fillTraps()` | Llena las 3 trampas a 10 unidades cada una |
+| `argendebug.dumpState()` | Imprime el estado completo del juego (solo lectura) |
+| `argendebug.levelUp(indice?, cant?)` | Sube de nivel a la criatura en `indice` (default: 0) `cant` veces (default: 1). Actualiza HP máx, movimientos y PP. |
+| `argendebug.removeCreature(indice)` | Elimina la criatura en `indice` del equipo. Mínimo 1 criatura. |
+
+Los comandos mutan `GameState` directamente. Los cambios persisten al próximo autosave (cada 10 pasos o al terminar batalla). Para agregar comandos nuevos: editar `src/debug/DebugCommands.ts` y actualizar el mensaje en `src/debug/index.ts`.
+
 ---
 
-*Última actualización: mayo 2026 — Fases 1–7 y 9 completas, Fase 8 en progreso. Canvas 320×240 @ ×3. Paleta master 20 colores. Eventos de batalla secuenciales con animaciones de HP y desmayo. Datos del juego en JSON con validación Zod.*
+*Última actualización: mayo 2026 — Fases 1–7 y 9 completas, Fase 8 en progreso. Canvas 320×240 @ ×3. Paleta master 20 colores. Eventos de batalla secuenciales con animaciones de HP y desmayo. Datos del juego en JSON con validación Zod. Sistema de progresión (flags/contadores/variables), aprendizaje de movimientos por nivel con popup OlvidarMenu, catálogo accesible desde el inicio (tecla C), herramientas de debug en window.argendebug. 80 tests unitarios, todos verdes.*

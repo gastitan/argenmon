@@ -40,13 +40,21 @@ export interface EventoBatalla {
     | 'captura_sacudida'
     | 'captura_exito'
     | 'captura_fallo'
-    | 'batalla_fin';
+    | 'batalla_fin'
+    | 'sube_nivel'
+    | 'aprende_movimiento'
+    | 'intenta_aprender_movimiento'
+    | 'cancela_aprendizaje';
   mensaje?: string;
   cantidad?: number;
   nuevoHp?: number;
   resultado?: ResultadoBatalla;
   critico?: boolean;
   efectividad?: number;
+  movimientoId?: string;
+  slot?: number;
+  automatico?: boolean;
+  nivelNuevo?: number;
 }
 
 export interface EstadoBatalla {

@@ -73,11 +73,16 @@ export class MoveMenu {
     this.onConfirmar = onConfirmar;
     this.onCancelar = onCancelar;
 
-    movimientos.forEach((m, i) => {
-      if (this.items[i]) {
+    for (let i = 0; i < 4; i++) {
+      const m = movimientos[i];
+      if (m) {
         this.items[i].setText(`${m.movimiento.nombre}\nPP ${m.ppActual}/${m.movimiento.pp}`);
+        this.items[i].setAlpha(1);
+      } else {
+        this.items[i].setText('');
+        this.items[i].setAlpha(0.4);
       }
-    });
+    }
 
     this.actualizarCursor();
     this.setVisible(true);
