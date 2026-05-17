@@ -164,15 +164,15 @@ describe('GameState — save versioning', () => {
     vi.unstubAllGlobals();
   });
 
-  it('descarta el save si version es menor a 2', async () => {
+  it('descarta el save si version es menor a 3', async () => {
     const { GameState } = await import('@/state/GameState');
-    store['pampamon_save_v2'] = JSON.stringify({ version: 1, nombreJugador: 'test' });
+    store['pampamon_save_v3'] = JSON.stringify({ version: 1, nombreJugador: 'test' });
     expect(GameState.cargar()).toBe(false);
   });
 
   it('descarta el save si no tiene campo version', async () => {
     const { GameState } = await import('@/state/GameState');
-    store['pampamon_save_v2'] = JSON.stringify({ nombreJugador: 'sin_version' });
+    store['pampamon_save_v3'] = JSON.stringify({ nombreJugador: 'sin_version' });
     expect(GameState.cargar()).toBe(false);
   });
 
