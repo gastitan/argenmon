@@ -1,0 +1,35 @@
+{
+  "flags": {
+    "trainer.peon_defeated": {
+      "default": false,
+      "desc": "El jugador derrotó al Peón en la Pampa"
+    },
+    "trainer.maestra_rural_defeated": {
+      "default": false,
+      "desc": "El jugador derrotó a la Maestra Rural en la Pampa"
+    },
+    "trainer.capataz_defeated": {
+      "default": false,
+      "desc": "El jugador derrotó al Capataz, jefe de la Pampa"
+    },
+    "biome.pampa_completed": {
+      "default": false,
+      "desc": "El jugador completó el bioma Pampa (derrotó al Capataz)"
+    }
+  },
+  "counters": {
+    "stats.steps_walked": {
+      "default": 0,
+      "desc": "Pasos totales caminados en overworld"
+    },
+    "stats.battles_won": {
+      "default": 0,
+      "desc": "Batallas ganadas (wild + entrenadores)"
+    },
+    "stats.captures_total": {
+      "default": 0,
+      "desc": "Criaturas capturadas en total"
+    }
+  },
+  "variables": {}
+}

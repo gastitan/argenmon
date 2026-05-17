@@ -22,9 +22,11 @@ export class CatalogScene extends Phaser.Scene {
       fontFamily: FONT, fontSize: '8px', color: PALETA_HEX.oscurisimo,
     }).setOrigin(0.5, 0);
 
-    this.add.text(GAME_WIDTH / 2, SUBTITLE_Y, '¡Venciste al Capataz!', {
-      fontFamily: FONT, fontSize: '8px', color: PALETA_HEX.oscuro,
-    }).setOrigin(0.5, 0);
+    if (GameState.obtenerFlag('biome.pampa_completed')) {
+      this.add.text(GAME_WIDTH / 2, SUBTITLE_Y, '¡Venciste al Capataz!', {
+        fontFamily: FONT, fontSize: '8px', color: PALETA_HEX.oscuro,
+      }).setOrigin(0.5, 0);
+    }
 
     const catalogo = GameState.datos.catalogo;
     let capturadas = 0;

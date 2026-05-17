@@ -10,6 +10,7 @@ export class BattleMenu {
   private cursor!: Phaser.GameObjects.Text;
   private seleccion = 0;
   private onConfirmar: ((op: OpcionBattle) => void) | null = null;
+  private deshabilitadas = new Set<OpcionBattle>();
   private keys!: { up: Phaser.Input.Keyboard.Key; down: Phaser.Input.Keyboard.Key; confirm: Phaser.Input.Keyboard.Key };
 
   constructor(scene: Phaser.Scene) {
@@ -44,9 +45,17 @@ export class BattleMenu {
     this.setVisible(false);
   }
 
-  mostrar(onConfirmar: (op: OpcionBattle) => void): void {
-    this.seleccion = 0;
+  mostrar(onConfirmar: (op: OpcionBattle) => void, deshabilitadas = new Set<OpcionBattle>()): void {
+    this.deshabilitadas = deshabilitadas;
     this.onConfirmar = onConfirmar;
+
+    OPCIONES.forEach((op, i) => {
+      this.items[i].setAlpha(deshabilitadas.has(op) ? 0.4 : 1);
+    });
+
+    this.seleccion = OPCIONES.findIndex((op) => !deshabilitadas.has(op));
+    if (this.seleccion < 0) this.seleccion = 0;
+
     this.actualizarCursor();
     this.setVisible(true);
   }
@@ -55,17 +64,28 @@ export class BattleMenu {
     if (!this.items[0].visible) return;
 
     if (Phaser.Input.Keyboard.JustDown(this.keys.up)) {
-      this.seleccion = (this.seleccion - 1 + OPCIONES.length) % OPCIONES.length;
-      this.actualizarCursor();
+      this.moverCursor(-1);
     }
     if (Phaser.Input.Keyboard.JustDown(this.keys.down)) {
-      this.seleccion = (this.seleccion + 1) % OPCIONES.length;
-      this.actualizarCursor();
+      this.moverCursor(1);
     }
     if (Phaser.Input.Keyboard.JustDown(this.keys.confirm)) {
-      this.setVisible(false);
-      this.onConfirmar?.(OPCIONES[this.seleccion]);
+      if (!this.deshabilitadas.has(OPCIONES[this.seleccion])) {
+        this.setVisible(false);
+        this.onConfirmar?.(OPCIONES[this.seleccion]);
+      }
     }
+  }
+
+  private moverCursor(dir: 1 | -1): void {
+    let next = (this.seleccion + dir + OPCIONES.length) % OPCIONES.length;
+    let intentos = 0;
+    while (this.deshabilitadas.has(OPCIONES[next]) && intentos < OPCIONES.length) {
+      next = (next + dir + OPCIONES.length) % OPCIONES.length;
+      intentos++;
+    }
+    this.seleccion = next;
+    this.actualizarCursor();
   }
 
   setVisible(v: boolean): void {

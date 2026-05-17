@@ -9,7 +9,8 @@
     "equipo": [
       { "especieId": "mara", "nivel": 7 }
     ],
-    "esJefeFinal": false
+    "esJefeFinal": false,
+    "flagDerrota": "trainer.peon_defeated"
   },
   {
     "id": "maestra",
@@ -22,7 +23,8 @@
       { "especieId": "vizcacha", "nivel": 8 },
       { "especieId": "hornero",  "nivel": 7 }
     ],
-    "esJefeFinal": false
+    "esJefeFinal": false,
+    "flagDerrota": "trainer.maestra_rural_defeated"
   },
   {
     "id": "almacenero",
@@ -48,6 +50,7 @@
       { "especieId": "peludo", "nivel": 15 },
       { "especieId": "nandu",  "nivel": 15 }
     ],
-    "esJefeFinal": true
+    "esJefeFinal": true,
+    "flagDerrota": "trainer.capataz_defeated"
   }
 ]

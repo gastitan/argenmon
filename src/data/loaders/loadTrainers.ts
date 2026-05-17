@@ -16,6 +16,7 @@ export interface DatosEntrenador {
   visionTiles: number;
   equipo: EquipoEntrenador[];
   esJefeFinal?: boolean;
+  flagDerrota?: string;
 }
 
 function loadTrainers(): DatosEntrenador[] {
@@ -38,6 +39,7 @@ function loadTrainers(): DatosEntrenador[] {
   return parsed.map((t) => ({
     ...t,
     esJefeFinal: t.esJefeFinal || undefined,
+    flagDerrota: t.flagDerrota,
   }));
 }
 

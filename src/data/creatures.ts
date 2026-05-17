@@ -1,5 +1,5 @@
 // Datos de criaturas migrados a JSON. Este archivo re-exporta la API pública.
-export type { EspecieBase, EspecieId } from '@/data/loaders/loadCreatures';
+export type { EspecieBase, EspecieId, MovepoolEntrada } from '@/data/loaders/loadCreatures';
 export { ESPECIES } from '@/data/loaders/loadCreatures';
 
 // Fórmulas puras de stats — no son datos, se mantienen aquí.
