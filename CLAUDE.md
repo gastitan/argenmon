@@ -72,7 +72,7 @@ tests/          # Tests unitarios de systems/
 | Acentos | `#a8442a` `#3d5a7a` `#6a4a7a` |
 | Grises | `#5a5a55` `#8a8a85` |
 
-Esta paleta aplica a tiles, UI y overworld. Los sprites de criaturas se generan con Nano Banana (Gemini 2.5 Flash Image) y se procesan por script Python (Pillow) que fuerza la paleta y downscalea a 96×96 con LANCZOS.
+Esta paleta actúa como **paleta guía** (no restricción estricta). Se aplica por cuantización de distancia euclidiana RGB mediante `scripts/process_sprites.py`. Los sprites de criaturas se generan con Nano Banana (Gemini 2.5 Flash Image) y se procesan con pipeline LANCZOS → la interpolación produce variantes intermedias de los colores guía, lo que es esperado y deseado para el look "pixel art HD". Personajes y tilesets usan pipeline NEAREST → paleta aplicada píxel a píxel sin interpolación.
 
 **Resolución base:** 320×240 px, escalado ×3 → 960×720 en pantalla.
 

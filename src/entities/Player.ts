@@ -25,10 +25,10 @@ export class Player {
   ) {
     this.tileX = startTileX;
     this.tileY = startTileY;
+    // TEST: sprite temporal 32×48 para validación visual
     this.sprite = scene.add
-      .image(startTileX * TILE_SIZE + TILE_SIZE / 2, startTileY * TILE_SIZE + TILE_SIZE / 2, 'player_sprite')
-      .setOrigin(0.5)
-      .setDisplaySize(16, 16);
+      .image(startTileX * TILE_SIZE + TILE_SIZE / 2, startTileY * TILE_SIZE + TILE_SIZE, 'player_sprite')
+      .setOrigin(0.5, 1);
 
     if (!scene.input.keyboard) throw new Error('Falta keyboard input');
     this.cursors = scene.input.keyboard.createCursorKeys();
@@ -63,7 +63,7 @@ export class Player {
     this.estado = 'moving';
 
     const targetX = nuevoTX * TILE_SIZE + TILE_SIZE / 2;
-    const targetY = nuevoTY * TILE_SIZE + TILE_SIZE / 2;
+    const targetY = nuevoTY * TILE_SIZE + TILE_SIZE; // TEST: sprite temporal 32×48
 
     this.scene.tweens.add({
       targets: this.sprite,
