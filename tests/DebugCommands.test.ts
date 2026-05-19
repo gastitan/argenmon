@@ -117,7 +117,7 @@ describe('DebugCommands.levelUp', () => {
     DebugCommands.levelUp();
     const cambios = mockActualizarCriatura.mock.calls[0][1];
     expect(Array.isArray(cambios.movimientosActuales)).toBe(true);
-    expect(cambios.movimientosActuales.length).toBeGreaterThan(0);
+    expect(cambios.movimientosActuales!.length).toBeGreaterThan(0);
   });
 
   it('no hace nada si el equipo está vacío', () => {

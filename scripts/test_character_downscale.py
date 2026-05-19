@@ -6,7 +6,7 @@ Probador, NO es el pipeline final. Genera multiples variantes para comparar
 visualmente cual se ve mejor antes de comprometer el pipeline definitivo.
 
 Uso:
-  python test_character_downscale.py <ruta_al_sprite_raw.png>
+  python scripts/test_character_downscale.py <ruta_al_sprite_raw.png>
 
 Salida:
   Crea carpeta test_output/ con multiples variantes:
@@ -32,8 +32,8 @@ from pathlib import Path
 from PIL import Image
 
 # Configuracion
-TARGET_SIZE = (32, 32) #32,48
-PREVIEW_SCALE = 10  # escalado para preview (32x48 -> 192x288)
+TARGET_SIZE = (32, 32)
+PREVIEW_SCALE = 10  # escalado para preview (32x32 -> 320x320)
 
 # Paleta master (hardcodeada para no depender de path del proyecto)
 PALETTE_HEX = [
@@ -158,7 +158,7 @@ def upscale_preview(img: Image.Image, scale: int) -> Image.Image:
 
 def main() -> None:
     if len(sys.argv) != 2:
-        print("Uso: python test_character_downscale.py <sprite.png>", file=sys.stderr)
+        print("Uso: python scripts/test_character_downscale.py <sprite.png>", file=sys.stderr)
         sys.exit(1)
 
     src_path = Path(sys.argv[1])

@@ -89,6 +89,24 @@ def test_characters_pipeline_uses_nearest() -> None:
     assert mock_resize.call_args[0][1] == Image.NEAREST
 
 
+def test_tilesets_pipeline_skips_resize() -> None:
+    # tilesets tiene target_size=None → el output es la imagen cuantizada sin resize
+    config = ASSET_CONFIGS["tilesets"]
+    assert config["target_size"] is None
+
+    palette = [(0, 0, 0)]
+    img = Image.new("RGBA", (16, 16), (0, 0, 0, 255))
+
+    with patch("process_sprites.Image.open", return_value=img), \
+         patch.object(Image.Image, "resize") as mock_resize, \
+         patch.object(Image.Image, "save") as mock_save:
+        ok = process_sprite(Path("fake.png"), Path("out.png"), palette, config, "tilesets")
+
+    assert ok is True
+    mock_resize.assert_not_called()
+    mock_save.assert_called_once()
+
+
 if __name__ == "__main__":
     tests = [
         test_nearest_color_exact_match,
@@ -99,6 +117,7 @@ if __name__ == "__main__":
         test_validate_integer_scale_rejects_non_integer,
         test_creatures_pipeline_uses_lanczos,
         test_characters_pipeline_uses_nearest,
+        test_tilesets_pipeline_skips_resize,
     ]
 
     passed = 0
