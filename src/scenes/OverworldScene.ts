@@ -58,9 +58,14 @@ export class OverworldScene extends Phaser.Scene {
     if (!layer) throw new Error('No se pudo crear la layer del mapa');
     this.layer = layer;
     this.layer.setCollision([TILE_ARBOL, TILE_AGUA]);
+    this.layer.setDepth(0);
+
+    // Render en dos pasadas: terreno + objetos. Ver mini-sprint árboles.
+    this.crearArboles();
 
     const { x: startTileX, y: startTileY } = GameState.datos.posicion;
     this.player = new Player(this, startTileX, startTileY, this.esBloqueado.bind(this));
+    this.player.sprite.setDepth(this.player.sprite.y);
 
     // Opción A: cámara sigue al jugador con follow inmediato (lerp=1).
     // El mapa (480×320) es solo un poco más grande que el canvas (320×240),
@@ -78,7 +83,7 @@ export class OverworldScene extends Phaser.Scene {
         backgroundColor: PALETA_HEX.clarisimo,
       })
       .setScrollFactor(0)
-      .setDepth(100);
+      .setDepth(1000);
 
     this.input.keyboard?.on('keydown-B', () => {
       this.scene.start(SCENE_KEYS.Battle, { tipo: 'debug' });
@@ -95,6 +100,27 @@ export class OverworldScene extends Phaser.Scene {
 
   update(_time: number, delta: number): void {
     if (!this.dialogoActivo) this.player.update(delta);
+    this.player.sprite.setDepth(this.player.sprite.y);
+  }
+
+  // ── Árboles (pasada de objetos) ─────────────────────────────────────────────
+
+  private crearArboles(): void {
+    // Baseline = 6 px sobre el fondo del sprite: donde el tronco toca el suelo visualmente.
+    // Esto garantiza que el player en la misma fila (depth = img.y) siempre gana al árbol
+    // (depth = img.y - 6) sin depender del orden en la display list.
+    const ARBOL_BASELINE_OFFSET = 6;
+    const variantes = ['arbol_ombu', 'arbol_ceibo', 'arbol_algarrobo'] as const;
+    for (let y = 0; y < mapaPampaInicial.length; y++) {
+      for (let x = 0; x < mapaPampaInicial[y].length; x++) {
+        if (mapaPampaInicial[y][x] !== TILE_ARBOL) continue;
+        const idx = (x * 7 + y * 13) % 3;
+        const img = this.add
+          .image(x * TILE_SIZE + TILE_SIZE / 2, y * TILE_SIZE + TILE_SIZE, variantes[idx])
+          .setOrigin(0.5, 1);
+        img.setDepth(img.y - ARBOL_BASELINE_OFFSET);
+      }
+    }
   }
 
   // ── Marcadores de entrenadores ──────────────────────────────────────────────
@@ -106,7 +132,7 @@ export class OverworldScene extends Phaser.Scene {
       const rect = this.add
         .rectangle(x, y, TILE_SIZE, TILE_SIZE, COLOR_ENTRENADOR)
         .setOrigin(0, 0)
-        .setDepth(10);
+        .setDepth(y + TILE_SIZE);
 
       if (datos.flagDerrota && GameState.obtenerFlag(datos.flagDerrota)) {
         rect.setVisible(false);
@@ -189,22 +215,22 @@ export class OverworldScene extends Phaser.Scene {
 
     const fondo = this.add
       .rectangle(DIALOG_BOX.x, DIALOG_BOX.y, DIALOG_BOX.w, DIALOG_BOX.h, 0x9bbc0f)
-      .setOrigin(0).setScrollFactor(0).setDepth(200);
+      .setOrigin(0).setScrollFactor(0).setDepth(1000);
 
     const texto = this.add.text(DIALOG_TEXT_POS.x, DIALOG_TEXT_POS.y, '¡Bienvenido!\n¿Querés que cure a tus animales?', {
       fontFamily: FONT, fontSize: '8px', color: PALETA_HEX.oscurisimo,
       wordWrap: { width: DIALOG_BOX.w - 16 },
-    }).setScrollFactor(0).setDepth(201);
+    }).setScrollFactor(0).setDepth(1001);
 
     let seleccion = 0;
 
     const opSi = this.add.text(SHOP_OPTION_SI.x, SHOP_OPTION_SI.y, '>Sí', {
       fontFamily: FONT, fontSize: '8px', color: PALETA_HEX.oscurisimo,
-    }).setScrollFactor(0).setDepth(201);
+    }).setScrollFactor(0).setDepth(1001);
 
     const opNo = this.add.text(SHOP_OPTION_NO.x, SHOP_OPTION_NO.y, ' No', {
       fontFamily: FONT, fontSize: '8px', color: PALETA_HEX.oscurisimo,
-    }).setScrollFactor(0).setDepth(201);
+    }).setScrollFactor(0).setDepth(1001);
 
     const destruir = () => {
       fondo.destroy();

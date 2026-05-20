@@ -18,10 +18,45 @@ export class BootScene extends Phaser.Scene {
     this.load.image('sprite_nandu', 'assets/sprites/nandu.png');
     this.load.image('sprite_vizcacha', 'assets/sprites/vizcacha.png');
     this.load.image('player_sprite', 'assets/sprites/player.png');
+    // TEST: pasto_1.png pintado a mano, evaluación visual antes de pintar las otras variantes.
+    this.load.image('tile_pasto_bajo', 'assets/raw_sprites/tilesets/pasto_1.png');
+    // TEST: pasto_alto_1.png pintado a mano, evaluación visual.
+    this.load.image('tile_pasto_alto', 'assets/raw_sprites/tilesets/pasto_alto_1.png');
+    // TEST: agua_1.png pintado a mano. Último tile base de Pampa.
+    this.load.image('tile_agua', 'assets/raw_sprites/tilesets/agua_1.png');
+    this.load.image('arbol_ombu', 'assets/raw_sprites/tilesets/ombu.png');
+    this.load.image('arbol_ceibo', 'assets/raw_sprites/tilesets/ceibo.png');
+    this.load.image('arbol_algarrobo', 'assets/raw_sprites/tilesets/algarrobo.png');
     this.crearTileset();
   }
 
   create(): void {
+    // Render en dos pasadas: terreno + objetos. Ver mini-sprint árboles.
+    // Tile ID=0 y tile ID=2 muestran pasto en la pasada de terreno (Tilemap).
+    // Los sprites de árbol se superponen en crearArboles() de OverworldScene.
+    const tilesetTex = this.textures.get('tileset');
+    const canvas = tilesetTex.getSourceImage() as HTMLCanvasElement;
+    const ctx = canvas.getContext('2d')!;
+    const pastoImg = this.textures.get('tile_pasto_bajo').getSourceImage() as HTMLImageElement;
+
+    ctx.clearRect(0, 0, TILE_SIZE, TILE_SIZE);
+    ctx.drawImage(pastoImg, 0, 0, TILE_SIZE, TILE_SIZE);
+
+    // TEST: pasto_alto_1.png pintado a mano, evaluación visual.
+    const pastoAltoImg = this.textures.get('tile_pasto_alto').getSourceImage() as HTMLImageElement;
+    ctx.clearRect(TILE_SIZE, 0, TILE_SIZE, TILE_SIZE);
+    ctx.drawImage(pastoAltoImg, TILE_SIZE, 0, TILE_SIZE, TILE_SIZE);
+
+    ctx.clearRect(TILE_SIZE * 2, 0, TILE_SIZE, TILE_SIZE);
+    ctx.drawImage(pastoImg, TILE_SIZE * 2, 0, TILE_SIZE, TILE_SIZE);
+
+    // TEST: agua_1.png pintado a mano. Último tile base de Pampa.
+    const aguaImg = this.textures.get('tile_agua').getSourceImage() as HTMLImageElement;
+    ctx.clearRect(TILE_SIZE * 3, 0, TILE_SIZE, TILE_SIZE);
+    ctx.drawImage(aguaImg, TILE_SIZE * 3, 0, TILE_SIZE, TILE_SIZE);
+
+    tilesetTex.source[0].update();
+
     this.scene.start(SCENE_KEYS.Menu);
   }
 
