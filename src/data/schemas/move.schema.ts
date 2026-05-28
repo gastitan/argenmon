@@ -15,8 +15,20 @@ const EfectoEvasionSchema = z.object({
   etapas: z.number().int().min(1),
 });
 
-export const EfectoMovimientoSchema = z.union([EfectoEnvenenarSchema, EfectoEvasionSchema]);
+const EfectoModificadorStatSchema = z.object({
+  tipo: z.literal('modificador_stat'),
+  objetivo: z.enum(['atacante', 'defensor']),
+  stat: z.enum(['atk', 'def', 'atkEsp', 'defEsp', 'vel']),
+  etapas: z.number().int().min(-6).max(6),
+});
+
+export const EfectoMovimientoSchema = z.union([
+  EfectoEnvenenarSchema,
+  EfectoEvasionSchema,
+  EfectoModificadorStatSchema,
+]);
 export type EfectoMovimiento = z.infer<typeof EfectoMovimientoSchema>;
+export type EfectoModificadorStat = z.infer<typeof EfectoModificadorStatSchema>;
 
 export const MovimientoJSONSchema = z.object({
   id: z.string().min(1),

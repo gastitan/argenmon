@@ -302,6 +302,7 @@ Cosas que el desarrollador (humano) todavía tiene que definir. Marcar con [x] c
 | `argendebug.dumpState()` | Imprime el estado completo del juego (solo lectura) |
 | `argendebug.levelUp(indice?, cant?)` | Sube de nivel a la criatura en `indice` (default: 0) `cant` veces (default: 1). Actualiza HP máx, movimientos y PP. |
 | `argendebug.removeCreature(indice)` | Elimina la criatura en `indice` del equipo. Mínimo 1 criatura. |
+| `argendebug.resetGame()` | Borra el save de localStorage y recarga la página. Vuelve al estado inicial: pantalla de título, sin progreso, NPCs y encuentros reseteados. |
 
 Los comandos mutan `GameState` directamente. Los cambios persisten al próximo autosave (cada 10 pasos o al terminar batalla). Para agregar comandos nuevos: editar `src/debug/DebugCommands.ts` y actualizar el mensaje en `src/debug/index.ts`.
 

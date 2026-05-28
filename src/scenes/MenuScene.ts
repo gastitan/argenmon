@@ -14,7 +14,7 @@ export class MenuScene extends Phaser.Scene {
     this.cameras.main.setBackgroundColor(PALETA_HEX.clarisimo);
 
     this.add
-      .text(GAME_WIDTH / 2, MENU_LAYOUT.TITLE_Y, 'ARGENMON', {
+      .text(GAME_WIDTH / 2, MENU_LAYOUT.TITLE_Y, 'CRIOLLOS', {
         fontFamily: FONT,
         fontSize: '16px',
         color: PALETA_HEX.oscurisimo,

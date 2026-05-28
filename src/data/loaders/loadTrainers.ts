@@ -16,7 +16,10 @@ export interface DatosEntrenador {
   visionTiles: number;
   equipo: EquipoEntrenador[];
   esJefeFinal?: boolean;
+  spriteKey?: string;
   flagDerrota?: string;
+  dialogoPreBatalla?: string;
+  dialogoPostDerrota?: string;
 }
 
 function loadTrainers(): DatosEntrenador[] {
@@ -39,7 +42,10 @@ function loadTrainers(): DatosEntrenador[] {
   return parsed.map((t) => ({
     ...t,
     esJefeFinal: t.esJefeFinal || undefined,
+    spriteKey: t.spriteKey,
     flagDerrota: t.flagDerrota,
+    dialogoPreBatalla: t.dialogoPreBatalla,
+    dialogoPostDerrota: t.dialogoPostDerrota,
   }));
 }
 

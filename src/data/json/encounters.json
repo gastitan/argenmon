@@ -1,12 +1,33 @@
 {
-  "probEncuentroPorPaso": 0.10,
   "tablas": {
-    "pampa": [
-      { "especieId": "mara",     "peso": 30, "nivelMin": 3, "nivelMax": 7 },
-      { "especieId": "vizcacha", "peso": 25, "nivelMin": 3, "nivelMax": 7 },
-      { "especieId": "nandu",    "peso": 20, "nivelMin": 4, "nivelMax": 8 },
-      { "especieId": "peludo",   "peso": 15, "nivelMin": 4, "nivelMax": 8 },
-      { "especieId": "yarara",   "peso": 10, "nivelMin": 5, "nivelMax": 9 }
-    ]
+    "pampa_wild_low": {
+      "rate": 0.10,
+      "tipoTile": "pasto_alto",
+      "criaturas": [
+        { "especieId": "mara",     "peso": 35, "nivelMin": 3, "nivelMax": 7 },
+        { "especieId": "vizcacha", "peso": 30, "nivelMin": 3, "nivelMax": 7 },
+        { "especieId": "nandu",    "peso": 20, "nivelMin": 3, "nivelMax": 7 },
+        { "especieId": "peludo",   "peso": 10, "nivelMin": 3, "nivelMax": 7 },
+        { "especieId": "yarara",   "peso": 5,  "nivelMin": 3, "nivelMax": 7 }
+      ]
+    },
+    "pampa_cazadores": {
+      "rate": 0.05,
+      "tipoTile": "monte",
+      "criaturas": [
+        { "especieId": "jabali", "peso": 100, "nivelMin": 7, "nivelMax": 10 }
+      ]
+    },
+    "pampa_wild_high": {
+      "rate": 0.10,
+      "tipoTile": "pasto_alto",
+      "criaturas": [
+        { "especieId": "mara",     "peso": 15, "nivelMin": 8, "nivelMax": 12 },
+        { "especieId": "vizcacha", "peso": 15, "nivelMin": 8, "nivelMax": 12 },
+        { "especieId": "nandu",    "peso": 25, "nivelMin": 8, "nivelMax": 12 },
+        { "especieId": "peludo",   "peso": 20, "nivelMin": 8, "nivelMax": 12 },
+        { "especieId": "yarara",   "peso": 25, "nivelMin": 8, "nivelMax": 12 }
+      ]
+    }
   }
 }

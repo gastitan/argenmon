@@ -1,11 +1,11 @@
 import encountersJson from '@/data/json/encounters.json';
 import { EncuentrosSchema } from '@/data/schemas/encounter.schema';
 import { ESPECIES } from '@/data/loaders/loadCreatures';
-import type { EntradaEncuentro } from '@/data/schemas/encounter.schema';
+import type { TablaEncuentro } from '@/data/schemas/encounter.schema';
 
-export type { EntradaEncuentro };
+export type { TablaEncuentro };
 
-function loadEncounters() {
+function loadEncounters(): Map<string, TablaEncuentro> {
   let parsed;
   try {
     parsed = EncuentrosSchema.parse(encountersJson);
@@ -14,17 +14,17 @@ function loadEncounters() {
     throw new Error('Failed to load encounters data. Check encounters.json structure.');
   }
 
-  for (const [bioma, tabla] of Object.entries(parsed.tablas)) {
-    for (const entrada of tabla) {
+  const result = new Map<string, TablaEncuentro>();
+  for (const [zoneId, tabla] of Object.entries(parsed.tablas)) {
+    for (const entrada of tabla.criaturas) {
       if (!ESPECIES[entrada.especieId]) {
-        throw new Error(`Encounter table "${bioma}" references unknown species: ${entrada.especieId}`);
+        throw new Error(`Encounter table "${zoneId}" references unknown species: ${entrada.especieId}`);
       }
     }
+    result.set(zoneId, tabla);
   }
 
-  return parsed;
+  return result;
 }
 
-const _data = loadEncounters();
-export const PROB_ENCUENTRO_POR_PASO: number = _data.probEncuentroPorPaso;
-export const TABLAS_ENCUENTROS: Record<string, EntradaEncuentro[]> = _data.tablas;
+export const TABLAS_ENCUENTROS: Map<string, TablaEncuentro> = loadEncounters();

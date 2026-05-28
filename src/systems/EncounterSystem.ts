@@ -1,31 +1,39 @@
 import type { EspecieId } from '@/data/creatures';
 import type { RNG } from '@/utils/rng';
-import { PROB_ENCUENTRO_POR_PASO, TABLAS_ENCUENTROS } from '@/data/loaders/loadEncounters';
+import { TABLAS_ENCUENTROS } from '@/data/loaders/loadEncounters';
 
-interface EntradaEncuentro {
+export interface ResultadoEncuentro {
   especieId: EspecieId;
-  peso: number;
-  nivelMin: number;
-  nivelMax: number;
+  nivel: number;
 }
 
-const TABLA_PAMPA: EntradaEncuentro[] = TABLAS_ENCUENTROS['pampa'] ?? [];
+/**
+ * Intenta generar un encuentro wild dado el zoneId y el tipo de tile pisado.
+ * Retorna null si:
+ *  - No hay tabla para ese zoneId
+ *  - El tipoTile no coincide con el tipoTile de la tabla
+ *  - El RNG no disparó el encuentro (según la tasa de la tabla)
+ */
+export function intentarEncuentro(
+  zoneId: string,
+  tipoTile: string,
+  rng: RNG,
+): ResultadoEncuentro | null {
+  const tabla = TABLAS_ENCUENTROS.get(zoneId);
+  if (!tabla) return null;
+  if (tabla.tipoTile !== tipoTile) return null;
+  if (!rng.chance(tabla.rate)) return null;
 
-export { PROB_ENCUENTRO_POR_PASO };
-
-export function verificarEncuentro(rng: RNG): boolean {
-  return rng.chance(PROB_ENCUENTRO_POR_PASO);
-}
-
-export function elegirWild(rng: RNG): { especieId: EspecieId; nivel: number } {
-  const total = TABLA_PAMPA.reduce((s, e) => s + e.peso, 0);
+  const total = tabla.criaturas.reduce((s, e) => s + e.peso, 0);
   let r = rng.next() * total;
-  for (const entrada of TABLA_PAMPA) {
+  for (const entrada of tabla.criaturas) {
     r -= entrada.peso;
     if (r <= 0) {
       const nivel = entrada.nivelMin + rng.rangoEntero(0, entrada.nivelMax - entrada.nivelMin);
       return { especieId: entrada.especieId, nivel };
     }
   }
-  return { especieId: 'mara', nivel: 5 };
+  // Fallback: primera criatura de la tabla
+  const primera = tabla.criaturas[0];
+  return { especieId: primera.especieId, nivel: primera.nivelMin };
 }
