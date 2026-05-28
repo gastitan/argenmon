@@ -11,22 +11,55 @@ export class BootScene extends Phaser.Scene {
   }
 
   preload(): void {
+    // CREATURES
     this.load.image('sprite_hornero', 'assets/sprites/hornero.png');
     this.load.image('sprite_yarara', 'assets/sprites/yarara.png');
     this.load.image('sprite_mara', 'assets/sprites/mara.png');
     this.load.image('sprite_peludo', 'assets/sprites/peludo.png');
     this.load.image('sprite_nandu', 'assets/sprites/nandu.png');
     this.load.image('sprite_vizcacha', 'assets/sprites/vizcacha.png');
+    this.load.image('sprite_dogo', 'assets/sprites/dogo.png');
+    this.load.image('sprite_jabali', 'assets/sprites/jabali.png');
+    // PLAYER
     this.load.image('player_sprite', 'assets/sprites/player.png');
+    // CIVILIAN NPCs
+    this.load.image('npc_man_1', 'assets/sprites/man_1.png');
+    this.load.image('npc_man_2', 'assets/sprites/man_2.png');
+    this.load.image('npc_woman_1', 'assets/sprites/woman_1.png');
+    this.load.image('npc_girl_1', 'assets/sprites/girl_1.png');
+    // TRAINER NPCs
+    this.load.image('npc_peon', 'assets/sprites/peon.png');
+    this.load.image('npc_almacenero', 'assets/sprites/almacenero.png');
+    this.load.image('npc_capataz', 'assets/sprites/capataz.png');
+    this.load.image('npc_maestra_rural', 'assets/sprites/maestra_rural.png');
+    this.load.image('npc_cazador_1', 'assets/sprites/cazador_1.png');
+    this.load.image('npc_cazador_2', 'assets/sprites/cazador_2.png');
+    this.load.image('npc_peon_2', 'assets/sprites/peon_2.png');
+    this.load.image('npc_peon_3', 'assets/sprites/peon_3.png');
     // TEST: pasto_1.png pintado a mano, evaluación visual antes de pintar las otras variantes.
     this.load.image('tile_pasto_bajo', 'assets/raw_sprites/tilesets/pasto_1.png');
     // TEST: pasto_alto_1.png pintado a mano, evaluación visual.
     this.load.image('tile_pasto_alto', 'assets/raw_sprites/tilesets/pasto_alto_1.png');
     // TEST: agua_1.png pintado a mano. Último tile base de Pampa.
     this.load.image('tile_agua', 'assets/raw_sprites/tilesets/agua_1.png');
+    this.load.image('tile_vereda', 'assets/raw_sprites/tilesets/vereda.png');
+    this.load.image('tile_monte', 'assets/raw_sprites/tilesets/monte.png');
+    this.load.image('tile_tierra_pelada', 'assets/raw_sprites/tilesets/tierra_pelada.png');
+    this.load.image('tile_camino', 'assets/raw_sprites/tilesets/camino_tierra.png');
+    // TREES
     this.load.image('arbol_ombu', 'assets/raw_sprites/tilesets/ombu.png');
     this.load.image('arbol_ceibo', 'assets/raw_sprites/tilesets/ceibo.png');
     this.load.image('arbol_algarrobo', 'assets/raw_sprites/tilesets/algarrobo.png');
+    // WORLD OBJECTS
+    this.load.image('rancho_a', 'assets/sprites/rancho_a.png');
+    this.load.image('rancho_b', 'assets/sprites/rancho_b.png');
+    this.load.image('almacen', 'assets/sprites/almacen.png');
+    this.load.image('escuela', 'assets/sprites/escuela.png');
+    this.load.image('casona_estancia', 'assets/sprites/estancia.png');
+    this.load.image('tranquera_malvi', 'assets/sprites/tranquera.png');
+    this.load.image('cerco_vertical', 'assets/sprites/cerco-vertical.png');
+    this.load.image('cerco_horizontal', 'assets/sprites/cerco-horizontal.png');
+    this.load.image('iglesia', 'assets/sprites/iglesia.png');
     this.crearTileset();
   }
 
@@ -55,6 +88,22 @@ export class BootScene extends Phaser.Scene {
     ctx.clearRect(TILE_SIZE * 3, 0, TILE_SIZE, TILE_SIZE);
     ctx.drawImage(aguaImg, TILE_SIZE * 3, 0, TILE_SIZE, TILE_SIZE);
 
+    const veredaImg = this.textures.get('tile_vereda').getSourceImage() as HTMLImageElement;
+    ctx.clearRect(TILE_SIZE * 4, 0, TILE_SIZE, TILE_SIZE);
+    ctx.drawImage(veredaImg, TILE_SIZE * 4, 0, TILE_SIZE, TILE_SIZE);
+
+    const monteImg = this.textures.get('tile_monte').getSourceImage() as HTMLImageElement;
+    ctx.clearRect(TILE_SIZE * 5, 0, TILE_SIZE, TILE_SIZE);
+    ctx.drawImage(monteImg, TILE_SIZE * 5, 0, TILE_SIZE, TILE_SIZE);
+
+    const tierraImg = this.textures.get('tile_tierra_pelada').getSourceImage() as HTMLImageElement;
+    ctx.clearRect(TILE_SIZE * 6, 0, TILE_SIZE, TILE_SIZE);
+    ctx.drawImage(tierraImg, TILE_SIZE * 6, 0, TILE_SIZE, TILE_SIZE);
+
+    const caminoImg = this.textures.get('tile_camino').getSourceImage() as HTMLImageElement;
+    ctx.clearRect(TILE_SIZE * 7, 0, TILE_SIZE, TILE_SIZE);
+    ctx.drawImage(caminoImg, TILE_SIZE * 7, 0, TILE_SIZE, TILE_SIZE);
+
     tilesetTex.source[0].update();
 
     this.scene.start(SCENE_KEYS.Menu);
@@ -62,7 +111,7 @@ export class BootScene extends Phaser.Scene {
 
   private crearTileset(): void {
     const g = this.make.graphics({ x: 0, y: 0 }, false);
-    const TILES = 4;
+    const TILES = 8;
     const W = TILE_SIZE * TILES;
     const H = TILE_SIZE;
 
@@ -95,6 +144,18 @@ export class BootScene extends Phaser.Scene {
     g.fillStyle(PALETA.claro, 1).fillRect(waterOff + 2, 4, 6, 1);
     g.fillStyle(PALETA.claro, 1).fillRect(waterOff + 8, 11, 6, 1);
     g.fillStyle(PALETA.oscurisimo, 1).fillRect(waterOff + 1, 9, 4, 1);
+
+    const veredaOff = TILE_SIZE * 4;
+    g.fillStyle(0x8a8a85, 1).fillRect(veredaOff, 0, TILE_SIZE, H);
+
+    const monteOff = TILE_SIZE * 5;
+    g.fillStyle(0x4a6b3a, 1).fillRect(monteOff, 0, TILE_SIZE, H);
+
+    const tierraOff = TILE_SIZE * 6;
+    g.fillStyle(0xa87b4f, 1).fillRect(tierraOff, 0, TILE_SIZE, H);
+
+    const caminoOff = TILE_SIZE * 7;
+    g.fillStyle(0xc9a576, 1).fillRect(caminoOff, 0, TILE_SIZE, H);
 
     g.generateTexture('tileset', W, H);
     g.destroy();

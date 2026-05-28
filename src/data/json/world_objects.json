@@ -1,0 +1,234 @@
+{
+  "objetos": [
+    {
+      "id": "rancho_civil_a_1",
+      "spriteId": "rancho_a",
+      "posicion": {
+        "x": 17,
+        "y": 10
+      },
+      "spriteWidth": 32,
+      "spriteHeight": 48
+    },
+    {
+      "id": "rancho_civil_b_1",
+      "spriteId": "rancho_b",
+      "posicion": {
+        "x": 19,
+        "y": 26
+      },
+      "spriteWidth": 48,
+      "spriteHeight": 48
+    },
+    {
+      "id": "almacen_tres_sombras",
+      "spriteId": "almacen",
+      "posicion": {
+        "x": 17,
+        "y": 19
+      },
+      "spriteWidth": 32,
+      "spriteHeight": 48
+    },
+    {
+      "id": "escuela_tres_sombras",
+      "spriteId": "escuela",
+      "posicion": {
+        "x": 23,
+        "y": 10
+      },
+      "spriteWidth": 32,
+      "spriteHeight": 48
+    },
+    {
+      "id": "casona_estancia",
+      "spriteId": "casona_estancia",
+      "posicion": {
+        "x": 54,
+        "y": 8
+      },
+      "spriteWidth": 48,
+      "spriteHeight": 64
+    },
+    {
+      "id": "tranquera_malvi",
+      "spriteId": "tranquera_malvi",
+      "posicion": {
+        "x": 54,
+        "y": 20
+      },
+      "spriteWidth": 48,
+      "spriteHeight": 32,
+      "footprint": [
+        {
+          "dx": -1,
+          "dy": 0
+        },
+        {
+          "dx": 1,
+          "dy": 0
+        }
+      ]
+    },
+    {
+      "id": "cerco_horizontal_1779860810979",
+      "spriteId": "cerco_horizontal",
+      "posicion": {
+        "x": 49,
+        "y": 20
+      },
+      "spriteWidth": 48,
+      "spriteHeight": 16
+    },
+    {
+      "id": "cerco_horizontal_1779860934071",
+      "spriteId": "cerco_horizontal",
+      "posicion": {
+        "x": 46,
+        "y": 20
+      },
+      "spriteWidth": 48,
+      "spriteHeight": 16
+    },
+    {
+      "id": "cerco_vertical_1779860965296",
+      "spriteId": "cerco_vertical",
+      "posicion": {
+        "x": 36,
+        "y": 11
+      },
+      "spriteWidth": 16,
+      "spriteHeight": 48
+    },
+    {
+      "id": "cerco_vertical_1779860976371",
+      "spriteId": "cerco_vertical",
+      "posicion": {
+        "x": 36,
+        "y": 8
+      },
+      "spriteWidth": 16,
+      "spriteHeight": 48
+    },
+    {
+      "id": "cerco_vertical_1779860979806",
+      "spriteId": "cerco_vertical",
+      "posicion": {
+        "x": 36,
+        "y": 5
+      },
+      "spriteWidth": 16,
+      "spriteHeight": 48
+    },
+    {
+      "id": "cerco_vertical_1779860982876",
+      "spriteId": "cerco_vertical",
+      "posicion": {
+        "x": 36,
+        "y": 2
+      },
+      "spriteWidth": 16,
+      "spriteHeight": 48
+    },
+    {
+      "id": "cerco_vertical_1779861045840",
+      "spriteId": "cerco_vertical",
+      "posicion": {
+        "x": 36,
+        "y": 19
+      },
+      "spriteWidth": 16,
+      "spriteHeight": 48
+    },
+    {
+      "id": "cerco_vertical_1779861052040",
+      "spriteId": "cerco_vertical",
+      "posicion": {
+        "x": 36,
+        "y": 22
+      },
+      "spriteWidth": 16,
+      "spriteHeight": 48
+    },
+    {
+      "id": "cerco_vertical_1779861056759",
+      "spriteId": "cerco_vertical",
+      "posicion": {
+        "x": 36,
+        "y": 25
+      },
+      "spriteWidth": 16,
+      "spriteHeight": 48
+    },
+    {
+      "id": "cerco_vertical_1779861060372",
+      "spriteId": "cerco_vertical",
+      "posicion": {
+        "x": 36,
+        "y": 28
+      },
+      "spriteWidth": 16,
+      "spriteHeight": 48
+    },
+    {
+      "id": "iglesia_1779891205977",
+      "spriteId": "iglesia",
+      "posicion": {
+        "x": 20,
+        "y": 4
+      },
+      "spriteWidth": 48,
+      "spriteHeight": 64
+    },
+    {
+      "id": "rancho_a_1779894869923",
+      "spriteId": "rancho_a",
+      "posicion": {
+        "x": 17,
+        "y": 23
+      },
+      "spriteWidth": 32,
+      "spriteHeight": 48
+    },
+    {
+      "id": "rancho_b_1779894928003",
+      "spriteId": "rancho_b",
+      "posicion": {
+        "x": 56,
+        "y": 26
+      },
+      "spriteWidth": 48,
+      "spriteHeight": 48
+    },
+    {
+      "id": "rancho_a_1779910746986",
+      "spriteId": "rancho_a",
+      "posicion": {
+        "x": 13,
+        "y": 5
+      },
+      "spriteWidth": 32,
+      "spriteHeight": 48
+    },
+    {
+      "id": "cerco_vertical_1779911906609",
+      "spriteId": "cerco_vertical",
+      "posicion": {
+        "x": 36,
+        "y": 16
+      },
+      "spriteWidth": 16,
+      "spriteHeight": 48
+    },
+    {
+      "id": "rancho_a_1780000384354",
+      "spriteId": "rancho_a",
+      "posicion": {
+        "x": 43,
+        "y": 3
+      },
+      "spriteWidth": 32,
+      "spriteHeight": 48
+    }
+  ]
+}

@@ -2,55 +2,164 @@
   {
     "id": "peon",
     "nombre": "El Peón",
-    "tileX": 10,
-    "tileY": 10,
+    "tileX": 13,
+    "tileY": 6,
     "direccion": "down",
     "visionTiles": 4,
     "equipo": [
-      { "especieId": "mara", "nivel": 7 }
+      {
+        "especieId": "mara",
+        "nivel": 7
+      }
     ],
     "esJefeFinal": false,
+    "spriteKey": "npc_peon",
     "flagDerrota": "trainer.peon_defeated"
   },
   {
     "id": "maestra",
     "nombre": "La Maestra Rural",
-    "tileX": 19,
-    "tileY": 3,
+    "tileX": 23,
+    "tileY": 11,
     "direccion": "down",
     "visionTiles": 5,
     "equipo": [
-      { "especieId": "vizcacha", "nivel": 8 },
-      { "especieId": "hornero",  "nivel": 7 }
+      {
+        "especieId": "vizcacha",
+        "nivel": 8
+      },
+      {
+        "especieId": "hornero",
+        "nivel": 7
+      }
     ],
     "esJefeFinal": false,
+    "spriteKey": "npc_maestra_rural",
     "flagDerrota": "trainer.maestra_rural_defeated"
   },
   {
     "id": "almacenero",
     "nombre": "El Almacenero",
-    "tileX": 5,
-    "tileY": 15,
+    "tileX": 19,
+    "tileY": 19,
     "direccion": "right",
     "visionTiles": 5,
     "equipo": [
-      { "especieId": "nandu", "nivel": 9 }
+      {
+        "especieId": "nandu",
+        "nivel": 9
+      }
     ],
-    "esJefeFinal": false
+    "esJefeFinal": false,
+    "spriteKey": "npc_almacenero"
+  },
+  {
+    "id": "cazador_1",
+    "nombre": "Don Hilario",
+    "tileX": 29,
+    "tileY": 13,
+    "direccion": "down",
+    "visionTiles": 5,
+    "equipo": [
+      {
+        "especieId": "sabueso",
+        "nivel": 10
+      }
+    ],
+    "esJefeFinal": false,
+    "spriteKey": "npc_cazador_1",
+    "flagDerrota": "trainer.hilario_defeated"
+  },
+  {
+    "id": "cazador_2",
+    "nombre": "Bartolo",
+    "tileX": 33,
+    "tileY": 17,
+    "direccion": "left",
+    "visionTiles": 6,
+    "equipo": [
+      {
+        "especieId": "sabueso",
+        "nivel": 11
+      },
+      {
+        "especieId": "jabali",
+        "nivel": 12
+      }
+    ],
+    "esJefeFinal": false,
+    "spriteKey": "npc_cazador_2",
+    "flagDerrota": "trainer.bartolo_defeated"
+  },
+  {
+    "id": "peon_eulogio",
+    "nombre": "Eulogio",
+    "tileX": 53,
+    "tileY": 12,
+    "direccion": "right",
+    "visionTiles": 4,
+    "equipo": [
+      {
+        "especieId": "mara",
+        "nivel": 12
+      },
+      {
+        "especieId": "vizcacha",
+        "nivel": 13
+      }
+    ],
+    "esJefeFinal": false,
+    "spriteKey": "npc_peon_2",
+    "flagDerrota": "trainer.peon_eulogio_defeated",
+    "dialogoPreBatalla": "¿Y vos quién sos? Acá no entra cualquiera, mocoso.",
+    "dialogoPostDerrota": "Bah… andá nomás. El patrón te va a poner en tu lugar."
+  },
+  {
+    "id": "peon_evaristo",
+    "nombre": "Evaristo",
+    "tileX": 54,
+    "tileY": 16,
+    "direccion": "left",
+    "visionTiles": 4,
+    "equipo": [
+      {
+        "especieId": "hornero",
+        "nivel": 12
+      },
+      {
+        "especieId": "nandu",
+        "nivel": 13
+      }
+    ],
+    "esJefeFinal": false,
+    "spriteKey": "npc_peon_3",
+    "flagDerrota": "trainer.peon_evaristo_defeated",
+    "dialogoPreBatalla": "Atrás, pibe. Vos no pasás de acá.",
+    "dialogoPostDerrota": "Pegás más fuerte de lo que pareciera. Pero el Capataz no perdona a nadie."
   },
   {
     "id": "capataz",
     "nombre": "El Capataz",
-    "tileX": 26,
-    "tileY": 16,
-    "direccion": "left",
+    "tileX": 54,
+    "tileY": 9,
+    "direccion": "down",
     "visionTiles": 8,
     "equipo": [
-      { "especieId": "yarara", "nivel": 14 },
-      { "especieId": "peludo", "nivel": 15 },
-      { "especieId": "nandu",  "nivel": 15 }
+      {
+        "especieId": "yarara",
+        "nivel": 15
+      },
+      {
+        "especieId": "peludo",
+        "nivel": 16
+      },
+      {
+        "especieId": "nandu",
+        "nivel": 16
+      }
     ],
     "esJefeFinal": true,
+    "spriteKey": "npc_capataz",
     "flagDerrota": "trainer.capataz_defeated"
   }
 ]

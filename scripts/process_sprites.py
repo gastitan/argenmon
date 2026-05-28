@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Procesa sprites PNG para Argenmon aplicando la paleta guía master y escalando
+Procesa sprites PNG para Criollos aplicando la paleta guía master y escalando
 según el tipo de asset.
 
 La paleta master (public/palette.json) actúa como PALETA GUÍA, no como

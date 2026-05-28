@@ -8,6 +8,22 @@
       "default": false,
       "desc": "El jugador derrotó a la Maestra Rural en la Pampa"
     },
+    "trainer.hilario_defeated": {
+      "default": false,
+      "desc": "El jugador derrotó a Don Hilario (cazador) en la Pampa"
+    },
+    "trainer.bartolo_defeated": {
+      "default": false,
+      "desc": "El jugador derrotó a Bartolo (cazador) en la Pampa"
+    },
+    "trainer.peon_eulogio_defeated": {
+      "default": false,
+      "desc": "El jugador derrotó a Eulogio (peón de la estancia)"
+    },
+    "trainer.peon_evaristo_defeated": {
+      "default": false,
+      "desc": "El jugador derrotó a Evaristo (peón de la estancia)"
+    },
     "trainer.capataz_defeated": {
       "default": false,
       "desc": "El jugador derrotó al Capataz, jefe de la Pampa"

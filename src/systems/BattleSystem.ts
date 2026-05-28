@@ -44,7 +44,8 @@ export interface EventoBatalla {
     | 'sube_nivel'
     | 'aprende_movimiento'
     | 'intenta_aprender_movimiento'
-    | 'cancela_aprendizaje';
+    | 'cancela_aprendizaje'
+    | 'cambio_stat';
   mensaje?: string;
   cantidad?: number;
   nuevoHp?: number;
@@ -336,6 +337,8 @@ export class BattleSystem {
       if (efecto?.tipo === 'evasion') {
         atacante.modificadorEvasion = Math.min(2, atacante.modificadorEvasion + efecto.etapas);
         this.emitir({ tipo: 'evasion_sube', mensaje: `¡${atacante.especie.nombre} se escondió!` });
+      } else if (efecto?.tipo === 'modificador_stat') {
+        this.aplicarModificadorStat(atacante, defensor, efecto.objetivo, efecto.stat, efecto.etapas);
       }
       return;
     }
@@ -347,14 +350,19 @@ export class BattleSystem {
       return;
     }
 
+    const atkBase = movimiento.categoria === 'fisico' ? atacante.atk : atacante.atkEsp;
+    const atkStage = movimiento.categoria === 'fisico' ? atacante.modificadorAtk : 0;
+    const defBase = movimiento.categoria === 'fisico' ? defensor.def : defensor.defEsp;
+    const defStage = movimiento.categoria === 'fisico' ? defensor.modificadorDef : 0;
+
     const resultado = damageFormula(
       {
         nivel: atacante.nivel,
-        atk: movimiento.categoria === 'fisico' ? atacante.atk : atacante.atkEsp,
+        atk: BattleSystem.statConModificador(atkBase, atkStage),
         tipos: atacante.tipos,
       },
       {
-        def: movimiento.categoria === 'fisico' ? defensor.def : defensor.defEsp,
+        def: BattleSystem.statConModificador(defBase, defStage),
         tipos: defensor.tipos,
       },
       { poder: movimiento.poder, tipo: movimiento.tipo },
@@ -382,6 +390,9 @@ export class BattleSystem {
       defensor.estadoAlterado = 'envenenado';
       this.emitir({ tipo: 'envenenado', mensaje: `¡${defensor.especie.nombre} fue envenenado!` });
     }
+    if (efecto?.tipo === 'modificador_stat' && defensor.estaVivo) {
+      this.aplicarModificadorStat(atacante, defensor, efecto.objetivo, efecto.stat, efecto.etapas);
+    }
 
     if (!defensor.estaVivo) {
       this.emitir({
@@ -389,6 +400,30 @@ export class BattleSystem {
         mensaje: `¡${defensor.especie.nombre} se desmayó!`,
       });
     }
+  }
+
+  private aplicarModificadorStat(
+    atacante: Criatura,
+    defensor: Criatura,
+    objetivo: 'atacante' | 'defensor',
+    stat: 'atk' | 'def' | 'atkEsp' | 'defEsp' | 'vel',
+    etapas: number,
+  ): void {
+    const criatura = objetivo === 'atacante' ? atacante : defensor;
+    const clamp = (v: number) => Math.max(-6, Math.min(6, v));
+    const NOMBRES: Record<string, string> = { atk: 'Ataque', def: 'Defensa', atkEsp: 'Ataque Especial', defEsp: 'Defensa Especial', vel: 'Velocidad' };
+
+    if (stat === 'atk') criatura.modificadorAtk = clamp(criatura.modificadorAtk + etapas);
+    else if (stat === 'def') criatura.modificadorDef = clamp(criatura.modificadorDef + etapas);
+
+    const dir = etapas > 0 ? 'aumentó' : 'bajó';
+    this.emitir({ tipo: 'cambio_stat', mensaje: `¡${criatura.especie.nombre} ${dir} su ${NOMBRES[stat] ?? stat}!` });
+  }
+
+  private static statConModificador(base: number, stage: number): number {
+    const num = 2 + Math.max(0, stage);
+    const den = 2 + Math.max(0, -stage);
+    return Math.max(1, Math.floor(base * num / den));
   }
 
   private emitir(evento: EventoBatalla): void { this.cola.push(evento); }

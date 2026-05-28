@@ -1,4 +1,4 @@
-# Argenmon
+# Criollos
 
 RPG 2D por turnos estilo Game Boy con fauna autóctona de la Pampa argentina. Explorás ecosistemas, capturás animales y combatís con ellos usando un sistema de tipos y movimientos.
 

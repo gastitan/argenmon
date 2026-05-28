@@ -105,6 +105,46 @@
     "spriteKey": "sprite_peludo"
   },
   {
+    "id": "sabueso",
+    "nombre": "Sabueso",
+    "tipos": ["Normal"],
+    "hpBase": 50,
+    "atkBase": 70,
+    "defBase": 45,
+    "atkEspBase": 30,
+    "defEspBase": 45,
+    "velBase": 75,
+    "tasaCaptura": 0.30,
+    "movepool": [
+      { "nivel": 1, "movimientoId": "mordida" },
+      { "nivel": 1, "movimientoId": "embestida" },
+      { "nivel": 4, "movimientoId": "aullido" },
+      { "nivel": 8, "movimientoId": "rastreo" },
+      { "nivel": 12, "movimientoId": "colmillo_brutal" }
+    ],
+    "spriteKey": "sprite_dogo"
+  },
+  {
+    "id": "jabali",
+    "nombre": "Jabalí",
+    "tipos": ["Tierra"],
+    "hpBase": 80,
+    "atkBase": 75,
+    "defBase": 60,
+    "atkEspBase": 25,
+    "defEspBase": 50,
+    "velBase": 40,
+    "tasaCaptura": 0.20,
+    "movepool": [
+      { "nivel": 1, "movimientoId": "embestida" },
+      { "nivel": 1, "movimientoId": "bramido" },
+      { "nivel": 5, "movimientoId": "colmillo_jabali" },
+      { "nivel": 10, "movimientoId": "carga" },
+      { "nivel": 15, "movimientoId": "estampida" }
+    ],
+    "spriteKey": "sprite_jabali"
+  },
+  {
     "id": "yarara",
     "nombre": "Yarará",
     "tipos": ["Veneno"],

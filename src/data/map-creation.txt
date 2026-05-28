@@ -1,0 +1,55 @@
+El mapa funciona con tres capas independientes que se combinan. Te lo explico capa por capa:
+
+Capa 1 — El tilemap base (terreno)
+Todo vive en src/data/maps.ts. El mapa es una grilla de 60×30 tiles, donde cada celda tiene un tipo de terreno:
+
+
+'pasto'      → tile 0 (verde base, sin colisión)
+'pasto_alto' → tile 1 (verde oscuro, genera encuentros)
+'arbol'      → tile 2 (colisión)
+'agua'       → tile 3 (colisión)
+'monte'      → tile 1 (mismo visual que pasto_alto, pero en zona cazadores)
+La posición de cada objeto se escribe con coordenadas de tile (x, y). Hay dos formas:
+
+Tile individual:
+
+
+// maps.ts línea 76-84
+ov['10,5']  = 'arbol';   // árbol en columna 10, fila 5
+ov['14,22'] = 'arbol';
+ov['37,14'] = 'arbol';
+Rectángulo de tiles (función patch):
+
+
+// línea 95-97 — manchones de pasto alto
+patch(8, 10, 8, 12, 'pasto_alto');   // x: 8–10, y: 8–12 → 15 tiles
+patch(11, 13, 17, 21, 'pasto_alto'); // manchón B
+patch(43, 45, 8, 10, 'agua');        // aguada decorativa
+El borde completo del mapa (fila 0, fila 29, col 0, col 59) se fuerza a 'arbol' automáticamente en el constructor (línea 117), funcionando como pared perimetral.
+
+Capa 2 — Sprites de árboles (objetos decorativos sobre el tilemap)
+En OverworldScene.ts:120, crearArboles() recorre el mapa buscando tiles 'arbol' y dibuja un sprite encima. La variante visual (ombú, ceibo, algarrobo) se elige con un hash determinista de la posición:
+
+
+const idx = (x * 7 + y * 13) % 3;  // siempre el mismo árbol en el mismo lugar
+Los árboles tienen depth dinámico (img.y - offset) para que el jugador pueda quedar detrás o delante según su posición vertical.
+
+Capa 3 — Objetos del mundo (edificios, estructuras)
+Se definen en src/data/json/world_objects.json con posición en tiles y tamaño en píxeles:
+
+
+{
+  "id": "almacen_tres_sombras",
+  "spriteId": "almacen",
+  "posicion": { "x": 19, "y": 13 },   ← tile de anclaje (esquina inferior izquierda)
+  "spriteWidth": 32,
+  "spriteHeight": 48
+}
+crearObjetosMundo() en OverworldScene.ts:137 los instancia como imágenes Phaser con origin(0.5, 1) (anclado abajo-centro). El sistema calcula automáticamente qué tiles ocupa (resolverFootprint) y los marca como bloqueados para colisión.
+
+Resumen de dónde editar cada cosa
+¿Qué querés agregar?	¿Dónde?
+Árbol / agua / pasto alto	maps.ts — una línea ov['x,y'] = 'arbol' o un patch(...)
+Edificio / construcción	world_objects.json — nueva entrada con posición y sprite
+NPC civil (sin batalla)	src/data/json/civilians.json
+Entrenador	src/data/json/trainers.json

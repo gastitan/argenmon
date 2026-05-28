@@ -30,6 +30,8 @@ export class Criatura {
 
   estadoAlterado: 'envenenado' | null = null;
   modificadorEvasion = 0;
+  modificadorAtk = 0; // etapas de stat (-6 a +6)
+  modificadorDef = 0;
 
   constructor(especie: EspecieBase, nivel: number, movimientoIds?: string[]) {
     this.especie = especie;

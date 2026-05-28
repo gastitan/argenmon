@@ -2,25 +2,31 @@ import Phaser from 'phaser';
 import { PALETA_HEX, SCENE_KEYS, TILE_SIZE, FONT } from '@/config';
 import { OVERWORLD_LAYOUT } from '@/config/layout';
 import { Player } from '@/entities/Player';
-import { mapaPampaInicial } from '@/data/maps';
+import { ARBOLES, mapaPampaNumeros, getTileData } from '@/data/maps';
 import { GameState } from '@/state/GameState';
 import { ESPECIES } from '@/data/creatures';
 import { DATOS_ENTRENADORES } from '@/data/trainers';
 import type { DatosEntrenador } from '@/data/trainers';
-import { verificarEncuentro, elegirWild } from '@/systems/EncounterSystem';
+import { DATOS_CIVILES } from '@/data/loaders/loadCivilians';
+import type { DatosCivil } from '@/data/loaders/loadCivilians';
+import { OBJETOS_MUNDO } from '@/data/loaders/loadWorldObjects';
+import { resolverFootprint } from '@/utils/worldObjectFootprint';
+import { intentarEncuentro } from '@/systems/EncounterSystem';
 import { crearRNG } from '@/utils/rng';
 import type { RNG } from '@/utils/rng';
 
-const TILE_PASTO_ALTO = 1;
-const TILE_ARBOL = 2;
 const TILE_AGUA = 3;
 
-// Colores de marcador para cada entrenador
 const COLOR_ENTRENADOR = 0x306230;
 
 interface MarcadorEntrenador {
   datos: DatosEntrenador;
-  rect: Phaser.GameObjects.Rectangle;
+  visual: Phaser.GameObjects.Image | Phaser.GameObjects.Rectangle;
+}
+
+interface MarcadorCivil {
+  datos: DatosCivil;
+  image: Phaser.GameObjects.Image;
 }
 
 export class OverworldScene extends Phaser.Scene {
@@ -30,6 +36,8 @@ export class OverworldScene extends Phaser.Scene {
   private debugText!: Phaser.GameObjects.Text;
   private rng!: RNG;
   private marcadores: MarcadorEntrenador[] = [];
+  private marcadoresCiviles: MarcadorCivil[] = [];
+  private tilesObjetosMundo = new Set<string>();
   private pasosSinGuardar = 0;
   private dialogoActivo = false;
 
@@ -48,7 +56,7 @@ export class OverworldScene extends Phaser.Scene {
     }
 
     this.map = this.make.tilemap({
-      data: mapaPampaInicial,
+      data: mapaPampaNumeros,
       tileWidth: TILE_SIZE,
       tileHeight: TILE_SIZE,
     });
@@ -57,23 +65,21 @@ export class OverworldScene extends Phaser.Scene {
     const layer = this.map.createLayer(0, tiles, 0, 0);
     if (!layer) throw new Error('No se pudo crear la layer del mapa');
     this.layer = layer;
-    this.layer.setCollision([TILE_ARBOL, TILE_AGUA]);
+    this.layer.setCollision([TILE_AGUA]);
     this.layer.setDepth(0);
 
-    // Render en dos pasadas: terreno + objetos. Ver mini-sprint árboles.
     this.crearArboles();
+    this.crearObjetosMundo();
 
     const { x: startTileX, y: startTileY } = GameState.datos.posicion;
     this.player = new Player(this, startTileX, startTileY, this.esBloqueado.bind(this));
     this.player.sprite.setDepth(this.player.sprite.y);
 
-    // Opción A: cámara sigue al jugador con follow inmediato (lerp=1).
-    // El mapa (480×320) es solo un poco más grande que el canvas (320×240),
-    // así que el scroll es mínimo. Dead zone no aporta beneficio aquí.
     this.cameras.main.startFollow(this.player.sprite, true, 1, 1);
     this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
 
     this.crearMarcadoresEntrenadores();
+    this.crearMarcadoresCiviles();
 
     this.debugText = this.add
       .text(OVERWORLD_LAYOUT.DEBUG_TEXT_POS.x, OVERWORLD_LAYOUT.DEBUG_TEXT_POS.y, '', {
@@ -93,6 +99,10 @@ export class OverworldScene extends Phaser.Scene {
       if (!this.dialogoActivo) this.scene.start(SCENE_KEYS.Catalog);
     });
 
+    this.input.keyboard?.on('keydown-Z', () => {
+      if (!this.dialogoActivo) this.intentarHablarConCivil();
+    });
+
     this.events.on('player-step', (tx: number, ty: number) => {
       this.alPisar(tx, ty);
     });
@@ -106,19 +116,29 @@ export class OverworldScene extends Phaser.Scene {
   // ── Árboles (pasada de objetos) ─────────────────────────────────────────────
 
   private crearArboles(): void {
-    // Baseline = 6 px sobre el fondo del sprite: donde el tronco toca el suelo visualmente.
-    // Esto garantiza que el player en la misma fila (depth = img.y) siempre gana al árbol
-    // (depth = img.y - 6) sin depender del orden en la display list.
     const ARBOL_BASELINE_OFFSET = 6;
     const variantes = ['arbol_ombu', 'arbol_ceibo', 'arbol_algarrobo'] as const;
-    for (let y = 0; y < mapaPampaInicial.length; y++) {
-      for (let x = 0; x < mapaPampaInicial[y].length; x++) {
-        if (mapaPampaInicial[y][x] !== TILE_ARBOL) continue;
-        const idx = (x * 7 + y * 13) % 3;
-        const img = this.add
-          .image(x * TILE_SIZE + TILE_SIZE / 2, y * TILE_SIZE + TILE_SIZE, variantes[idx])
-          .setOrigin(0.5, 1);
-        img.setDepth(img.y - ARBOL_BASELINE_OFFSET);
+    for (const key of ARBOLES) {
+      const [x, y] = key.split(',').map(Number);
+      this.tilesObjetosMundo.add(key);
+      const idx = (x * 7 + y * 13) % 3;
+      const img = this.add
+        .image(x * TILE_SIZE + TILE_SIZE / 2, y * TILE_SIZE + TILE_SIZE, variantes[idx])
+        .setOrigin(0.5, 1);
+      img.setDepth(img.y - ARBOL_BASELINE_OFFSET);
+    }
+  }
+
+  // ── Objetos del mundo (ranchos, etc.) ──────────────────────────────────────
+
+  private crearObjetosMundo(): void {
+    for (const obj of OBJETOS_MUNDO) {
+      const px = obj.posicion.x * TILE_SIZE + TILE_SIZE / 2;
+      const py = obj.posicion.y * TILE_SIZE + TILE_SIZE;
+      const img = this.add.image(px, py, obj.spriteId).setOrigin(0.5, 1);
+      img.setDepth(img.y);
+      for (const tile of resolverFootprint(obj)) {
+        this.tilesObjetosMundo.add(`${tile.x},${tile.y}`);
       }
     }
   }
@@ -129,17 +149,81 @@ export class OverworldScene extends Phaser.Scene {
     for (const datos of DATOS_ENTRENADORES) {
       const x = datos.tileX * TILE_SIZE;
       const y = datos.tileY * TILE_SIZE;
-      const rect = this.add
-        .rectangle(x, y, TILE_SIZE, TILE_SIZE, COLOR_ENTRENADOR)
-        .setOrigin(0, 0)
-        .setDepth(y + TILE_SIZE);
+      const visual = datos.spriteKey
+        ? this.add.image(x, y, datos.spriteKey).setOrigin(0, 0).setDepth(y + TILE_SIZE)
+        : this.add.rectangle(x, y, TILE_SIZE, TILE_SIZE, COLOR_ENTRENADOR).setOrigin(0, 0).setDepth(y + TILE_SIZE);
 
       if (datos.flagDerrota && GameState.obtenerFlag(datos.flagDerrota)) {
-        rect.setVisible(false);
+        visual.setVisible(false);
       }
 
-      this.marcadores.push({ datos, rect });
+      this.marcadores.push({ datos, visual });
     }
+  }
+
+  // ── Marcadores de civiles ───────────────────────────────────────────────────
+
+  private crearMarcadoresCiviles(): void {
+    for (const datos of DATOS_CIVILES) {
+      const x = datos.tileX * TILE_SIZE;
+      const y = datos.tileY * TILE_SIZE;
+      const image = this.add
+        .image(x, y, datos.spriteKey)
+        .setOrigin(0, 0)
+        .setDepth(y + TILE_SIZE);
+      this.marcadoresCiviles.push({ datos, image });
+    }
+  }
+
+  // ── Interacción con civiles ─────────────────────────────────────────────────
+
+  private intentarHablarConCivil(): void {
+    const { x: px, y: py } = this.player.posicionTile;
+    const adyacentes = [
+      { x: px, y: py - 1 },
+      { x: px, y: py + 1 },
+      { x: px - 1, y: py },
+      { x: px + 1, y: py },
+    ];
+    for (const marcador of this.marcadoresCiviles) {
+      const { tileX, tileY } = marcador.datos;
+      if (adyacentes.some((a) => a.x === tileX && a.y === tileY)) {
+        this.mostrarDialogoCivil(marcador.datos);
+        return;
+      }
+    }
+  }
+
+  private mostrarDialogoCivil(datos: DatosCivil): void {
+    this.dialogoActivo = true;
+    const { DIALOG_BOX, DIALOG_TEXT_POS } = OVERWORLD_LAYOUT;
+
+    const fondo = this.add
+      .rectangle(DIALOG_BOX.x, DIALOG_BOX.y, DIALOG_BOX.w, DIALOG_BOX.h, 0x9bbc0f)
+      .setOrigin(0).setScrollFactor(0).setDepth(1000);
+
+    const texto = this.add.text(
+      DIALOG_TEXT_POS.x,
+      DIALOG_TEXT_POS.y,
+      `${datos.nombre}: ${datos.dialogos[0]}`,
+      {
+        fontFamily: FONT,
+        fontSize: '8px',
+        color: PALETA_HEX.oscurisimo,
+        wordWrap: { width: DIALOG_BOX.w - 16 },
+      },
+    ).setScrollFactor(0).setDepth(1001);
+
+    const cerrar = () => {
+      fondo.destroy();
+      texto.destroy();
+      this.dialogoActivo = false;
+      this.input.keyboard?.off('keydown-Z', cerrar);
+      this.input.keyboard?.off('keydown-X', cerrar);
+    };
+
+    this.input.keyboard?.once('keydown-Z', cerrar);
+    this.input.keyboard?.once('keydown-X', cerrar);
   }
 
   // ── Lógica de cada paso ─────────────────────────────────────────────────────
@@ -155,7 +239,7 @@ export class OverworldScene extends Phaser.Scene {
 
     // Verificar línea de visión de entrenadores (tiene prioridad sobre encuentros)
     for (const marcador of this.marcadores) {
-      if (!marcador.rect.visible) continue;
+      if (!marcador.visual.visible) continue;
       if (this.enLineaDeVision(tx, ty, marcador.datos)) {
         if (marcador.datos.id === 'almacenero') {
           this.mostrarDialogoAlmacenero();
@@ -166,16 +250,16 @@ export class OverworldScene extends Phaser.Scene {
       }
     }
 
-    // Verificar encuentro wild en pasto alto
-    const tile = this.layer.getTileAt(tx, ty);
-    if (tile && tile.index === TILE_PASTO_ALTO) {
-      if (verificarEncuentro(this.rng)) {
-        const wild = elegirWild(this.rng);
-        GameState.marcarVisto(wild.especieId);
-        this.scene.start(SCENE_KEYS.Battle, { tipo: 'wild', ...wild });
+    // Verificar encuentro wild según zoneId y tipo de tile
+    const tileData = getTileData(tx, ty);
+    if (tileData && (tileData.terreno === 'pasto_alto' || tileData.terreno === 'monte')) {
+      const resultado = intentarEncuentro(tileData.zoneId, tileData.terreno, this.rng);
+      if (resultado) {
+        GameState.marcarVisto(resultado.especieId);
+        this.scene.start(SCENE_KEYS.Battle, { tipo: 'wild', ...resultado });
         return;
       }
-      this.debugText.setText(`pasto (${tx},${ty})`);
+      this.debugText.setText(`${tileData.terreno} (${tx},${ty}) zona:${tileData.zoneId}`);
     } else {
       const nomEspecie = GameState.datos.equipo[0]
         ? ESPECIES[GameState.datos.equipo[0].especieId].nombre
@@ -195,7 +279,6 @@ export class OverworldScene extends Phaser.Scene {
       if (direccion === 'left')  vx -= i;
 
       if (vx === playerTX && vy === playerTY) return true;
-      // Detener si hay obstáculo en la línea de visión
       if (this.esBloqueado(vx, vy)) break;
     }
     return false;
@@ -203,8 +286,37 @@ export class OverworldScene extends Phaser.Scene {
 
   private iniciarBatallaEntrenador(datos: DatosEntrenador): void {
     const marcador = this.marcadores.find((m) => m.datos.id === datos.id);
-    if (marcador) marcador.rect.setVisible(false);
-    this.scene.start(SCENE_KEYS.Battle, { tipo: 'entrenador', entrenadorId: datos.id });
+    if (marcador) marcador.visual.setVisible(false);
+
+    const comenzar = () => {
+      this.scene.start(SCENE_KEYS.Battle, { tipo: 'entrenador', entrenadorId: datos.id });
+    };
+
+    if (datos.dialogoPreBatalla) {
+      this.dialogoActivo = true;
+      const { DIALOG_BOX, DIALOG_TEXT_POS } = OVERWORLD_LAYOUT;
+      const fondo = this.add
+        .rectangle(DIALOG_BOX.x, DIALOG_BOX.y, DIALOG_BOX.w, DIALOG_BOX.h, 0x9bbc0f)
+        .setOrigin(0).setScrollFactor(0).setDepth(1000);
+      const texto = this.add.text(
+        DIALOG_TEXT_POS.x, DIALOG_TEXT_POS.y,
+        `${datos.nombre}: ${datos.dialogoPreBatalla}`,
+        { fontFamily: FONT, fontSize: '8px', color: PALETA_HEX.oscurisimo, wordWrap: { width: DIALOG_BOX.w - 16 } },
+      ).setScrollFactor(0).setDepth(1001);
+
+      const cerrar = () => {
+        fondo.destroy();
+        texto.destroy();
+        this.dialogoActivo = false;
+        this.input.keyboard?.off('keydown-Z', cerrar);
+        this.input.keyboard?.off('keydown-X', cerrar);
+        comenzar();
+      };
+      this.input.keyboard?.once('keydown-Z', cerrar);
+      this.input.keyboard?.once('keydown-X', cerrar);
+    } else {
+      comenzar();
+    }
   }
 
   // ── Diálogo Almacenero ──────────────────────────────────────────────────────
@@ -286,8 +398,11 @@ export class OverworldScene extends Phaser.Scene {
 
   private esBloqueado(tx: number, ty: number): boolean {
     if (tx < 0 || ty < 0 || tx >= this.map.width || ty >= this.map.height) return true;
+    if (this.marcadoresCiviles.some((m) => m.datos.tileX === tx && m.datos.tileY === ty)) return true;
+    if (this.marcadores.some((m) => m.visual.visible && m.datos.tileX === tx && m.datos.tileY === ty)) return true;
+    if (this.tilesObjetosMundo.has(`${tx},${ty}`)) return true;
     const tile = this.layer.getTileAt(tx, ty);
     if (!tile) return true;
-    return tile.index === TILE_ARBOL || tile.index === TILE_AGUA;
+    return tile.index === TILE_AGUA;
   }
 }

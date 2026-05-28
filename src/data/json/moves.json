@@ -262,5 +262,82 @@
     "pp": 10,
     "prioridad": 0,
     "efecto": null
+  },
+  {
+    "id": "aullido",
+    "nombre": "Aullido",
+    "tipo": "Normal",
+    "categoria": "estado",
+    "poder": 0,
+    "precision": 100,
+    "pp": 20,
+    "prioridad": 0,
+    "efecto": { "tipo": "modificador_stat", "objetivo": "atacante", "stat": "atk", "etapas": 1 }
+  },
+  {
+    "id": "rastreo",
+    "nombre": "Rastreo",
+    "tipo": "Normal",
+    "categoria": "fisico",
+    "poder": 50,
+    "precision": 100,
+    "pp": 20,
+    "prioridad": 1,
+    "efecto": null
+  },
+  {
+    "id": "colmillo_brutal",
+    "nombre": "Colmillo Brutal",
+    "tipo": "Normal",
+    "categoria": "fisico",
+    "poder": 70,
+    "precision": 95,
+    "pp": 15,
+    "prioridad": 0,
+    "efecto": null
+  },
+  {
+    "id": "bramido",
+    "nombre": "Bramido",
+    "tipo": "Normal",
+    "categoria": "estado",
+    "poder": 0,
+    "precision": 100,
+    "pp": 20,
+    "prioridad": 0,
+    "efecto": { "tipo": "modificador_stat", "objetivo": "defensor", "stat": "atk", "etapas": -1 }
+  },
+  {
+    "id": "colmillo_jabali",
+    "nombre": "Colmillo (Jabalí)",
+    "tipo": "Tierra",
+    "categoria": "fisico",
+    "poder": 55,
+    "precision": 100,
+    "pp": 20,
+    "prioridad": 0,
+    "efecto": null
+  },
+  {
+    "id": "carga",
+    "nombre": "Carga",
+    "tipo": "Tierra",
+    "categoria": "fisico",
+    "poder": 80,
+    "precision": 90,
+    "pp": 15,
+    "prioridad": 0,
+    "efecto": { "tipo": "modificador_stat", "objetivo": "atacante", "stat": "def", "etapas": -1 }
+  },
+  {
+    "id": "estampida",
+    "nombre": "Estampida",
+    "tipo": "Tierra",
+    "categoria": "fisico",
+    "poder": 80,
+    "precision": 90,
+    "pp": 10,
+    "prioridad": 0,
+    "efecto": null
   }
 ]

@@ -9,7 +9,7 @@ export const BATTLE_LAYOUT = {
   GROUND_STRIP: { x: 0, y: 160, w: 320, h: 16 },
   UI_PANEL: { x: 0, y: 176, w: 320, h: 64 },
   RIVAL: {
-    SPRITE_POS: { x: 208, y: 32 },   // top-left; sprite ocupa (208,32)→(304,128)
+    SPRITE_POS: { x: 180, y: 8 },    // top-left; sprite ocupa (200,8)→(296,104)
     SPRITE_SIZE: 96,
     INFO_POS: { x: 8, y: 8 },
     HP_BAR_OFFSET_Y: 14,

@@ -1,0 +1,74 @@
+{
+  "civiles": [
+    {
+      "id": "don_ramon",
+      "nombre": "Don Ramón",
+      "tileX": 20,
+      "tileY": 12,
+      "spriteKey": "npc_man_1",
+      "dialogos": [
+        "Cuidá tus animales, pibe. El campo no perdona."
+      ]
+    },
+    {
+      "id": "nina_honda",
+      "nombre": "Niña",
+      "tileX": 24,
+      "tileY": 25,
+      "spriteKey": "npc_girl_1",
+      "dialogos": [
+        "¿Viste el ñandú que pasó ayer? Corre más rápido que el viento."
+      ]
+    },
+    {
+      "id": "mujer_ropa",
+      "nombre": "Mujer",
+      "tileX": 22,
+      "tileY": 16,
+      "spriteKey": "npc_woman_1",
+      "dialogos": [
+        "El Capataz no quiere visitas en la estancia. Andá con cuidado si vas pa'allá."
+      ]
+    },
+    {
+      "id": "almacenera",
+      "nombre": "Almacenera",
+      "tileX": 20,
+      "tileY": 6,
+      "spriteKey": "npc_woman_1",
+      "dialogos": [
+        "Los cazadores pasaron hace un rato. Llevaban un sabueso bravo."
+      ]
+    },
+    {
+      "id": "don_aniceto",
+      "nombre": "Don Aniceto",
+      "tileX": 40,
+      "tileY": 14,
+      "spriteKey": "npc_man_2",
+      "dialogos": [
+        "El Capataz no es mala persona, pibe. Pero esos bichos suyos... esos sí que muerden."
+      ]
+    },
+    {
+      "id": "peon_a",
+      "nombre": "Peón",
+      "tileX": 38,
+      "tileY": 20,
+      "spriteKey": "npc_man_1",
+      "dialogos": [
+        "Acá el viento corre solo. Cuidate."
+      ]
+    },
+    {
+      "id": "peon_b",
+      "nombre": "Peón",
+      "tileX": 45,
+      "tileY": 3,
+      "spriteKey": "npc_man_2",
+      "dialogos": [
+        "Si ves un peludo grande, no lo molestes. Es un viejito que vive ahí hace años."
+      ]
+    }
+  ]
+}

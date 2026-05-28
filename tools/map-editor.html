@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Criollos — Editor de Mapa Pampa</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Courier New', monospace;
+      background: #1a1410;
+      color: #f5e6c8;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── Toolbar ── */
+    #toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 14px;
+      background: #2d2419;
+      border-bottom: 2px solid #4a3520;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+    #toolbar h1 { font-size: 13px; color: #e8c870; white-space: nowrap; }
+
+    .btn {
+      padding: 3px 10px;
+      background: #4a3520;
+      color: #f5e6c8;
+      border: 1px solid #7a5a3a;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 11px;
+      border-radius: 2px;
+      white-space: nowrap;
+    }
+    .btn:hover { background: #7a5a3a; }
+    .btn.active { background: #a87b4f; border-color: #e8c870; color: #1a1410; font-weight: bold; }
+    .btn.save { background: #2d4a3a; border-color: #4a9b6a; color: #b8e8c8; }
+    .btn.save:hover { background: #4a7a5a; }
+    .btn.save:disabled { opacity: 0.35; cursor: default; pointer-events: none; }
+
+    .sep { width: 1px; background: #4a3520; height: 20px; flex-shrink: 0; }
+
+    .chk-label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    /* ── Layout ── */
+    #content { display: flex; flex: 1; overflow: hidden; }
+
+    /* ── Sidebar ── */
+    #sidebar {
+      width: 156px;
+      background: #2d2419;
+      border-right: 2px solid #4a3520;
+      padding: 8px 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+
+    .panel-title {
+      font-size: 9px;
+      color: #a87b4f;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding-bottom: 3px;
+      border-bottom: 1px solid #4a3520;
+      margin-top: 6px;
+    }
+    .panel-title:first-child { margin-top: 0; }
+
+    .tile-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 6px;
+      cursor: pointer;
+      border-radius: 2px;
+      font-size: 10px;
+      border: 1px solid transparent;
+      background: none;
+      color: #f5e6c8;
+      width: 100%;
+      text-align: left;
+    }
+    .tile-btn:hover { background: #4a3520; }
+    .tile-btn.selected { border-color: #e8c870; background: #3a2a10; }
+
+    .swatch {
+      width: 16px;
+      height: 16px;
+      border: 1px solid rgba(255,255,255,0.15);
+      flex-shrink: 0;
+    }
+
+    .entity-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 5px;
+      padding: 3px 5px;
+      cursor: pointer;
+      border-radius: 2px;
+      font-size: 10px;
+      border: 1px solid transparent;
+    }
+    .entity-item:hover { background: #4a3520; }
+    .entity-item.selected { border-color: #e8c870; background: #3a2a10; }
+    .entity-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 2px; }
+
+    .save-section-btn {
+      display: block;
+      width: 100%;
+      margin-top: 4px;
+      padding: 3px 6px;
+      background: #1e3028;
+      border: 1px solid #2a5a3a;
+      color: #7ab890;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 10px;
+      border-radius: 2px;
+      text-align: left;
+    }
+    .save-section-btn:hover { background: #2a4038; }
+    .save-section-btn:disabled { opacity: 0.3; cursor: default; pointer-events: none; }
+
+    .hint { font-size: 9px; color: #6a6060; line-height: 1.5; }
+    .legend-item { display: flex; align-items: center; gap: 5px; font-size: 9px; margin: 2px 0; }
+
+    /* ── Selection info box ── */
+    #sel-info {
+      margin-top: 6px;
+      padding: 5px;
+      background: #1e1810;
+      border: 1px solid #4a3520;
+      border-radius: 2px;
+    }
+    #sel-info-title { font-size: 9px; color: #e8c870; font-weight: bold; margin-bottom: 3px; }
+    #sel-info-name  { font-size: 10px; color: #f5e6c8; margin-bottom: 2px; }
+    #sel-info-pos   { font-size: 10px; color: #a87b4f; }
+
+    /* ── Map canvas area ── */
+    #map-container {
+      flex: 1;
+      overflow: auto;
+      padding: 12px;
+      background: #111010;
+    }
+    #map-canvas {
+      display: block;
+      image-rendering: pixelated;
+      cursor: crosshair;
+    }
+
+    /* ── Status bar ── */
+    #status {
+      padding: 3px 12px;
+      background: #2d2419;
+      border-top: 2px solid #4a3520;
+      font-size: 10px;
+      color: #8a7060;
+      flex-shrink: 0;
+      display: flex;
+      gap: 14px;
+      overflow: hidden;
+    }
+    #status span { white-space: nowrap; }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed;
+      bottom: 32px;
+      right: 14px;
+      padding: 7px 14px;
+      border-radius: 3px;
+      font-size: 11px;
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
+      z-index: 100;
+      max-width: 360px;
+    }
+    #toast.show-ok  { opacity: 1; background: #1e3d28; border: 1px solid #3a7a48; color: #a8d8b0; }
+    #toast.show-err { opacity: 1; background: #3d1e1e; border: 1px solid #7a3a3a; color: #d8a0a0; }
+  </style>
+</head>
+<body>
+
+<!-- TOOLBAR -->
+<div id="toolbar">
+  <h1>Criollos — Editor Pampa</h1>
+  <div class="sep"></div>
+  <button class="btn active" id="btn-terrain" onclick="setMode('terrain')">Terreno</button>
+  <button class="btn"        id="btn-objects" onclick="setMode('objects')">Objetos / NPCs</button>
+  <div class="sep"></div>
+  <label class="chk-label"><input type="checkbox" id="chk-zones" onchange="render()" checked> Zonas</label>
+  <label class="chk-label"><input type="checkbox" id="chk-grid"  onchange="render()">         Grilla</label>
+  <label class="chk-label"><input type="checkbox" id="chk-npcs"  onchange="render()" checked> NPCs</label>
+  <div class="sep"></div>
+  <label class="chk-label" style="font-size:10px">Zoom:</label>
+  <button class="btn" id="zoom-8"  onclick="setZoom(8)">8</button>
+  <button class="btn active" id="zoom-12" onclick="setZoom(12)">12</button>
+  <button class="btn" id="zoom-16" onclick="setZoom(16)">16</button>
+  <button class="btn" id="zoom-20" onclick="setZoom(20)">20</button>
+  <div class="sep"></div>
+  <button class="btn save" onclick="saveMap()">Guardar Mapa</button>
+  <button class="btn save" onclick="saveAllObjects()">Guardar Objetos</button>
+</div>
+
+<!-- CONTENT -->
+<div id="content">
+
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+
+    <!-- ── TERRAIN PANEL ── -->
+    <div id="panel-terrain">
+      <div class="panel-title">Terreno</div>
+      <button class="tile-btn selected" id="tile-pasto"         onclick="selectTerrain('pasto')">        <div class="swatch" style="background:#7a9b5a"></div>pasto</button>
+      <button class="tile-btn"          id="tile-pasto_alto"    onclick="selectTerrain('pasto_alto')">   <div class="swatch" style="background:#4a6b3a"></div>pasto alto</button>
+      <button class="tile-btn"          id="tile-arbol"         onclick="selectTerrain('arbol')">        <div class="swatch" style="background:#2d3d1f"></div>arbol</button>
+      <button class="tile-btn"          id="tile-agua"          onclick="selectTerrain('agua')">         <div class="swatch" style="background:#3d5a7a"></div>agua</button>
+      <button class="tile-btn"          id="tile-monte"         onclick="selectTerrain('monte')">        <div class="swatch" style="background:#7a9b3a"></div>monte</button>
+      <button class="tile-btn"          id="tile-tierra_pelada" onclick="selectTerrain('tierra_pelada')"><div class="swatch" style="background:#a87b4f"></div>tierra pelada</button>
+      <button class="tile-btn"          id="tile-camino"        onclick="selectTerrain('camino')">       <div class="swatch" style="background:#c9a576"></div>camino</button>
+      <button class="tile-btn"          id="tile-vereda"        onclick="selectTerrain('vereda')">       <div class="swatch" style="background:#8a8a85"></div>vereda</button>
+
+      <div class="panel-title">Leyenda NPCs</div>
+      <div class="legend-item"><div style="width:10px;height:10px;border-radius:50%;background:#4a8aff;border:1px solid #fff4"></div>Civil</div>
+      <div class="legend-item"><div style="width:10px;height:10px;border-radius:50%;background:#e84a2a;border:1px solid #fff4"></div>Entrenador</div>
+      <div class="legend-item"><div style="width:10px;height:10px;border-radius:50%;background:#e8c870;border:1px solid #fff4"></div>Jefe Final</div>
+
+      <div class="panel-title">Zonas (X)</div>
+      <div style="font-size:9px;line-height:1.9">
+        <div style="color:#ffff88">0–5 Entrada</div>
+        <div style="color:#88ff88">6–15 Wild Low</div>
+        <div style="color:#88ddff">16–25 Tres Sombras</div>
+        <div style="color:#ffaa44">26–35 Cazadores</div>
+        <div style="color:#aaff44">36–47 Wild High</div>
+        <div style="color:#cc88ff">48–59 Estancia</div>
+      </div>
+
+      <div class="panel-title">Atajos</div>
+      <div class="hint">
+        Click izq → pintar<br>
+        Click der → pipeta<br>
+        Arrastrar → área<br>
+        1–8 → terreno rápido<br>
+        Ctrl+S → guardar
+      </div>
+    </div>
+
+    <!-- ── OBJECTS / NPC PANEL ── -->
+    <div id="panel-objects" style="display:none">
+
+      <!-- Selection info -->
+      <div id="sel-info" style="display:none">
+        <div id="sel-info-title">Seleccionado</div>
+        <div id="sel-info-name"></div>
+        <div id="sel-info-pos"></div>
+        <div class="hint" style="margin-top:3px">Click en mapa → mover<br>Esc → deseleccionar</div>
+      </div>
+
+      <!-- Edificios -->
+      <div class="panel-title">Edificios</div>
+      <div id="list-edificios"></div>
+      <button class="save-section-btn" id="save-btn-edificios" onclick="saveEdificios()" disabled>Guardar edificios</button>
+
+      <!-- Agregar objetos -->
+      <div class="panel-title">Agregar</div>
+      <button class="save-section-btn" id="add-btn-rancho_a"         onclick="addWorldObject('rancho_a')">+ Rancho A</button>
+      <button class="save-section-btn" id="add-btn-rancho_b"         onclick="addWorldObject('rancho_b')">+ Rancho B</button>
+      <button class="save-section-btn" id="add-btn-iglesia"          onclick="addWorldObject('iglesia')">+ Iglesia ★</button>
+      <button class="save-section-btn" id="add-btn-cerco_vertical"   onclick="addWorldObject('cerco_vertical')">+ Cerco Vertical</button>
+      <button class="save-section-btn" id="add-btn-cerco_horizontal" onclick="addWorldObject('cerco_horizontal')">+ Cerco Horizontal</button>
+      <button class="save-section-btn" id="btn-delete-selected" onclick="deleteSelected()" disabled style="color:#d8a0a0;border-color:#7a3a3a">Eliminar seleccionado</button>
+
+      <!-- Civiles -->
+      <div class="panel-title">Civiles</div>
+      <div id="list-civiles"></div>
+      <button class="save-section-btn" id="save-btn-civiles" onclick="saveCiviles()" disabled>Guardar civiles</button>
+
+      <!-- Entrenadores -->
+      <div class="panel-title">Entrenadores</div>
+      <div id="list-trainers"></div>
+      <button class="save-section-btn" id="save-btn-trainers" onclick="saveTrainers()" disabled>Guardar entrenadores</button>
+
+      <div class="panel-title">Atajos</div>
+      <div class="hint">
+        Click entidad → seleccionar<br>
+        Click mapa → mover<br>
+        Esc → deseleccionar<br>
+        Ctrl+S → guardar todo
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MAP -->
+  <div id="map-container">
+    <canvas id="map-canvas"></canvas>
+  </div>
+</div>
+
+<!-- STATUS BAR -->
+<div id="status">
+  <span id="st-pos">–</span>
+  <span id="st-terrain">–</span>
+  <span id="st-zone">–</span>
+  <span id="st-entity" style="color:#c9a576"></span>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── Constants ────────────────────────────────────────────────────────────────
+const MAP_W = 60, MAP_H = 30, TILE_PX = 16;
+
+const TERRAIN_COLORS = {
+  pasto:         '#7a9b5a',
+  pasto_alto:    '#4a6b3a',
+  arbol:         '#2d3d1f',
+  agua:          '#3d5a7a',
+  monte:         '#7a9b3a',
+  tierra_pelada: '#a87b4f',
+  camino:        '#c9a576',
+  vereda:        '#8a8a85',
+};
+
+const ZONE_RANGES = [
+  { x1: 0,  x2: 5,  color: 'rgba(255,255,180,0.11)', label: 'ENTRADA' },
+  { x1: 6,  x2: 15, color: 'rgba(120,220,120,0.09)', label: 'WILD LOW' },
+  { x1: 16, x2: 25, color: 'rgba(100,180,255,0.09)', label: 'TRES SOMBRAS' },
+  { x1: 26, x2: 35, color: 'rgba(255,160,60, 0.09)', label: 'CAZADORES' },
+  { x1: 36, x2: 47, color: 'rgba(180,255,100,0.09)', label: 'WILD HIGH' },
+  { x1: 48, x2: 59, color: 'rgba(200,120,255,0.09)', label: 'ESTANCIA' },
+];
+
+function zoneForX(x) {
+  if (x <= 5)  return 'pampa_entrada';
+  if (x <= 15) return 'pampa_wild_low';
+  if (x <= 25) return 'pampa_tres_sombras';
+  if (x <= 35) return 'pampa_cazadores';
+  if (x <= 47) return 'pampa_wild_high';
+  return 'pampa_estancia';
+}
+
+// ── State ────────────────────────────────────────────────────────────────────
+let tiles        = [];
+let trees        = new Set();  // "x,y" keys — overlay layer, separate from base terrain
+let worldObjects = [];   // edificios — posicion: { x, y }
+let civilians    = [];   // civiles   — tileX, tileY
+let trainers     = [];   // trainers  — tileX, tileY
+
+let cellSize = 12;
+let mode = 'terrain';
+let selectedTerrain = 'pasto';
+
+// selection = { type: 'edificio'|'civil'|'trainer', ref: <object> } | null
+let selection = null;
+
+let isPainting = false;
+let treeAction = null;  // 'add' | 'remove' — fixed on mousedown for consistent drag
+let hoverX = -1, hoverY = -1;
+
+let dirtyMap = false, dirtyEdificios = false, dirtyCiviles = false, dirtyTrainers = false;
+
+// ── NPC Sprites ───────────────────────────────────────────────────────────────
+const SPRITE_PATHS = {
+  npc_man_1:         '/assets/sprites/man_1.png',
+  npc_man_2:         '/assets/sprites/man_2.png',
+  npc_woman_1:       '/assets/sprites/woman_1.png',
+  npc_girl_1:        '/assets/sprites/girl_1.png',
+  npc_peon:          '/assets/sprites/peon.png',
+  npc_almacenero:    '/assets/sprites/almacenero.png',
+  npc_capataz:       '/assets/sprites/capataz.png',
+  npc_maestra_rural: '/assets/sprites/maestra_rural.png',
+  npc_cazador_1:     '/assets/sprites/cazador_1.png',
+  npc_cazador_2:     '/assets/sprites/cazador_2.png',
+  npc_peon_2:        '/assets/sprites/peon_2.png',
+  npc_peon_3:        '/assets/sprites/peon_3.png',
+};
+
+const spriteImages = {};
+
+function preloadSprites() {
+  return Promise.all(Object.entries(SPRITE_PATHS).map(([key, path]) =>
+    new Promise(resolve => {
+      const img = new Image();
+      img.onload  = () => { spriteImages[key] = img; resolve(); };
+      img.onerror = () => resolve();
+      img.src = path;
+    })
+  ));
+}
+
+// ── Canvas ───────────────────────────────────────────────────────────────────
+const canvas = document.getElementById('map-canvas');
+const ctx    = canvas.getContext('2d');
+
+function resizeCanvas() {
+  canvas.width  = MAP_W * cellSize;
+  canvas.height = MAP_H * cellSize;
+}
+
+// ── Render ───────────────────────────────────────────────────────────────────
+function render() {
+  if (!tiles.length) return;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // 1. Terrain
+  for (let y = 0; y < MAP_H; y++)
+    for (let x = 0; x < MAP_W; x++) {
+      ctx.fillStyle = TERRAIN_COLORS[tiles[y][x]] || '#ff00ff';
+      ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+    }
+
+  // 1.5 Tree overlay (drawn over base terrain, before zones/grid/NPCs)
+  ctx.fillStyle = TERRAIN_COLORS.arbol;
+  for (const key of trees) {
+    const [tx, ty] = key.split(',').map(Number);
+    ctx.fillRect(tx * cellSize, ty * cellSize, cellSize, cellSize);
+  }
+
+  // 2. Zone overlays + labels
+  if (document.getElementById('chk-zones').checked) {
+    const fontSize = Math.max(7, cellSize - 3);
+    ctx.font = `bold ${fontSize}px monospace`;
+    for (const z of ZONE_RANGES) {
+      const px = z.x1 * cellSize, pw = (z.x2 - z.x1 + 1) * cellSize;
+      ctx.fillStyle = z.color;
+      ctx.fillRect(px, 0, pw, MAP_H * cellSize);
+      ctx.save();
+      ctx.translate(px + pw / 2, MAP_H * cellSize / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.textAlign = 'center';
+      ctx.fillStyle = 'rgba(255,255,255,0.28)';
+      ctx.fillText(z.label, 0, 0);
+      ctx.restore();
+    }
+    ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+    ctx.lineWidth = 1;
+    for (const z of ZONE_RANGES) {
+      ctx.beginPath();
+      ctx.moveTo(z.x1 * cellSize + 0.5, 0);
+      ctx.lineTo(z.x1 * cellSize + 0.5, canvas.height);
+      ctx.stroke();
+    }
+  }
+
+  // 3. Grid
+  if (document.getElementById('chk-grid').checked) {
+    ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+    ctx.lineWidth = 0.5;
+    for (let x = 0; x <= MAP_W; x++) { ctx.beginPath(); ctx.moveTo(x*cellSize,0); ctx.lineTo(x*cellSize,canvas.height); ctx.stroke(); }
+    for (let y = 0; y <= MAP_H; y++) { ctx.beginPath(); ctx.moveTo(0,y*cellSize); ctx.lineTo(canvas.width,y*cellSize); ctx.stroke(); }
+  }
+
+  if (document.getElementById('chk-npcs').checked) {
+    // 4. World objects footprints
+    for (const obj of worldObjects) {
+      const fp  = resolveFootprint(obj);
+      const isSel = selection && selection.type === 'edificio' && selection.ref === obj;
+      if (fp.length === 0) continue;
+      const xs = fp.map(t => t.x), ys = fp.map(t => t.y);
+      const minX = Math.min(...xs), maxX = Math.max(...xs);
+      const minY = Math.min(...ys), maxY = Math.max(...ys);
+
+      ctx.fillStyle = isSel ? 'rgba(232,200,112,0.45)' : 'rgba(200,150,80,0.28)';
+      for (const {x, y} of fp) ctx.fillRect(x*cellSize, y*cellSize, cellSize, cellSize);
+
+      ctx.strokeStyle = isSel ? '#e8c870' : 'rgba(200,160,80,0.7)';
+      ctx.lineWidth   = isSel ? 2 : 1;
+      ctx.setLineDash(isSel ? [3,2] : []);
+      ctx.strokeRect(minX*cellSize, minY*cellSize, (maxX-minX+1)*cellSize, (maxY-minY+1)*cellSize);
+      ctx.setLineDash([]);
+
+      if (cellSize >= 10) {
+        ctx.fillStyle  = isSel ? '#e8c870' : 'rgba(255,220,120,0.85)';
+        ctx.font       = `${Math.max(7, cellSize-5)}px monospace`;
+        ctx.textAlign  = 'center';
+        ctx.fillText(obj.spriteId, (minX+maxX+1)/2*cellSize, minY*cellSize - 2);
+      }
+    }
+
+    // 5. Civilians
+    const npcR = Math.max(2.5, cellSize / 2.8);
+    for (const c of civilians) {
+      const isSel = selection && selection.type === 'civil' && selection.ref === c;
+      if (c.spriteKey) drawNpcSprite(c.tileX, c.tileY, c.spriteKey, '#4a8aff', npcR, isSel);
+      else             drawNpcDot(c.tileX, c.tileY, '#4a8aff', npcR, isSel);
+      if (isSel && cellSize >= 10) drawNpcLabel(c.tileX, c.tileY, c.nombre, '#88aaff');
+    }
+
+    // 6. Trainers
+    for (const tr of trainers) {
+      const isSel  = selection && selection.type === 'trainer' && selection.ref === tr;
+      const color  = tr.esJefeFinal ? '#e8c870' : '#e84a2a';
+      if (tr.spriteKey) drawNpcSprite(tr.tileX, tr.tileY, tr.spriteKey, color, npcR, isSel);
+      else              drawNpcDot(tr.tileX, tr.tileY, color, npcR, isSel);
+      if (isSel && cellSize >= 10) drawNpcLabel(tr.tileX, tr.tileY, tr.nombre, color);
+    }
+  }
+
+  // 7. Hover highlight
+  if (hoverX >= 0 && hoverY >= 0) {
+    ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+    ctx.lineWidth   = 2;
+    ctx.strokeRect(hoverX*cellSize+1, hoverY*cellSize+1, cellSize-2, cellSize-2);
+  }
+}
+
+function drawNpcDot(tx, ty, color, r, isSelected) {
+  const cx = tx * cellSize + cellSize / 2;
+  const cy = ty * cellSize + cellSize / 2;
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(cx, cy, isSelected ? r * 1.4 : r, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = isSelected ? '#ffffff' : 'rgba(255,255,255,0.45)';
+  ctx.lineWidth   = isSelected ? 1.5 : 1;
+  if (isSelected) { ctx.setLineDash([2,2]); }
+  ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+function drawNpcSprite(tx, ty, spriteKey, fallbackColor, npcR, isSelected) {
+  const img = spriteImages[spriteKey];
+  if (img) {
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(img, tx * cellSize, ty * cellSize, cellSize, cellSize);
+    if (isSelected) {
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth   = 1.5;
+      ctx.setLineDash([2, 2]);
+      ctx.strokeRect(tx * cellSize + 1, ty * cellSize + 1, cellSize - 2, cellSize - 2);
+      ctx.setLineDash([]);
+    }
+  } else {
+    drawNpcDot(tx, ty, fallbackColor, npcR, isSelected);
+  }
+}
+
+function drawNpcLabel(tx, ty, name, color) {
+  ctx.fillStyle  = color;
+  ctx.font       = `${Math.max(7, cellSize - 4)}px monospace`;
+  ctx.textAlign  = 'center';
+  ctx.fillText(name, tx * cellSize + cellSize / 2, ty * cellSize - 2);
+}
+
+// ── Footprint (mirrors worldObjectFootprint.ts) ───────────────────────────────
+function resolveFootprint(obj) {
+  if (obj.footprint) {
+    return obj.footprint
+      .map(({dx, dy}) => ({ x: obj.posicion.x + dx, y: obj.posicion.y + dy }))
+      .filter(({x, y}) => x >= 0 && x < MAP_W && y >= 0 && y < MAP_H);
+  }
+  const cx  = obj.posicion.x * TILE_PX + TILE_PX / 2;
+  const by  = (obj.posicion.y + 1) * TILE_PX;
+  const l   = Math.floor((cx - obj.spriteWidth  / 2) / TILE_PX);
+  const r   = Math.floor((cx + obj.spriteWidth  / 2 - 1) / TILE_PX);
+  const top = Math.floor((by - obj.spriteHeight) / TILE_PX);
+  const bot = Math.floor((by - 1) / TILE_PX);
+  const res = [];
+  for (let y = top; y <= bot; y++)
+    for (let x = l; x <= r; x++)
+      if (x >= 0 && x < MAP_W && y >= 0 && y < MAP_H) res.push({ x, y });
+  return res;
+}
+
+// ── Canvas interactions ───────────────────────────────────────────────────────
+function tileFromEvent(e) {
+  const rect = canvas.getBoundingClientRect();
+  const x = Math.floor((e.clientX - rect.left) / cellSize);
+  const y = Math.floor((e.clientY - rect.top)  / cellSize);
+  if (x < 0 || x >= MAP_W || y < 0 || y >= MAP_H) return null;
+  return { x, y };
+}
+
+canvas.addEventListener('mousedown', e => {
+  const t = tileFromEvent(e);
+  if (!t) return;
+
+  if (mode === 'terrain') {
+    isPainting = true;
+    if (e.button === 2) {
+      // right-click pipette: if tile has tree, select 'arbol'; else select base terrain
+      selectTerrain(trees.has(`${t.x},${t.y}`) ? 'arbol' : tiles[t.y][t.x]);
+    } else {
+      if (selectedTerrain === 'arbol') {
+        treeAction = trees.has(`${t.x},${t.y}`) ? 'remove' : 'add';
+      }
+      paintTile(t.x, t.y);
+      render();
+    }
+    return;
+  }
+
+  // ── Objects / NPC mode ──
+  if (selection) {
+    // Move the selected entity to the clicked tile
+    if (selection.type === 'edificio') {
+      selection.ref.posicion.x = t.x;
+      selection.ref.posicion.y = t.y;
+      dirtyEdificios = true;
+      markDirty('edificios');
+    } else if (selection.type === 'civil') {
+      selection.ref.tileX = t.x;
+      selection.ref.tileY = t.y;
+      dirtyCiviles = true;
+      markDirty('civiles');
+    } else if (selection.type === 'trainer') {
+      selection.ref.tileX = t.x;
+      selection.ref.tileY = t.y;
+      dirtyTrainers = true;
+      markDirty('trainers');
+    }
+    refreshSelInfo();
+    buildAllLists();
+    render();
+    return;
+  }
+
+  // Try to pick an entity at this tile (priority: edificios > civiles > trainers)
+  const hitObj     = worldObjects.find(o => resolveFootprint(o).some(fp => fp.x === t.x && fp.y === t.y));
+  if (hitObj) { select('edificio', hitObj); return; }
+
+  const hitCivil   = civilians.find(c => c.tileX === t.x && c.tileY === t.y);
+  if (hitCivil) { select('civil', hitCivil); return; }
+
+  const hitTrainer = trainers.find(tr => tr.tileX === t.x && tr.tileY === t.y);
+  if (hitTrainer) { select('trainer', hitTrainer); return; }
+});
+
+canvas.addEventListener('mousemove', e => {
+  const t = tileFromEvent(e);
+  if (!t) { hoverX = -1; hoverY = -1; updateStatus(null); render(); return; }
+  hoverX = t.x; hoverY = t.y;
+  if (isPainting && mode === 'terrain') paintTile(t.x, t.y);
+  updateStatus(t);
+  render();
+});
+
+canvas.addEventListener('mouseup',   () => { isPainting = false; });
+canvas.addEventListener('mouseleave',() => { isPainting = false; hoverX = -1; hoverY = -1; render(); });
+canvas.addEventListener('contextmenu', e => e.preventDefault());
+
+function paintTile(x, y) {
+  if (mode !== 'terrain') return;
+  const key = `${x},${y}`;
+  if (selectedTerrain === 'arbol') {
+    // arbol tool: toggle trees set, never touch base terrain
+    if (treeAction === 'add') {
+      if (!trees.has(key)) { trees.add(key); dirtyMap = true; }
+    } else {
+      if (trees.has(key)) { trees.delete(key); dirtyMap = true; }
+    }
+  } else {
+    // terrain tool: also remove tree if present, then set base terrain
+    const hadTree = trees.has(key);
+    if (hadTree) { trees.delete(key); dirtyMap = true; }
+    if (tiles[y][x] !== selectedTerrain) { tiles[y][x] = selectedTerrain; dirtyMap = true; }
+  }
+}
+
+// ── Selection ─────────────────────────────────────────────────────────────────
+function select(type, ref) {
+  selection = { type, ref };
+  refreshSelInfo();
+  buildAllLists();
+  render();
+  document.getElementById('btn-delete-selected').disabled = (type !== 'edificio');
+}
+
+function deselect() {
+  selection = null;
+  document.getElementById('sel-info').style.display = 'none';
+  document.getElementById('btn-delete-selected').disabled = true;
+  buildAllLists();
+  render();
+}
+
+function refreshSelInfo() {
+  if (!selection) return;
+  const { type, ref } = selection;
+  let name = '', pos = '';
+  if (type === 'edificio') { name = ref.id; pos = `(${ref.posicion.x}, ${ref.posicion.y})`; }
+  else if (type === 'civil')   { name = ref.nombre + ' [civil]'; pos = `(${ref.tileX}, ${ref.tileY})`; }
+  else if (type === 'trainer') { name = ref.nombre + (ref.esJefeFinal ? ' [jefe]' : ' [trainer]'); pos = `(${ref.tileX}, ${ref.tileY})`; }
+  document.getElementById('sel-info').style.display = '';
+  document.getElementById('sel-info-name').textContent = name;
+  document.getElementById('sel-info-pos').textContent  = pos;
+}
+
+// ── Dirty tracking ────────────────────────────────────────────────────────────
+function markDirty(section) {
+  document.getElementById('save-btn-' + section).disabled = false;
+}
+
+// ── Status bar ────────────────────────────────────────────────────────────────
+function updateStatus(t) {
+  if (!t) {
+    document.getElementById('st-pos').textContent     = '–';
+    document.getElementById('st-terrain').textContent = '–';
+    document.getElementById('st-zone').textContent    = '–';
+    document.getElementById('st-entity').textContent  = '';
+    return;
+  }
+  const hasTree = trees.has(`${t.x},${t.y}`);
+  document.getElementById('st-pos').textContent     = `(${t.x}, ${t.y})`;
+  document.getElementById('st-terrain').textContent = (tiles[t.y]?.[t.x] ?? '?') + (hasTree ? ' [árbol]' : '');
+  document.getElementById('st-zone').textContent    = zoneForX(t.x);
+
+  const ents = [];
+  worldObjects.forEach(o  => { if (resolveFootprint(o).some(fp => fp.x === t.x && fp.y === t.y)) ents.push('[obj] ' + o.id); });
+  civilians.forEach(c     => { if (c.tileX  === t.x && c.tileY  === t.y) ents.push('[civil] '   + c.nombre); });
+  trainers.forEach(tr     => { if (tr.tileX === t.x && tr.tileY === t.y) ents.push((tr.esJefeFinal ? '[jefe] ' : '[trainer] ') + tr.nombre); });
+  document.getElementById('st-entity').textContent = ents.join('  ');
+}
+
+// ── Mode ──────────────────────────────────────────────────────────────────────
+function setMode(m) {
+  mode = m;
+  selection = null;
+  isPainting = false;
+  document.getElementById('btn-terrain').classList.toggle('active', m === 'terrain');
+  document.getElementById('btn-objects').classList.toggle('active', m === 'objects');
+  document.getElementById('panel-terrain').style.display = m === 'terrain' ? '' : 'none';
+  document.getElementById('panel-objects').style.display = m === 'objects' ? '' : 'none';
+  canvas.style.cursor = m === 'terrain' ? 'crosshair' : 'pointer';
+  document.getElementById('sel-info').style.display = 'none';
+  if (m === 'objects') buildAllLists();
+  render();
+}
+
+// ── Terrain selection ─────────────────────────────────────────────────────────
+function selectTerrain(t) {
+  selectedTerrain = t;
+  document.querySelectorAll('.tile-btn').forEach(b => b.classList.remove('selected'));
+  const b = document.getElementById('tile-' + t);
+  if (b) b.classList.add('selected');
+}
+
+// ── Entity lists ──────────────────────────────────────────────────────────────
+function buildAllLists() {
+  buildList('list-edificios', worldObjects, o => ({
+    dotColor: '#c9a576',
+    label: o.spriteId,
+    sub: `(${o.posicion.x}, ${o.posicion.y})`,
+    isSel: selection && selection.type === 'edificio' && selection.ref === o,
+    onClick: () => { selection && selection.ref === o ? deselect() : select('edificio', o); },
+  }));
+
+  buildList('list-civiles', civilians, c => ({
+    dotColor: '#4a8aff',
+    label: c.nombre,
+    sub: `(${c.tileX}, ${c.tileY})`,
+    isSel: selection && selection.type === 'civil' && selection.ref === c,
+    onClick: () => { selection && selection.ref === c ? deselect() : select('civil', c); },
+  }));
+
+  buildList('list-trainers', trainers, tr => ({
+    dotColor: tr.esJefeFinal ? '#e8c870' : '#e84a2a',
+    label: tr.nombre + (tr.esJefeFinal ? ' ★' : ''),
+    sub: `(${tr.tileX}, ${tr.tileY})`,
+    isSel: selection && selection.type === 'trainer' && selection.ref === tr,
+    onClick: () => { selection && selection.ref === tr ? deselect() : select('trainer', tr); },
+  }));
+}
+
+function buildList(containerId, items, mapper) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = '';
+  for (const item of items) {
+    const { dotColor, label, sub, isSel, onClick } = mapper(item);
+    const div = document.createElement('div');
+    div.className = 'entity-item' + (isSel ? ' selected' : '');
+    div.innerHTML = `<div class="entity-dot" style="background:${dotColor}"></div>
+      <div><div style="font-size:10px">${label}</div><div style="font-size:9px;color:#8a7060">${sub}</div></div>`;
+    div.onclick = onClick;
+    el.appendChild(div);
+  }
+}
+
+// ── Objetos colocables ────────────────────────────────────────────────────────
+const PLACEABLE_SPRITES = {
+  rancho_a:         { spriteWidth: 32, spriteHeight: 48, unique: false },
+  rancho_b:         { spriteWidth: 48, spriteHeight: 48, unique: false },
+  iglesia:          { spriteWidth: 48, spriteHeight: 64, unique: true  },
+  cerco_vertical:   { spriteWidth: 16, spriteHeight: 48, unique: false },
+  cerco_horizontal: { spriteWidth: 48, spriteHeight: 16, unique: false },
+};
+
+function refreshAddButtons() {
+  for (const [spriteId, spec] of Object.entries(PLACEABLE_SPRITES)) {
+    const btn = document.getElementById(`add-btn-${spriteId}`);
+    if (!btn) continue;
+    const alreadyExists = spec.unique && worldObjects.some(o => o.spriteId === spriteId);
+    btn.disabled = alreadyExists;
+    btn.title = alreadyExists ? 'Ya existe una instancia en el mapa' : '';
+  }
+}
+
+function addWorldObject(spriteId) {
+  const spec = PLACEABLE_SPRITES[spriteId];
+  if (spec.unique && worldObjects.some(o => o.spriteId === spriteId)) {
+    toast(`Ya hay una instancia de ${spriteId} en el mapa.`, false);
+    return;
+  }
+  const id = `${spriteId}_${Date.now()}`;
+  const newObj = {
+    id,
+    spriteId,
+    posicion: { x: 1, y: 1 },
+    spriteWidth:  spec.spriteWidth,
+    spriteHeight: spec.spriteHeight,
+  };
+  worldObjects.push(newObj);
+  markDirty('edificios');
+  buildAllLists();
+  refreshAddButtons();
+  render();
+  select('edificio', newObj);
+}
+
+function deleteSelected() {
+  if (!selection || selection.type !== 'edificio') return;
+  const idx = worldObjects.indexOf(selection.ref);
+  if (idx === -1) return;
+  worldObjects.splice(idx, 1);
+  markDirty('edificios');
+  refreshAddButtons();
+  deselect();
+}
+
+// ── Zoom ──────────────────────────────────────────────────────────────────────
+function setZoom(size) {
+  cellSize = size;
+  [8,12,16,20].forEach(s => {
+    const b = document.getElementById('zoom-' + s);
+    if (b) b.classList.toggle('active', s === size);
+  });
+  resizeCanvas();
+  render();
+}
+
+// ── Toast ─────────────────────────────────────────────────────────────────────
+let toastTimer = null;
+function toast(msg, ok = true) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = ok ? 'show-ok' : 'show-err';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.className = ''; }, 3500);
+}
+
+// ── Save functions ────────────────────────────────────────────────────────────
+async function postJson(endpoint, data) {
+  const res = await fetch(endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data, null, 2),
+  });
+  if (!res.ok) throw new Error(await res.text());
+}
+
+async function saveMap() {
+  try {
+    const treesArr = Array.from(trees).map(key => {
+      const [x, y] = key.split(',').map(Number);
+      return { x, y };
+    });
+    await postJson('/api/map-editor/save-map', { width: MAP_W, height: MAP_H, tiles, trees: treesArr });
+    dirtyMap = false;
+    toast('Mapa guardado. Refrescá el juego para ver los cambios.');
+  } catch (e) { toast('Error al guardar mapa: ' + e.message, false); }
+}
+
+async function saveEdificios() {
+  try {
+    await postJson('/api/map-editor/save-objects', { objetos: worldObjects });
+    dirtyEdificios = false;
+    document.getElementById('save-btn-edificios').disabled = true;
+    toast('Edificios guardados. Refrescá el juego.');
+  } catch (e) { toast('Error al guardar edificios: ' + e.message, false); }
+}
+
+async function saveCiviles() {
+  try {
+    await postJson('/api/map-editor/save-civilians', { civiles: civilians });
+    dirtyCiviles = false;
+    document.getElementById('save-btn-civiles').disabled = true;
+    toast('Civiles guardados. Refrescá el juego.');
+  } catch (e) { toast('Error al guardar civiles: ' + e.message, false); }
+}
+
+async function saveTrainers() {
+  try {
+    await postJson('/api/map-editor/save-trainers', trainers);
+    dirtyTrainers = false;
+    document.getElementById('save-btn-trainers').disabled = true;
+    toast('Entrenadores guardados. Refrescá el juego.');
+  } catch (e) { toast('Error al guardar entrenadores: ' + e.message, false); }
+}
+
+async function saveAllObjects() {
+  try {
+    await Promise.all([
+      postJson('/api/map-editor/save-objects',   { objetos: worldObjects }),
+      postJson('/api/map-editor/save-civilians',  { civiles: civilians }),
+      postJson('/api/map-editor/save-trainers',   trainers),
+    ]);
+    dirtyEdificios = false; dirtyCiviles = false; dirtyTrainers = false;
+    document.getElementById('save-btn-edificios').disabled = true;
+    document.getElementById('save-btn-civiles').disabled   = true;
+    document.getElementById('save-btn-trainers').disabled  = true;
+    toast('Objetos y NPCs guardados. Refrescá el juego.');
+  } catch (e) { toast('Error al guardar objetos: ' + e.message, false); }
+}
+
+// ── Keyboard shortcuts ────────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+    e.preventDefault();
+    if (mode === 'terrain') {
+      saveMap();
+    } else {
+      saveAllObjects();
+    }
+  }
+  if (e.key === 'Escape') deselect();
+
+  // 1–8 quick-select terrain
+  const terrainMap = { '1':'pasto','2':'pasto_alto','3':'arbol','4':'agua','5':'monte','6':'tierra_pelada','7':'camino','8':'vereda' };
+  if (terrainMap[e.key] && mode === 'terrain') selectTerrain(terrainMap[e.key]);
+});
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+async function init() {
+  resizeCanvas();
+  ctx.fillStyle = '#2d2419';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#a87b4f';
+  ctx.font = '14px monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('Cargando datos...', canvas.width / 2, canvas.height / 2);
+
+  try {
+    const res = await fetch('/api/map-editor/data');
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+    const [data] = await Promise.all([res.json(), preloadSprites()]);
+
+    tiles        = data.mapData.tiles;
+    worldObjects = data.worldObjects.objetos;
+    civilians    = data.civilians.civiles;
+    trainers     = data.trainers;
+
+    // Load trees — new format has trees:[{x,y}], old format has 'arbol' in tiles[]
+    trees.clear();
+    if (data.mapData.trees && Array.isArray(data.mapData.trees)) {
+      for (const {x, y} of data.mapData.trees) trees.add(`${x},${y}`);
+    } else {
+      for (let row = 0; row < MAP_H; row++)
+        for (let col = 0; col < MAP_W; col++)
+          if (tiles[row][col] === 'arbol') {
+            trees.add(`${col},${row}`);
+            tiles[row][col] = 'pasto';
+          }
+    }
+
+    refreshAddButtons();
+    render();
+  } catch (e) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#3d1e1e';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#d8a0a0';
+    ctx.font = '12px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('Error: ' + e.message, canvas.width / 2, canvas.height / 2 - 10);
+    ctx.fillText('¿Está corriendo el dev server de Vite?', canvas.width / 2, canvas.height / 2 + 10);
+    toast('Error cargando datos: ' + e.message, false);
+  }
+}
+
+window.addEventListener('beforeunload', e => {
+  if (dirtyMap || dirtyEdificios || dirtyCiviles || dirtyTrainers) {
+    e.preventDefault(); e.returnValue = '';
+  }
+});
+
+init();
+</script>
+</body>
+</html>

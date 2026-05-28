@@ -6,8 +6,8 @@ import { movimientosAlNivel } from '@/systems/Movepool';
 import * as Progress from '@/systems/Progress';
 import type { ProgressoGuardado } from '@/systems/Progress';
 
-export const VERSION_SAVE = 3;
-const SAVE_KEY = 'pampamon_save_v3';
+export const VERSION_SAVE = 4;
+const SAVE_KEY = 'pampamon_save_v4';
 
 export interface CriaturaGuardada {
   uid: string;
@@ -89,7 +89,7 @@ function crearEstadoInicial(): PlayerState {
     version: VERSION_SAVE,
     nombreJugador: '',
     biomaActual: 'pampa',
-    posicion: { x: 5, y: 5 },
+    posicion: { x: 2, y: 15 },
     equipo: [],
     inventario: { trampaComun: 3, trampaMonte: 0, trampaFina: 0 },
     catalogo: {},
@@ -127,7 +127,7 @@ class GameStateManager {
     try {
       const parsed = JSON.parse(raw) as PlayerState;
       if (!parsed.version || parsed.version < VERSION_SAVE) {
-        console.log('[GameState] Save descartado: versión incompatible (se requiere v3).');
+        console.log('[GameState] Save descartado: versión incompatible (se requiere v4). El mapa cambió — iniciando partida nueva.');
         return false;
       }
       this.state = parsed;

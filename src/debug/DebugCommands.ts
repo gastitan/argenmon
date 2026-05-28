@@ -64,4 +64,10 @@ export const DebugCommands = {
     GameState.datos.equipo.splice(indice, 1);
     console.log(`[DEBUG] ${especie.nombre} eliminada del equipo. Equipo actual: ${GameState.datos.equipo.length} criatura(s)`);
   },
+
+  resetGame(): void {
+    GameState.borrarSave();
+    console.log('[DEBUG] Save borrado. Recargando...');
+    location.reload();
+  },
 };

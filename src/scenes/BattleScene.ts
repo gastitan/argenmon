@@ -456,10 +456,13 @@ export class BattleScene extends Phaser.Scene {
       if (!agregada) {
         // equipo lleno — futura pantalla de reemplazo
       }
-    } else if (resultado === 'victoria' && this.config.tipo === 'entrenador') {
-      const datosEntrenador = encontrarEntrenador(this.config.entrenadorId);
-      if (datosEntrenador?.flagDerrota) {
-        GameState.setearFlag(datosEntrenador.flagDerrota, true);
+    }
+
+    let datosEntrenadorFin: ReturnType<typeof encontrarEntrenador> = undefined;
+    if (resultado === 'victoria' && this.config.tipo === 'entrenador') {
+      datosEntrenadorFin = encontrarEntrenador(this.config.entrenadorId);
+      if (datosEntrenadorFin?.flagDerrota) {
+        GameState.setearFlag(datosEntrenadorFin.flagDerrota, true);
       }
     }
 
@@ -474,7 +477,14 @@ export class BattleScene extends Phaser.Scene {
     this.faseUI = 'animando';
     this.dialogo.mostrar(msg, () => {
       if (resultado === 'victoria') {
-        this.procesarXpYNiveles(() => this.guardarYSalir(resultado));
+        const postDerrota = datosEntrenadorFin?.dialogoPostDerrota;
+        const nombre = datosEntrenadorFin?.nombre;
+        const continuar = () => this.procesarXpYNiveles(() => this.guardarYSalir(resultado));
+        if (postDerrota && nombre) {
+          this.dialogo.mostrar(`${nombre}: ${postDerrota}`, continuar);
+        } else {
+          continuar();
+        }
       } else {
         this.guardarYSalir(resultado);
       }

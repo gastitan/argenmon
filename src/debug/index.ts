@@ -7,4 +7,5 @@ if (import.meta.env.DEV) {
   console.log('  argendebug.dumpState()             — imprime el estado completo del juego');
   console.log('  argendebug.levelUp(indice, cant)   — sube de nivel a la criatura en el índice dado (default: 0, +1)');
   console.log('  argendebug.removeCreature(indice)  — elimina la criatura del equipo en ese índice (mínimo 1 criatura)');
+  console.log('  argendebug.resetGame()             — borra el save y recarga la página (vuelta al estado inicial)');
 }
