@@ -219,6 +219,16 @@
       },
       "spriteWidth": 16,
       "spriteHeight": 48
+    },
+    {
+      "id": "rancho_a_1780000384354",
+      "spriteId": "rancho_a",
+      "posicion": {
+        "x": 43,
+        "y": 3
+      },
+      "spriteWidth": 32,
+      "spriteHeight": 48
     }
   ]
 }

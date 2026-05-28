@@ -187,12 +187,20 @@ function mapEditorPlugin(): Plugin {
           return;
         }
 
-        // POST /api/map-editor/save-civilians  — overwrite civilians.json
+        // POST /api/map-editor/save-civilians  — merge positions into civilians.json
+        // Only tileX/tileY are editor-controlled. All other fields (spriteKey, dialogos, etc.)
+        // are preserved from the current file on disk to prevent stale-state overwrites.
         if (req.method === 'POST' && url === '/api/map-editor/save-civilians') {
           readBody(req).then(body => {
             try {
-              JSON.parse(body);
-              writeFileSync(civiliansPath, body, 'utf-8');
+              const incoming = JSON.parse(body) as { civiles: Array<{ id: string; tileX: number; tileY: number }> };
+              const current  = JSON.parse(readFileSync(civiliansPath, 'utf-8')) as { civiles: Array<Record<string, unknown>> };
+              const posMap   = new Map(incoming.civiles.map(c => [c.id, { tileX: c.tileX, tileY: c.tileY }]));
+              const merged   = { civiles: current.civiles.map(c => {
+                const pos = posMap.get(c.id as string);
+                return pos ? { ...c, tileX: pos.tileX, tileY: pos.tileY } : c;
+              }) };
+              writeFileSync(civiliansPath, JSON.stringify(merged, null, 2), 'utf-8');
               jsonOk(res, { ok: true });
             } catch (e) {
               jsonErr(res, String(e), 400);
@@ -201,12 +209,20 @@ function mapEditorPlugin(): Plugin {
           return;
         }
 
-        // POST /api/map-editor/save-trainers  — overwrite trainers.json
+        // POST /api/map-editor/save-trainers  — merge positions into trainers.json
+        // Only tileX/tileY are editor-controlled. All other fields (spriteKey, equipo, etc.)
+        // are preserved from the current file on disk to prevent stale-state overwrites.
         if (req.method === 'POST' && url === '/api/map-editor/save-trainers') {
           readBody(req).then(body => {
             try {
-              JSON.parse(body);
-              writeFileSync(trainersPath, body, 'utf-8');
+              const incoming = JSON.parse(body) as Array<{ id: string; tileX: number; tileY: number }>;
+              const current  = JSON.parse(readFileSync(trainersPath, 'utf-8')) as Array<Record<string, unknown>>;
+              const posMap   = new Map(incoming.map(t => [t.id, { tileX: t.tileX, tileY: t.tileY }]));
+              const merged   = current.map(t => {
+                const pos = posMap.get(t.id as string);
+                return pos ? { ...t, tileX: pos.tileX, tileY: pos.tileY } : t;
+              });
+              writeFileSync(trainersPath, JSON.stringify(merged, null, 2), 'utf-8');
               jsonOk(res, { ok: true });
             } catch (e) {
               jsonErr(res, String(e), 400);

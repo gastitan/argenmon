@@ -64,7 +64,7 @@
       "id": "peon_b",
       "nombre": "Peón",
       "tileX": 45,
-      "tileY": 11,
+      "tileY": 3,
       "spriteKey": "npc_man_2",
       "dialogos": [
         "Si ves un peludo grande, no lo molestes. Es un viejito que vive ahí hace años."
