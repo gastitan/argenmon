@@ -1,13 +1,15 @@
 import { describe, it, expect } from 'vitest';
 import { DATOS_ENTRENADORES } from '@/data/trainers';
+import { EntrenadorJSONSchema, EntrenadoresArraySchema } from '@/data/schemas/trainer.schema';
+import trainersJson from '@/data/json/trainers.json';
 
 function findTrainer(id: string) {
   return DATOS_ENTRENADORES.find((t) => t.id === id);
 }
 
 describe('Entrenadores — cantidad y existencia', () => {
-  it('existen exactamente 8 entrenadores', () => {
-    expect(DATOS_ENTRENADORES).toHaveLength(8);
+  it('existen exactamente 9 entrenadores', () => {
+    expect(DATOS_ENTRENADORES).toHaveLength(9);
   });
 
   it('todos tienen id, nombre, posición y equipo', () => {
@@ -54,7 +56,7 @@ describe('Cazadores nuevos', () => {
     expect(t).toBeDefined();
     expect(t.nombre).toBe('Don Hilario');
     expect(t.tileX).toBe(29);
-    expect(t.tileY).toBe(13);
+    expect(t.tileY).toBe(10);
     expect(t.equipo).toHaveLength(1);
     expect(t.equipo[0].especieId).toBe('sabueso');
     expect(t.equipo[0].nivel).toBe(10);
@@ -64,7 +66,7 @@ describe('Cazadores nuevos', () => {
     const t = findTrainer('cazador_2')!;
     expect(t).toBeDefined();
     expect(t.nombre).toBe('Bartolo');
-    expect(t.tileX).toBe(33);
+    expect(t.tileX).toBe(35);
     expect(t.tileY).toBe(17);
     expect(t.equipo).toHaveLength(2);
     expect(t.equipo[0].especieId).toBe('sabueso');
@@ -82,7 +84,7 @@ describe('Peones de la Estancia', () => {
     expect(t.tileX).toBe(53);
     expect(t.tileY).toBe(12);
     expect(t.direccion).toBe('right');
-    expect(t.visionTiles).toBe(4);
+    expect(t.visionTiles).toBe(1);
     expect(t.equipo).toHaveLength(2);
     expect(t.equipo[0].especieId).toBe('mara');
     expect(t.equipo[0].nivel).toBe(12);
@@ -100,7 +102,7 @@ describe('Peones de la Estancia', () => {
     expect(t.tileX).toBe(54);
     expect(t.tileY).toBe(16);
     expect(t.direccion).toBe('left');
-    expect(t.visionTiles).toBe(4);
+    expect(t.visionTiles).toBe(2);
     expect(t.equipo).toHaveLength(2);
     expect(t.equipo[0].especieId).toBe('hornero');
     expect(t.equipo[0].nivel).toBe(12);
@@ -112,8 +114,57 @@ describe('Peones de la Estancia', () => {
   });
 });
 
+describe('modoActivacion — schema', () => {
+  const baseTrainer = {
+    id: 'test',
+    nombre: 'Test',
+    tileX: 0,
+    tileY: 0,
+    direccion: 'down' as const,
+    visionTiles: 3,
+    equipo: [{ especieId: 'hornero', nivel: 5 }],
+    esJefeFinal: false,
+  };
+
+  it('sin modoActivacion defaultea a "vision"', () => {
+    const result = EntrenadorJSONSchema.parse(baseTrainer);
+    expect(result.modoActivacion).toBe('vision');
+  });
+
+  it('con modoActivacion "dialogo" carga OK', () => {
+    const result = EntrenadorJSONSchema.parse({ ...baseTrainer, modoActivacion: 'dialogo' });
+    expect(result.modoActivacion).toBe('dialogo');
+  });
+
+  it('con modoActivacion inválido falla validación', () => {
+    expect(() => EntrenadorJSONSchema.parse({ ...baseTrainer, modoActivacion: 'invalido' })).toThrow();
+  });
+});
+
+describe('modoActivacion — trainers.json', () => {
+  it('trainers.json carga sin errores con los nuevos campos', () => {
+    expect(() => EntrenadoresArraySchema.parse(trainersJson)).not.toThrow();
+  });
+
+  it('almacenero, maestra y capataz tienen modoActivacion "dialogo"', () => {
+    for (const id of ['almacenero', 'maestra', 'capataz']) {
+      const t = DATOS_ENTRENADORES.find((e) => e.id === id)!;
+      expect(t, `entrenador ${id} no encontrado`).toBeDefined();
+      expect(t.modoActivacion).toBe('dialogo');
+    }
+  });
+
+  it('peon, cazador_1, cazador_2, peon_eulogio, peon_evaristo tienen modoActivacion "vision"', () => {
+    for (const id of ['peon', 'cazador_1', 'cazador_2', 'peon_eulogio', 'peon_evaristo']) {
+      const t = DATOS_ENTRENADORES.find((e) => e.id === id)!;
+      expect(t, `entrenador ${id} no encontrado`).toBeDefined();
+      expect(t.modoActivacion).toBe('vision');
+    }
+  });
+});
+
 describe('Capataz — niveles subidos', () => {
-  it('Yarará Lv15, Peludo Lv16, Ñandú Lv16', () => {
+  it('Yarará Lv15, Peludo Lv16, Ñandú Lv17', () => {
     const t = findTrainer('capataz')!;
     expect(t.equipo).toHaveLength(3);
     const yarara = t.equipo.find((e) => e.especieId === 'yarara')!;
@@ -121,11 +172,26 @@ describe('Capataz — niveles subidos', () => {
     const nandu = t.equipo.find((e) => e.especieId === 'nandu')!;
     expect(yarara.nivel).toBe(15);
     expect(peludo.nivel).toBe(16);
-    expect(nandu.nivel).toBe(16);
+    expect(nandu.nivel).toBe(17);
   });
 
   it('capataz es jefe final', () => {
     const t = findTrainer('capataz')!;
     expect(t.esJefeFinal).toBe(true);
+  });
+});
+
+describe('Juan — entrenador nuevo', () => {
+  it('existe en (35, 5) con sabueso Lv15', () => {
+    const t = findTrainer('trainer_1780193209975')!;
+    expect(t).toBeDefined();
+    expect(t.nombre).toBe('Juan');
+    expect(t.tileX).toBe(35);
+    expect(t.tileY).toBe(5);
+    expect(t.modoActivacion).toBe('vision');
+    expect(t.equipo).toHaveLength(1);
+    expect(t.equipo[0].especieId).toBe('sabueso');
+    expect(t.equipo[0].nivel).toBe(15);
+    expect(t.flagDerrota).toBe('trainer.trainer_1780193209975_defeated');
   });
 });

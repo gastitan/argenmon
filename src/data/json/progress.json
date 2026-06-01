@@ -31,6 +31,10 @@
     "biome.pampa_completed": {
       "default": false,
       "desc": "El jugador completó el bioma Pampa (derrotó al Capataz)"
+    },
+    "trainer.trainer_1780193209975_defeated": {
+      "default": false,
+      "desc": "El jugador derrotó a Juan"
     }
   },
   "counters": {

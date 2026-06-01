@@ -90,11 +90,14 @@ function buildInitialMapJson(): string {
 // ── Vite plugin ───────────────────────────────────────────────────────────────
 function mapEditorPlugin(): Plugin {
   const root = __dirname;
-  const mapJsonPath      = resolve(root, 'src/data/json/map_pampa.json');
-  const worldObjJsonPath = resolve(root, 'src/data/json/world_objects.json');
-  const civiliansPath    = resolve(root, 'src/data/json/civilians.json');
-  const trainersPath     = resolve(root, 'src/data/json/trainers.json');
-  const editorHtmlPath   = resolve(root, 'tools/map-editor.html');
+  const mapJsonPath           = resolve(root, 'src/data/json/map_pampa.json');
+  const worldObjJsonPath      = resolve(root, 'src/data/json/world_objects.json');
+  const civiliansPath         = resolve(root, 'src/data/json/civilians.json');
+  const trainersPath          = resolve(root, 'src/data/json/trainers.json');
+  const progressPath          = resolve(root, 'src/data/json/progress.json');
+  const characterSpritesPath  = resolve(root, 'src/data/json/character_sprites.json');
+  const creaturesPath         = resolve(root, 'src/data/json/creatures.json');
+  const editorHtmlPath        = resolve(root, 'tools/map-editor.html');
 
   function ensureMapJson() {
     if (!existsSync(mapJsonPath)) {
@@ -147,11 +150,33 @@ function mapEditorPlugin(): Plugin {
         // GET /api/map-editor/data  — load all JSON files
         if (req.method === 'GET' && url === '/api/map-editor/data') {
           try {
+            let characterSprites: unknown = { sprites: [] };
+            try {
+              characterSprites = JSON.parse(readFileSync(characterSpritesPath, 'utf-8'));
+            } catch {
+              console.warn('[map-editor] character_sprites.json not found or malformed — using empty catalog');
+            }
+            let creatures: unknown[] = [];
+            try {
+              const rawCreatures = JSON.parse(readFileSync(creaturesPath, 'utf-8'));
+              creatures = Array.isArray(rawCreatures) ? rawCreatures : ((rawCreatures as { criaturas?: unknown[] }).criaturas ?? []);
+            } catch {
+              console.warn('[map-editor] creatures.json not found or malformed — using empty list');
+            }
+            let progress: unknown = { flags: {}, counters: {}, variables: {} };
+            try {
+              progress = JSON.parse(readFileSync(progressPath, 'utf-8'));
+            } catch {
+              console.warn('[map-editor] progress.json not found or malformed — using empty catalog');
+            }
             jsonOk(res, {
-              mapData:      JSON.parse(readFileSync(mapJsonPath,      'utf-8')),
-              worldObjects: JSON.parse(readFileSync(worldObjJsonPath, 'utf-8')),
-              civilians:    JSON.parse(readFileSync(civiliansPath,    'utf-8')),
-              trainers:     JSON.parse(readFileSync(trainersPath,     'utf-8')),
+              mapData:          JSON.parse(readFileSync(mapJsonPath,      'utf-8')),
+              worldObjects:     JSON.parse(readFileSync(worldObjJsonPath, 'utf-8')),
+              civilians:        JSON.parse(readFileSync(civiliansPath,    'utf-8')),
+              trainers:         JSON.parse(readFileSync(trainersPath,     'utf-8')),
+              progress,
+              characterSprites,
+              creatures,
             });
           } catch (e) {
             jsonErr(res, String(e));
@@ -187,20 +212,14 @@ function mapEditorPlugin(): Plugin {
           return;
         }
 
-        // POST /api/map-editor/save-civilians  — merge positions into civilians.json
-        // Only tileX/tileY are editor-controlled. All other fields (spriteKey, dialogos, etc.)
-        // are preserved from the current file on disk to prevent stale-state overwrites.
+        // POST /api/map-editor/save-civilians  — full write of civilians.json
+        // The editor is the source of truth for all civilian fields (position, nombre, spriteKey, dialogos).
         if (req.method === 'POST' && url === '/api/map-editor/save-civilians') {
           readBody(req).then(body => {
             try {
-              const incoming = JSON.parse(body) as { civiles: Array<{ id: string; tileX: number; tileY: number }> };
-              const current  = JSON.parse(readFileSync(civiliansPath, 'utf-8')) as { civiles: Array<Record<string, unknown>> };
-              const posMap   = new Map(incoming.civiles.map(c => [c.id, { tileX: c.tileX, tileY: c.tileY }]));
-              const merged   = { civiles: current.civiles.map(c => {
-                const pos = posMap.get(c.id as string);
-                return pos ? { ...c, tileX: pos.tileX, tileY: pos.tileY } : c;
-              }) };
-              writeFileSync(civiliansPath, JSON.stringify(merged, null, 2), 'utf-8');
+              const parsed = JSON.parse(body) as { civiles: Array<Record<string, unknown>> };
+              if (!parsed || !Array.isArray(parsed.civiles)) throw new Error('Invalid payload: missing civiles array');
+              writeFileSync(civiliansPath, JSON.stringify(parsed, null, 2) + '\n', 'utf-8');
               jsonOk(res, { ok: true });
             } catch (e) {
               jsonErr(res, String(e), 400);
@@ -209,20 +228,34 @@ function mapEditorPlugin(): Plugin {
           return;
         }
 
-        // POST /api/map-editor/save-trainers  — merge positions into trainers.json
-        // Only tileX/tileY are editor-controlled. All other fields (spriteKey, equipo, etc.)
-        // are preserved from the current file on disk to prevent stale-state overwrites.
+        // POST /api/map-editor/save-progress  — full write of progress.json
+        if (req.method === 'POST' && url === '/api/map-editor/save-progress') {
+          readBody(req).then(body => {
+            try {
+              const parsed = JSON.parse(body) as Record<string, unknown>;
+              if (typeof parsed !== 'object' || parsed === null
+                || typeof parsed['flags'] !== 'object'
+                || typeof parsed['counters'] !== 'object'
+                || typeof parsed['variables'] !== 'object') {
+                throw new Error('Invalid payload: progress.json must have flags, counters and variables objects');
+              }
+              writeFileSync(progressPath, JSON.stringify(parsed, null, 2) + '\n', 'utf-8');
+              jsonOk(res, { ok: true });
+            } catch (e) {
+              jsonErr(res, String(e), 400);
+            }
+          });
+          return;
+        }
+
+        // POST /api/map-editor/save-trainers  — full write of trainers.json
+        // The editor is the source of truth for all trainer fields.
         if (req.method === 'POST' && url === '/api/map-editor/save-trainers') {
           readBody(req).then(body => {
             try {
-              const incoming = JSON.parse(body) as Array<{ id: string; tileX: number; tileY: number }>;
-              const current  = JSON.parse(readFileSync(trainersPath, 'utf-8')) as Array<Record<string, unknown>>;
-              const posMap   = new Map(incoming.map(t => [t.id, { tileX: t.tileX, tileY: t.tileY }]));
-              const merged   = current.map(t => {
-                const pos = posMap.get(t.id as string);
-                return pos ? { ...t, tileX: pos.tileX, tileY: pos.tileY } : t;
-              });
-              writeFileSync(trainersPath, JSON.stringify(merged, null, 2), 'utf-8');
+              const parsed = JSON.parse(body) as Array<Record<string, unknown>>;
+              if (!Array.isArray(parsed)) throw new Error('Invalid payload: expected array');
+              writeFileSync(trainersPath, JSON.stringify(parsed, null, 2) + '\n', 'utf-8');
               jsonOk(res, { ok: true });
             } catch (e) {
               jsonErr(res, String(e), 400);

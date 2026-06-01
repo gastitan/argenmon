@@ -5,6 +5,7 @@ import type { TrampaId } from '@/data/items';
 import { movimientosAlNivel } from '@/systems/Movepool';
 import * as Progress from '@/systems/Progress';
 import type { ProgressoGuardado } from '@/systems/Progress';
+import { RESPAWN_POR_BIOMA } from '@/config';
 
 export const VERSION_SAVE = 4;
 const SAVE_KEY = 'pampamon_save_v4';
@@ -161,6 +162,14 @@ class GameStateManager {
       const pps = criatura.movimientosActuales.map((id) => MOVIMIENTOS[id]?.pp ?? 0);
       criatura.ppActuales = [pps[0] ?? 0, pps[1] ?? 0, pps[2] ?? 0, pps[3] ?? 0];
     }
+  }
+
+  // Cura el equipo completo y reposiciona al respawn del bioma actual.
+  // Llamar ANTES de guardar() para que el save quede con el estado curado.
+  respawnTrasDerrota(): void {
+    this.curarEquipoCompleto();
+    const spawn = RESPAWN_POR_BIOMA[this.state.biomaActual] ?? RESPAWN_POR_BIOMA['pampa'];
+    this.state.posicion = { x: spawn.x, y: spawn.y };
   }
 
   agregarAlEquipo(criatura: CriaturaGuardada): boolean {

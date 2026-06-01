@@ -13,8 +13,10 @@
       }
     ],
     "esJefeFinal": false,
-    "spriteKey": "npc_peon",
-    "flagDerrota": "trainer.peon_defeated"
+    "spriteKey": "char_peon_gaucho",
+    "flagDerrota": "trainer.peon_defeated",
+    "dialogoPreBatalla": "Que haces pibe? Bienvenido a \"Tres Sombras\".",
+    "dialogoPostDerrota": "Pasando el pueblo, está el monte. Cuidado con los chanchos salvajes."
   },
   {
     "id": "maestra",
@@ -34,8 +36,11 @@
       }
     ],
     "esJefeFinal": false,
-    "spriteKey": "npc_maestra_rural",
-    "flagDerrota": "trainer.maestra_rural_defeated"
+    "spriteKey": "char_teacher",
+    "flagDerrota": "trainer.maestra_rural_defeated",
+    "modoActivacion": "dialogo",
+    "dialogoPreBatalla": "Veo que andás suelto por estos campos. Antes de seguir, dejame mostrarte una cosa. Esto es lo que tus criaturas tienen que aguantar afuera.",
+    "dialogoPostDerrota": "Aprendiste rápido. Ya tenés con qué arreglártelas en el monte."
   },
   {
     "id": "almacenero",
@@ -51,13 +56,15 @@
       }
     ],
     "esJefeFinal": false,
-    "spriteKey": "npc_almacenero"
+    "spriteKey": "char_worker_apron",
+    "modoActivacion": "dialogo",
+    "esComercio": true
   },
   {
     "id": "cazador_1",
     "nombre": "Don Hilario",
     "tileX": 29,
-    "tileY": 13,
+    "tileY": 10,
     "direccion": "down",
     "visionTiles": 5,
     "equipo": [
@@ -67,16 +74,17 @@
       }
     ],
     "esJefeFinal": false,
-    "spriteKey": "npc_cazador_1",
-    "flagDerrota": "trainer.hilario_defeated"
+    "spriteKey": "char_hunter_man",
+    "flagDerrota": "trainer.hilario_defeated",
+    "dialogoPreBatalla": "Estoy cazando, no molestes"
   },
   {
     "id": "cazador_2",
     "nombre": "Bartolo",
-    "tileX": 33,
+    "tileX": 35,
     "tileY": 17,
     "direccion": "left",
-    "visionTiles": 6,
+    "visionTiles": 4,
     "equipo": [
       {
         "especieId": "sabueso",
@@ -88,8 +96,9 @@
       }
     ],
     "esJefeFinal": false,
-    "spriteKey": "npc_cazador_2",
-    "flagDerrota": "trainer.bartolo_defeated"
+    "spriteKey": "char_peon_gaucho",
+    "flagDerrota": "trainer.bartolo_defeated",
+    "dialogoPreBatalla": "Anda con cuidado, los jabalís están cerca"
   },
   {
     "id": "peon_eulogio",
@@ -97,7 +106,7 @@
     "tileX": 53,
     "tileY": 12,
     "direccion": "right",
-    "visionTiles": 4,
+    "visionTiles": 1,
     "equipo": [
       {
         "especieId": "mara",
@@ -120,7 +129,7 @@
     "tileX": 54,
     "tileY": 16,
     "direccion": "left",
-    "visionTiles": 4,
+    "visionTiles": 2,
     "equipo": [
       {
         "especieId": "hornero",
@@ -155,11 +164,33 @@
       },
       {
         "especieId": "nandu",
-        "nivel": 16
+        "nivel": 17
       }
     ],
     "esJefeFinal": true,
     "spriteKey": "npc_capataz",
-    "flagDerrota": "trainer.capataz_defeated"
+    "flagDerrota": "trainer.capataz_defeated",
+    "modoActivacion": "dialogo",
+    "dialogoPreBatalla": "Así que vos sos el que anduvo revolviendo todo. Bueno, acá se termina el paseo, pibe.",
+    "dialogoPostDerrota": "Carajo. Hace mucho que nadie me ponía las cosas tan difíciles."
+  },
+  {
+    "id": "trainer_1780193209975",
+    "nombre": "Juan",
+    "tileX": 35,
+    "tileY": 5,
+    "spriteKey": "char_man_adult_2",
+    "direccion": "left",
+    "visionTiles": 4,
+    "equipo": [
+      {
+        "especieId": "sabueso",
+        "nivel": 15
+      }
+    ],
+    "esJefeFinal": false,
+    "modoActivacion": "vision",
+    "flagDerrota": "trainer.trainer_1780193209975_defeated",
+    "dialogoPreBatalla": "Pucha, ese bicho se me escapó justito..."
   }
 ]

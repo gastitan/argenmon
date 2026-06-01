@@ -3,8 +3,8 @@ import { DATOS_CIVILES } from '@/data/loaders/loadCivilians';
 import { MAPA_PAMPA } from '@/data/maps';
 
 describe('Civiles — cantidad y estructura', () => {
-  it('existen exactamente 7 civiles', () => {
-    expect(DATOS_CIVILES).toHaveLength(7);
+  it('existen exactamente 8 civiles', () => {
+    expect(DATOS_CIVILES).toHaveLength(8);
   });
 
   it('todos tienen id, nombre, posición y al menos un diálogo', () => {
@@ -45,7 +45,8 @@ describe('Civiles — posiciones válidas en el mapa', () => {
 
 describe('Civiles — zonas esperadas', () => {
   it('civiles de tres_sombras están en x 14-25', () => {
-    const enTresSombras = ['don_ramon', 'nina_honda', 'mujer_ropa', 'almacenera'];
+    // nina_honda fue movida al área wild_low (x=6) por el editor de mapa
+    const enTresSombras = ['don_ramon', 'mujer_ropa', 'almacenera'];
     for (const id of enTresSombras) {
       const civil = DATOS_CIVILES.find((c) => c.id === id)!;
       expect(civil).toBeDefined();

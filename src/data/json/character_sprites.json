@@ -1,0 +1,108 @@
+{
+  "sprites": [
+    {
+      "id": "man_adult_1",
+      "spriteKey": "char_man_adult_1",
+      "displayName": "Hombre adulto 1",
+      "category": "adult",
+      "gender": "male",
+      "tags": ["universal"]
+    },
+    {
+      "id": "man_adult_2",
+      "spriteKey": "char_man_adult_2",
+      "displayName": "Hombre adulto 2",
+      "category": "adult",
+      "gender": "male",
+      "tags": ["universal"]
+    },
+    {
+      "id": "woman_adult_1",
+      "spriteKey": "char_woman_adult_1",
+      "displayName": "Mujer adulta 1",
+      "category": "adult",
+      "gender": "female",
+      "tags": ["universal"]
+    },
+    {
+      "id": "woman_adult_2",
+      "spriteKey": "char_woman_adult_2",
+      "displayName": "Mujer adulta 2",
+      "category": "adult",
+      "gender": "female",
+      "tags": ["universal"]
+    },
+    {
+      "id": "old_man_rural",
+      "spriteKey": "char_old_man_rural",
+      "displayName": "Anciano rural",
+      "category": "elderly",
+      "gender": "male",
+      "tags": ["rural"]
+    },
+    {
+      "id": "old_woman_rural",
+      "spriteKey": "char_old_woman_rural",
+      "displayName": "Anciana rural",
+      "category": "elderly",
+      "gender": "female",
+      "tags": ["rural"]
+    },
+    {
+      "id": "boy_1",
+      "spriteKey": "char_boy_1",
+      "displayName": "Nene",
+      "category": "child",
+      "gender": "male",
+      "tags": ["universal"]
+    },
+    {
+      "id": "girl_1",
+      "spriteKey": "char_girl_1",
+      "displayName": "Nena",
+      "category": "child",
+      "gender": "female",
+      "tags": ["universal"]
+    },
+    {
+      "id": "peon_gaucho",
+      "spriteKey": "char_peon_gaucho",
+      "displayName": "Peón gaucho",
+      "category": "adult",
+      "gender": "male",
+      "tags": ["rural", "gaucho"]
+    },
+    {
+      "id": "worker_apron",
+      "spriteKey": "char_worker_apron",
+      "displayName": "Comerciante",
+      "category": "adult",
+      "gender": "male",
+      "tags": ["worker"]
+    },
+    {
+      "id": "hunter_man",
+      "spriteKey": "char_hunter_man",
+      "displayName": "Cazador",
+      "category": "adult",
+      "gender": "male",
+      "tags": ["rural", "hunter"]
+    },
+    {
+      "id": "authority_man",
+      "spriteKey": "char_authority_man",
+      "displayName": "Figura de autoridad",
+      "category": "adult",
+      "gender": "male",
+      "tags": ["authority"]
+    },
+    {
+      "id": "teacher",
+      "spriteKey": "char_teacher",
+      "displayName": "Maestra",
+      "category": "adult",
+      "gender": "female",
+      "tags": ["worker"]
+    }
+  ]
+}

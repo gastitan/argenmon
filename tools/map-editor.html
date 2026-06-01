@@ -198,6 +198,156 @@
     }
     #toast.show-ok  { opacity: 1; background: #1e3d28; border: 1px solid #3a7a48; color: #a8d8b0; }
     #toast.show-err { opacity: 1; background: #3d1e1e; border: 1px solid #7a3a3a; color: #d8a0a0; }
+
+    /* ── Civil Edit Panel ── */
+    #panel-civil-edit { display: flex; flex-direction: column; gap: 5px; }
+
+    .cep-header {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: 4px; padding-bottom: 5px; border-bottom: 1px solid #4a3520; margin-bottom: 1px;
+    }
+    .cep-header-left { display: flex; flex-direction: column; gap: 2px; }
+    .cep-title-row { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+    .cep-display-name { font-size: 10px; color: #f5e6c8; font-weight: bold; word-break: break-all; }
+    .cep-badge {
+      display: inline-block; font-size: 8px; padding: 1px 5px;
+      border-radius: 8px; background: #1a2d60; color: #88aaff;
+      border: 1px solid #3a5a9a; white-space: nowrap; flex-shrink: 0;
+    }
+    .cep-close-btn {
+      background: none; border: 1px solid #4a3520; color: #a87b4f;
+      cursor: pointer; font-size: 10px; padding: 2px 6px;
+      border-radius: 2px; font-family: inherit; flex-shrink: 0;
+    }
+    .cep-close-btn:hover { background: #4a3520; color: #f5e6c8; }
+
+    .cep-field { display: flex; flex-direction: column; gap: 2px; }
+    .cep-label { font-size: 8px; color: #a87b4f; text-transform: uppercase; letter-spacing: 0.5px; }
+    .cep-readonly { font-size: 9px; color: #6a6060; padding: 1px 0; }
+
+    .cep-input {
+      background: #1e1810; border: 1px solid #4a3520; color: #f5e6c8;
+      font-family: inherit; font-size: 10px; padding: 3px 5px;
+      border-radius: 2px; width: 100%;
+    }
+    .cep-input:focus { outline: none; border-color: #a87b4f; }
+    .cep-input.err { border-color: #7a3a3a; }
+
+    .cep-sprite-row { display: flex; gap: 4px; align-items: center; margin-bottom: 2px; }
+    .cep-select {
+      flex: 1; min-width: 0; background: #1e1810; border: 1px solid #4a3520;
+      color: #f5e6c8; font-family: inherit; font-size: 9px;
+      padding: 2px 3px; border-radius: 2px;
+    }
+    .cep-select:focus { outline: none; border-color: #a87b4f; }
+    .cep-sprite-img {
+      width: 32px; height: 32px; image-rendering: pixelated;
+      border: 1px solid #4a3520; background: #111010; flex-shrink: 0;
+    }
+    .cep-sprite-ph {
+      width: 32px; height: 32px; border: 1px solid #4a3520;
+      background: #1e1810; display: flex; align-items: center;
+      justify-content: center; font-size: 14px; color: #5a4a35; flex-shrink: 0;
+    }
+    .cep-mode-link { font-size: 8px; color: #6a5a40; cursor: pointer; text-decoration: underline; }
+    .cep-mode-link:hover { color: #a87b4f; }
+    .cep-warn { font-size: 8px; color: #8a6a2a; line-height: 1.4; margin: 2px 0; }
+
+    .cep-error { font-size: 8px; color: #d89090; display: none; }
+    .cep-error.vis { display: block; }
+
+    .cep-dialog-row { display: flex; gap: 3px; align-items: flex-start; margin-bottom: 3px; }
+    .cep-dialog-ta {
+      flex: 1; background: #1e1810; border: 1px solid #4a3520;
+      color: #f5e6c8; font-family: inherit; font-size: 9px;
+      padding: 3px 4px; border-radius: 2px; resize: vertical; min-height: 34px;
+    }
+    .cep-dialog-ta:focus { outline: none; border-color: #a87b4f; }
+    .cep-dialog-ta.err { border-color: #7a3a3a; }
+    .cep-del-btn {
+      background: none; border: 1px solid #4a3520; color: #7a5040;
+      cursor: pointer; font-size: 10px; padding: 2px 4px;
+      border-radius: 2px; font-family: inherit; flex-shrink: 0; line-height: 1;
+    }
+    .cep-del-btn:hover { background: #3d1e1e; color: #d8a0a0; }
+    .cep-del-btn:disabled { opacity: 0.3; cursor: default; pointer-events: none; }
+    .cep-add-btn {
+      background: #1a2818; border: 1px solid #2a4a30; color: #7ab870;
+      cursor: pointer; font-family: inherit; font-size: 9px;
+      padding: 3px 5px; border-radius: 2px; width: 100%; text-align: left; margin-top: 1px;
+    }
+    .cep-add-btn:hover { background: #2a4038; }
+    .cep-save-btn {
+      background: #1e3028; border: 1px solid #2a5a3a; color: #7ab890;
+      cursor: pointer; font-family: inherit; font-size: 10px;
+      padding: 4px 6px; border-radius: 2px; width: 100%; margin-top: 3px;
+    }
+    .cep-save-btn:hover { background: #2a4038; }
+    .cep-save-btn.dirty { border-color: #4a9b6a; color: #b8e8c8; font-weight: bold; }
+
+    /* ── Trainer direction buttons ── */
+    .tep-dir-wrap { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .tep-dir-row  { display: flex; gap: 2px; }
+    .tep-dir-btn {
+      background: #1e1810; border: 1px solid #4a3520; color: #a87b4f;
+      cursor: pointer; font-size: 12px; width: 24px; height: 24px;
+      border-radius: 2px; font-family: inherit; display: flex;
+      align-items: center; justify-content: center; padding: 0;
+    }
+    .tep-dir-btn:hover:not(:disabled) { background: #3a2810; color: #f5e6c8; }
+    .tep-dir-btn.active { background: #7a5a3a; border-color: #e8c870; color: #e8c870; }
+    .tep-dir-btn:disabled { opacity: 0.35; cursor: default; pointer-events: none; }
+
+    /* ── Trainer equip row ── */
+    .tep-equip-row { display: flex; gap: 3px; align-items: center; margin-bottom: 3px; }
+    .tep-equip-lvl { width: 38px !important; }
+    .tep-equip-del {
+      background: none; border: 1px solid #4a3520; color: #7a5040;
+      cursor: pointer; font-size: 10px; padding: 2px 4px;
+      border-radius: 2px; font-family: inherit; flex-shrink: 0; line-height: 1;
+    }
+    .tep-equip-del:hover { background: #3d1e1e; color: #d8a0a0; }
+    .tep-equip-del:disabled { opacity: 0.3; cursor: default; pointer-events: none; }
+
+    /* ── Trainer badge jefe final ── */
+    .cep-badge-jefe {
+      display: inline-block; font-size: 8px; padding: 1px 5px;
+      border-radius: 8px; background: #3d2a00; color: #e8c870;
+      border: 1px solid #7a6020; white-space: nowrap; flex-shrink: 0;
+    }
+
+    /* ── Almacenero info box ── */
+    .tep-almacenero-warn {
+      font-size: 8px; color: #88c8a0; line-height: 1.5;
+      background: #102820; border: 1px solid #1a5030;
+      padding: 4px 5px; border-radius: 2px; margin: 2px 0;
+    }
+
+    /* ── Vision group disabled (modoActivacion = dialogo) ── */
+    .tep-vision-group.disabled { opacity: 0.4; }
+    .tep-vision-group.disabled button,
+    .tep-vision-group.disabled input { pointer-events: none; cursor: default; }
+
+    /* ── Delete NPC button (destructive) ── */
+    .cep-delete-btn {
+      background: #2d1010; border: 1px solid #7a3a3a; color: #d89090;
+      cursor: pointer; font-family: inherit; font-size: 10px;
+      padding: 4px 6px; border-radius: 2px; width: 100%; margin-top: 6px;
+      text-align: left;
+    }
+    .cep-delete-btn:hover { background: #3d1e1e; border-color: #a04040; color: #f0b0b0; }
+
+    /* ── Flag warning + create button ── */
+    .tep-flag-warn {
+      display: flex; align-items: flex-start; gap: 4px;
+      font-size: 8px; color: #c8902a; line-height: 1.4; margin: 2px 0;
+    }
+    .tep-flag-create-btn {
+      background: #2a3818; border: 1px solid #4a6830; color: #88c870;
+      cursor: pointer; font-family: inherit; font-size: 8px;
+      padding: 2px 5px; border-radius: 2px; flex-shrink: 0; white-space: nowrap;
+    }
+    .tep-flag-create-btn:hover { background: #3a5028; }
   </style>
 </head>
 <body>
@@ -212,6 +362,7 @@
   <label class="chk-label"><input type="checkbox" id="chk-zones" onchange="render()" checked> Zonas</label>
   <label class="chk-label"><input type="checkbox" id="chk-grid"  onchange="render()">         Grilla</label>
   <label class="chk-label"><input type="checkbox" id="chk-npcs"  onchange="render()" checked> NPCs</label>
+  <label class="chk-label"><input type="checkbox" id="chk-cones" onchange="onConesToggle()">     Conos</label>
   <div class="sep"></div>
   <label class="chk-label" style="font-size:10px">Zoom:</label>
   <button class="btn" id="zoom-8"  onclick="setZoom(8)">8</button>
@@ -294,11 +445,13 @@
       <!-- Civiles -->
       <div class="panel-title">Civiles</div>
       <div id="list-civiles"></div>
+      <button class="save-section-btn" onclick="addCivil()">+ Agregar civil</button>
       <button class="save-section-btn" id="save-btn-civiles" onclick="saveCiviles()" disabled>Guardar civiles</button>
 
       <!-- Entrenadores -->
       <div class="panel-title">Entrenadores</div>
       <div id="list-trainers"></div>
+      <button class="save-section-btn" onclick="addTrainer()">+ Agregar entrenador</button>
       <button class="save-section-btn" id="save-btn-trainers" onclick="saveTrainers()" disabled>Guardar entrenadores</button>
 
       <div class="panel-title">Atajos</div>
@@ -308,6 +461,218 @@
         Esc → deseleccionar<br>
         Ctrl+S → guardar todo
       </div>
+    </div>
+
+    <!-- ── CIVIL EDIT PANEL ── -->
+    <div id="panel-civil-edit" style="display:none">
+
+      <!-- Header: nombre + badge + close -->
+      <div class="cep-header">
+        <div class="cep-header-left">
+          <div class="cep-title-row">
+            <span id="cep-display-name" class="cep-display-name"></span>
+            <span class="cep-badge">Civil</span>
+          </div>
+        </div>
+        <button class="cep-close-btn" onclick="closeCivilPanel(false)" title="Cerrar (Esc)">✕</button>
+      </div>
+
+      <!-- ID (read-only para existentes; editable para nuevos no guardados) -->
+      <div class="cep-field">
+        <div class="cep-label">ID</div>
+        <div id="cep-id" class="cep-readonly"></div>
+        <input id="cep-id-input" type="text" class="cep-input" oninput="onCivilIdChange()" style="display:none" placeholder="ej: civil_mi_nombre">
+        <div class="cep-error" id="cep-err-id"></div>
+      </div>
+
+      <!-- Posición (read-only, updated on canvas move) -->
+      <div class="cep-field">
+        <div class="cep-label">Posición</div>
+        <div id="cep-pos" class="cep-readonly"></div>
+      </div>
+
+      <!-- Nombre -->
+      <div class="cep-field">
+        <div class="cep-label">Nombre *</div>
+        <input id="cep-nombre" type="text" class="cep-input" oninput="onCivilNombreChange()">
+        <div class="cep-error" id="cep-err-nombre"></div>
+      </div>
+
+      <!-- Sprite: catalog mode -->
+      <div class="cep-field">
+        <div class="cep-label">Sprite *</div>
+        <div id="cep-sprite-catalog">
+          <div class="cep-sprite-row">
+            <select id="cep-sprite-sel" class="cep-select" onchange="onCivilSpriteSelectChange()"></select>
+            <img id="cep-sprite-preview" class="cep-sprite-img" src="" alt="" onerror="this.style.display='none';document.getElementById('cep-sprite-ph').style.display='flex'">
+            <div id="cep-sprite-ph" class="cep-sprite-ph" style="display:none">?</div>
+          </div>
+          <a class="cep-mode-link" href="#" onclick="switchToCustomMode(event)">usar sprite custom</a>
+        </div>
+
+        <!-- Sprite: custom mode -->
+        <div id="cep-sprite-custom" style="display:none">
+          <input id="cep-sprite-custom-key" type="text" class="cep-input" placeholder="spriteKey" oninput="onCivilSpriteCustomChange()" style="margin-bottom:3px">
+          <div class="cep-sprite-row">
+            <img id="cep-sprite-preview-c" class="cep-sprite-img" src="" alt="" onerror="this.style.display='none';document.getElementById('cep-sprite-ph-c').style.display='flex'">
+            <div id="cep-sprite-ph-c" class="cep-sprite-ph" style="display:none">?</div>
+            <div class="cep-warn">⚠ Sprite custom — asegurate de que esté cargado en BootScene</div>
+          </div>
+          <a class="cep-mode-link" href="#" onclick="switchToCatalogMode(event)">usar sprite del catálogo</a>
+        </div>
+        <div class="cep-error" id="cep-err-sprite"></div>
+      </div>
+
+      <!-- Diálogos -->
+      <div class="cep-field">
+        <div class="cep-label">Diálogos *</div>
+        <div id="cep-dialogos"></div>
+        <button class="cep-add-btn" onclick="addDialogo()">+ Agregar diálogo</button>
+        <div class="cep-error" id="cep-err-dialogos"></div>
+      </div>
+
+      <!-- Save -->
+      <button id="cep-save-btn" class="cep-save-btn" onclick="saveCivilesFromPanel()">Guardar civiles</button>
+      <!-- Delete -->
+      <button id="cep-delete-btn" class="cep-delete-btn" onclick="deleteCivilFromPanel()">🗑 Eliminar civil</button>
+    </div>
+
+    <!-- ── TRAINER EDIT PANEL ── -->
+    <div id="panel-trainer-edit" style="display:none">
+
+      <!-- Header -->
+      <div class="cep-header">
+        <div class="cep-header-left">
+          <div class="cep-title-row">
+            <span id="tep-display-name" class="cep-display-name"></span>
+            <span id="tep-badge" class="cep-badge">Entrenador</span>
+          </div>
+        </div>
+        <button class="cep-close-btn" onclick="closeTrainerPanel(false)" title="Cerrar (Esc)">✕</button>
+      </div>
+
+      <!-- ID (read-only para existentes; editable para nuevos no guardados) -->
+      <div class="cep-field">
+        <div class="cep-label">ID</div>
+        <div id="tep-id" class="cep-readonly"></div>
+        <input id="tep-id-input" type="text" class="cep-input" oninput="onTrainerIdChange()" style="display:none" placeholder="ej: trainer_mi_nombre">
+        <div class="cep-error" id="tep-err-id"></div>
+      </div>
+
+      <!-- Posición -->
+      <div class="cep-field">
+        <div class="cep-label">Posición</div>
+        <div id="tep-pos" class="cep-readonly"></div>
+      </div>
+
+      <!-- Nombre -->
+      <div class="cep-field">
+        <div class="cep-label">Nombre *</div>
+        <input id="tep-nombre" type="text" class="cep-input" oninput="onTrainerNombreChange()">
+        <div class="cep-error" id="tep-err-nombre"></div>
+      </div>
+
+      <!-- Sprite: catalog mode -->
+      <div class="cep-field">
+        <div class="cep-label">Sprite *</div>
+        <div id="tep-sprite-catalog">
+          <div class="cep-sprite-row">
+            <select id="tep-sprite-sel" class="cep-select" onchange="onTrainerSpriteSelectChange()"></select>
+            <img id="tep-sprite-preview" class="cep-sprite-img" src="" alt="" onerror="this.style.display='none';document.getElementById('tep-sprite-ph').style.display='flex'">
+            <div id="tep-sprite-ph" class="cep-sprite-ph" style="display:none">?</div>
+          </div>
+          <a class="cep-mode-link" href="#" onclick="switchTrainerToCustomMode(event)">usar sprite custom</a>
+        </div>
+        <!-- Sprite: custom mode -->
+        <div id="tep-sprite-custom" style="display:none">
+          <input id="tep-sprite-custom-key" type="text" class="cep-input" placeholder="spriteKey" oninput="onTrainerSpriteCustomChange()" style="margin-bottom:3px">
+          <div class="cep-sprite-row">
+            <img id="tep-sprite-preview-c" class="cep-sprite-img" src="" alt="" onerror="this.style.display='none';document.getElementById('tep-sprite-ph-c').style.display='flex'">
+            <div id="tep-sprite-ph-c" class="cep-sprite-ph" style="display:none">?</div>
+            <div class="cep-warn">⚠ Sprite custom — asegurate de que esté cargado en BootScene</div>
+          </div>
+          <a class="cep-mode-link" href="#" onclick="switchTrainerToCatalogMode(event)">usar sprite del catálogo</a>
+        </div>
+        <div class="cep-error" id="tep-err-sprite"></div>
+      </div>
+
+      <!-- Modo activación -->
+      <div class="cep-field">
+        <div class="cep-label">Modo activación</div>
+        <select id="tep-activacion" class="cep-select" onchange="onTrainerActivacionChange()" style="width:100%">
+          <option value="vision">visión</option>
+          <option value="dialogo">diálogo</option>
+        </select>
+      </div>
+
+      <!-- Dirección + tiles visión (disabled cuando modo=dialogo) -->
+      <div id="tep-vision-group">
+        <div class="cep-field" style="margin-top:3px">
+          <div class="cep-label">Dirección</div>
+          <div class="tep-dir-wrap">
+            <button class="tep-dir-btn" data-dir="up"    onclick="onTrainerDirChange('up')">↑</button>
+            <div class="tep-dir-row">
+              <button class="tep-dir-btn" data-dir="left"  onclick="onTrainerDirChange('left')">←</button>
+              <button class="tep-dir-btn" data-dir="right" onclick="onTrainerDirChange('right')">→</button>
+            </div>
+            <button class="tep-dir-btn" data-dir="down"  onclick="onTrainerDirChange('down')">↓</button>
+          </div>
+        </div>
+        <div class="cep-field" style="margin-top:3px">
+          <div class="cep-label">Tiles de visión (1–10)</div>
+          <input id="tep-vision-tiles" type="number" class="cep-input" min="1" max="10" oninput="onTrainerVisionTilesChange()">
+          <div class="cep-error" id="tep-err-vision"></div>
+        </div>
+      </div>
+
+      <!-- Es jefe final -->
+      <div class="cep-field">
+        <div class="cep-label">Es jefe final</div>
+        <label style="display:flex;align-items:center;gap:4px;font-size:10px;cursor:pointer">
+          <input type="checkbox" id="tep-jefe-final" onchange="onTrainerJefeChange()">
+          <span>Jefe final</span>
+        </label>
+      </div>
+
+      <!-- Flag derrota (siempre editable) -->
+      <div class="cep-field">
+        <div class="cep-label">Flag de derrota</div>
+        <input id="tep-flag-derrota" type="text" class="cep-input" oninput="onTrainerFlagChange()" placeholder="(ninguna)">
+        <div id="tep-flag-warn" class="tep-flag-warn" style="display:none">
+          <span>⚠ Esta flag no existe en progress.json. El juego fallará al derrotar a este entrenador.</span>
+          <button class="tep-flag-create-btn" onclick="createMissingFlag()">Crear flag</button>
+        </div>
+        <div class="cep-error" id="tep-err-flag"></div>
+      </div>
+
+      <!-- Diálogo pre-batalla -->
+      <div class="cep-field">
+        <div class="cep-label">Diálogo pre-batalla</div>
+        <textarea id="tep-dialogo-pre" class="cep-dialog-ta" rows="3" oninput="onTrainerDialogoPreChange()" placeholder="(opcional)"></textarea>
+      </div>
+
+      <!-- Diálogo post-derrota -->
+      <div class="cep-field">
+        <div class="cep-label">Diálogo post-derrota</div>
+        <textarea id="tep-dialogo-post" class="cep-dialog-ta" rows="3" oninput="onTrainerDialogoPostChange()" placeholder="(opcional)"></textarea>
+      </div>
+
+      <!-- Equipo -->
+      <div class="cep-field">
+        <div class="cep-label">Equipo *</div>
+        <!-- Warning almacenero (solo visible cuando id === 'almacenero') -->
+        <div id="tep-almacenero-warn" class="tep-almacenero-warn" style="display:none">
+          ℹ Este NPC no batalla en runtime — el equipo se ignora. El diálogo pre-batalla aparece como mensaje del menú de curación.
+        </div>
+        <div id="tep-equip-list"></div>
+        <button class="cep-add-btn" onclick="addEquipRow()">+ Agregar criatura</button>
+        <div class="cep-error" id="tep-err-equip"></div>
+      </div>
+
+      <!-- Save -->
+      <button id="tep-save-btn" class="cep-save-btn" onclick="saveTrainersFromPanel()">Guardar entrenadores</button>
+      <!-- Delete -->
+      <button id="tep-delete-btn" class="cep-delete-btn" onclick="deleteTrainerFromPanel()">🗑 Eliminar entrenador</button>
     </div>
 
   </div>
@@ -381,21 +746,36 @@ let hoverX = -1, hoverY = -1;
 
 let dirtyMap = false, dirtyEdificios = false, dirtyCiviles = false, dirtyTrainers = false;
 
+// IDs de NPCs creados en esta sesión y todavía no guardados al server (id editable).
+const newNpcIds = new Set();
+
+// ── Civil Edit Panel State ─────────────────────────────────────────────────────
+let catalogSprites  = [];   // {spriteKey, displayName} populated from API in init()
+let civilSnapshot   = null; // {nombre, spriteKey, dialogos:[]} snapshot for discard
+let panelDirty      = false;
+let civilSpriteMode = 'catalog'; // 'catalog' | 'custom'
+
+// ── Trainer Edit Panel State ───────────────────────────────────────────────────
+let creatures          = [];    // [{id, nombre, ...}] from API in init()
+let trainerSnapshot    = null;  // snapshot for discard
+let trainerPanelDirty  = false;
+let trainerSpriteMode  = 'catalog'; // 'catalog' | 'custom'
+let showCones          = localStorage.getItem('map_editor_show_cones') === 'true';
+
+// ── Progress state ────────────────────────────────────────────────────────────
+let progressData  = { flags: {}, counters: {}, variables: {} };
+let progressDirty = false;
+
 // ── NPC Sprites ───────────────────────────────────────────────────────────────
-const SPRITE_PATHS = {
-  npc_man_1:         '/assets/sprites/man_1.png',
-  npc_man_2:         '/assets/sprites/man_2.png',
-  npc_woman_1:       '/assets/sprites/woman_1.png',
-  npc_girl_1:        '/assets/sprites/girl_1.png',
-  npc_peon:          '/assets/sprites/peon.png',
-  npc_almacenero:    '/assets/sprites/almacenero.png',
-  npc_capataz:       '/assets/sprites/capataz.png',
-  npc_maestra_rural: '/assets/sprites/maestra_rural.png',
-  npc_cazador_1:     '/assets/sprites/cazador_1.png',
-  npc_cazador_2:     '/assets/sprites/cazador_2.png',
-  npc_peon_2:        '/assets/sprites/peon_2.png',
-  npc_peon_3:        '/assets/sprites/peon_3.png',
+// Sprites custom (no están en el catálogo genérico character_sprites.json).
+const SPRITE_PATHS_CUSTOM = {
+  npc_capataz: '/assets/sprites/capataz.png',
+  npc_peon_2:  '/assets/sprites/peon_2.png',
+  npc_peon_3:  '/assets/sprites/peon_3.png',
 };
+
+// Arranca como copia de los customs; se enriquece con el catálogo en init().
+const SPRITE_PATHS = { ...SPRITE_PATHS_CUSTOM };
 
 const spriteImages = {};
 
@@ -471,6 +851,9 @@ function render() {
     for (let x = 0; x <= MAP_W; x++) { ctx.beginPath(); ctx.moveTo(x*cellSize,0); ctx.lineTo(x*cellSize,canvas.height); ctx.stroke(); }
     for (let y = 0; y <= MAP_H; y++) { ctx.beginPath(); ctx.moveTo(0,y*cellSize); ctx.lineTo(canvas.width,y*cellSize); ctx.stroke(); }
   }
+
+  // 3.5 Cone overlays (independent of chk-npcs)
+  renderCones();
 
   if (document.getElementById('chk-npcs').checked) {
     // 4. World objects footprints
@@ -681,14 +1064,40 @@ function paintTile(x, y) {
 
 // ── Selection ─────────────────────────────────────────────────────────────────
 function select(type, ref) {
+  // Close civil panel first if open (with dirty check).
+  if (document.getElementById('panel-civil-edit').style.display !== 'none') {
+    if (selection && selection.type === 'civil' && selection.ref === ref) return;
+    if (!closeCivilPanel(false)) return;
+  }
+  // Close trainer panel first if open (with dirty check).
+  if (document.getElementById('panel-trainer-edit').style.display !== 'none') {
+    if (selection && selection.type === 'trainer' && selection.ref === ref) return;
+    if (!closeTrainerPanel(false)) return;
+  }
+
   selection = { type, ref };
-  refreshSelInfo();
-  buildAllLists();
-  render();
-  document.getElementById('btn-delete-selected').disabled = (type !== 'edificio');
+
+  if (type === 'civil') {
+    openCivilPanel(ref);
+  } else if (type === 'trainer') {
+    openTrainerPanel(ref);
+  } else {
+    refreshSelInfo();
+    buildAllLists();
+    render();
+    document.getElementById('btn-delete-selected').disabled = (type !== 'edificio');
+  }
 }
 
 function deselect() {
+  if (document.getElementById('panel-civil-edit').style.display !== 'none') {
+    closeCivilPanel(false);
+    return;
+  }
+  if (document.getElementById('panel-trainer-edit').style.display !== 'none') {
+    closeTrainerPanel(false);
+    return;
+  }
   selection = null;
   document.getElementById('sel-info').style.display = 'none';
   document.getElementById('btn-delete-selected').disabled = true;
@@ -699,6 +1108,19 @@ function deselect() {
 function refreshSelInfo() {
   if (!selection) return;
   const { type, ref } = selection;
+
+  // When civil panel is open, update its position field instead of sel-info.
+  if (type === 'civil' && document.getElementById('panel-civil-edit').style.display !== 'none') {
+    document.getElementById('cep-pos').textContent = `${ref.tileX}, ${ref.tileY}`;
+    return;
+  }
+
+  // When trainer panel is open, update its position field instead of sel-info.
+  if (type === 'trainer' && document.getElementById('panel-trainer-edit').style.display !== 'none') {
+    document.getElementById('tep-pos').textContent = `${ref.tileX}, ${ref.tileY}`;
+    return;
+  }
+
   let name = '', pos = '';
   if (type === 'edificio') { name = ref.id; pos = `(${ref.posicion.x}, ${ref.posicion.y})`; }
   else if (type === 'civil')   { name = ref.nombre + ' [civil]'; pos = `(${ref.tileX}, ${ref.tileY})`; }
@@ -736,6 +1158,12 @@ function updateStatus(t) {
 
 // ── Mode ──────────────────────────────────────────────────────────────────────
 function setMode(m) {
+  if (document.getElementById('panel-civil-edit').style.display !== 'none') {
+    if (!closeCivilPanel(false)) return;
+  }
+  if (document.getElementById('panel-trainer-edit').style.display !== 'none') {
+    if (!closeTrainerPanel(false)) return;
+  }
   mode = m;
   selection = null;
   isPainting = false;
@@ -902,31 +1330,88 @@ async function saveEdificios() {
 }
 
 async function saveCiviles() {
+  if (!validateAllNewNpcs()) return;
   try {
     await postJson('/api/map-editor/save-civilians', { civiles: civilians });
     dirtyCiviles = false;
+    panelDirty   = false;
+    // Marcar todos los civiles como guardados (id ya no editable)
+    for (const c of civilians) newNpcIds.delete(c.id);
+    // Si el panel civil está abierto, cambiar campo id a read-only
+    const cPanel = document.getElementById('panel-civil-edit');
+    if (cPanel.style.display !== 'none') {
+      const c = selection && selection.type === 'civil' ? selection.ref : null;
+      if (c) {
+        document.getElementById('cep-id').textContent      = c.id;
+        document.getElementById('cep-id').style.display    = '';
+        document.getElementById('cep-id-input').style.display = 'none';
+      }
+    }
     document.getElementById('save-btn-civiles').disabled = true;
+    updateCepSaveBtn();
     toast('Civiles guardados. Refrescá el juego.');
   } catch (e) { toast('Error al guardar civiles: ' + e.message, false); }
 }
 
 async function saveTrainers() {
+  if (!validateAllNewNpcs()) return;
+  if (!validateFlagsBeforeSave()) return;
   try {
+    // progress must be saved before trainers so flags exist when runtime reads them
+    if (progressDirty) {
+      await postJson('/api/map-editor/save-progress', progressData);
+      progressDirty = false;
+    }
     await postJson('/api/map-editor/save-trainers', trainers);
-    dirtyTrainers = false;
+    dirtyTrainers     = false;
+    trainerPanelDirty = false;
+    // Marcar todos los entrenadores como guardados (id ya no editable)
+    for (const tr of trainers) newNpcIds.delete(tr.id);
+    // Si el panel trainer está abierto, cambiar campo id a read-only
+    const trPanel = document.getElementById('panel-trainer-edit');
+    if (trPanel.style.display !== 'none') {
+      const tr = selection && selection.type === 'trainer' ? selection.ref : null;
+      if (tr) {
+        document.getElementById('tep-id').textContent         = tr.id;
+        document.getElementById('tep-id').style.display       = '';
+        document.getElementById('tep-id-input').style.display = 'none';
+      }
+    }
     document.getElementById('save-btn-trainers').disabled = true;
+    updateTepSaveBtn();
     toast('Entrenadores guardados. Refrescá el juego.');
-  } catch (e) { toast('Error al guardar entrenadores: ' + e.message, false); }
+  } catch (e) { toast('Error al guardar: ' + e.message, false); }
 }
 
 async function saveAllObjects() {
+  if (!validateAllNewNpcs()) return;
+  if (!validateFlagsBeforeSave()) return;
   try {
+    // progress must be saved before trainers so flags exist when runtime reads them
+    if (progressDirty) {
+      await postJson('/api/map-editor/save-progress', progressData);
+      progressDirty = false;
+    }
     await Promise.all([
       postJson('/api/map-editor/save-objects',   { objetos: worldObjects }),
       postJson('/api/map-editor/save-civilians',  { civiles: civilians }),
       postJson('/api/map-editor/save-trainers',   trainers),
     ]);
     dirtyEdificios = false; dirtyCiviles = false; dirtyTrainers = false;
+    // Marcar todos los NPCs como guardados
+    for (const c  of civilians) newNpcIds.delete(c.id);
+    for (const tr of trainers)  newNpcIds.delete(tr.id);
+    // Si algún panel está abierto, actualizar campo id a read-only
+    const cPanel  = document.getElementById('panel-civil-edit');
+    const trPanel = document.getElementById('panel-trainer-edit');
+    if (cPanel.style.display !== 'none') {
+      const c = selection && selection.type === 'civil' ? selection.ref : null;
+      if (c) { document.getElementById('cep-id').textContent = c.id; document.getElementById('cep-id').style.display = ''; document.getElementById('cep-id-input').style.display = 'none'; }
+    }
+    if (trPanel.style.display !== 'none') {
+      const tr = selection && selection.type === 'trainer' ? selection.ref : null;
+      if (tr) { document.getElementById('tep-id').textContent = tr.id; document.getElementById('tep-id').style.display = ''; document.getElementById('tep-id-input').style.display = 'none'; }
+    }
     document.getElementById('save-btn-edificios').disabled = true;
     document.getElementById('save-btn-civiles').disabled   = true;
     document.getElementById('save-btn-trainers').disabled  = true;
@@ -951,6 +1436,1050 @@ document.addEventListener('keydown', e => {
   if (terrainMap[e.key] && mode === 'terrain') selectTerrain(terrainMap[e.key]);
 });
 
+// ── Civil Edit Panel ──────────────────────────────────────────────────────────
+
+function openCivilPanel(civil) {
+  civilSnapshot = {
+    nombre:    civil.nombre,
+    spriteKey: civil.spriteKey || '',
+    dialogos:  [...civil.dialogos],
+  };
+  panelDirty = false;
+
+  document.getElementById('cep-display-name').textContent = civil.nombre;
+  document.getElementById('cep-id').textContent           = civil.id;
+  document.getElementById('cep-pos').textContent          = `${civil.tileX}, ${civil.tileY}`;
+
+  // Campo ID: editable si el civil es nuevo (no guardado); readonly si ya existe en server.
+  const isNewCivil = newNpcIds.has(civil.id);
+  document.getElementById('cep-id').style.display       = isNewCivil ? 'none' : '';
+  document.getElementById('cep-id-input').style.display = isNewCivil ? '' : 'none';
+  document.getElementById('cep-id-input').value         = civil.id;
+
+  document.getElementById('cep-nombre').value             = civil.nombre;
+  document.getElementById('cep-nombre').classList.remove('err');
+
+  const key       = civil.spriteKey || '';
+  const inCatalog = catalogSprites.some(s => s.spriteKey === key);
+  civilSpriteMode = (key && key.startsWith('char_') && inCatalog) ? 'catalog' : 'custom';
+
+  populateSpriteDropdown(key);
+  document.getElementById('cep-sprite-custom-key').value = key;
+  applyCivilSpriteMode();
+
+  buildDialogsList();
+  clearCivilErrors();
+  updateCepSaveBtn();
+
+  document.getElementById('panel-objects').style.display      = 'none';
+  document.getElementById('panel-civil-edit').style.display   = '';
+}
+
+function closeCivilPanel(force) {
+  if (!force && panelDirty) {
+    if (!confirm('Hay cambios sin guardar. ¿Descartar?')) return false;
+    const c = selection && selection.type === 'civil' ? selection.ref : null;
+    if (c && civilSnapshot) {
+      c.nombre    = civilSnapshot.nombre;
+      c.spriteKey = civilSnapshot.spriteKey;
+      c.dialogos  = [...civilSnapshot.dialogos];
+    }
+  }
+  panelDirty    = false;
+  civilSnapshot = null;
+
+  document.getElementById('panel-civil-edit').style.display = 'none';
+  document.getElementById('panel-objects').style.display    = '';
+
+  selection = null;
+  document.getElementById('btn-delete-selected').disabled = true;
+  buildAllLists();
+  render();
+  return true;
+}
+
+function updateCepSaveBtn() {
+  document.getElementById('cep-save-btn').classList.toggle('dirty', panelDirty);
+}
+
+function markPanelDirty() {
+  panelDirty   = true;
+  dirtyCiviles = true;
+  markDirty('civiles');
+  updateCepSaveBtn();
+}
+
+function populateSpriteDropdown(selectedKey) {
+  const sel = document.getElementById('cep-sprite-sel');
+  sel.innerHTML = '';
+  for (const s of catalogSprites) {
+    const opt = document.createElement('option');
+    opt.value       = s.spriteKey;
+    opt.textContent = s.displayName;
+    if (s.spriteKey === selectedKey) opt.selected = true;
+    sel.appendChild(opt);
+  }
+}
+
+function applyCivilSpriteMode() {
+  document.getElementById('cep-sprite-catalog').style.display = civilSpriteMode === 'catalog' ? '' : 'none';
+  document.getElementById('cep-sprite-custom').style.display  = civilSpriteMode === 'custom'  ? '' : 'none';
+  if (civilSpriteMode === 'catalog') updateCatalogPreview();
+  else                               updateCustomPreview();
+}
+
+function updateCatalogPreview() {
+  const key   = document.getElementById('cep-sprite-sel').value;
+  const img   = document.getElementById('cep-sprite-preview');
+  const ph    = document.getElementById('cep-sprite-ph');
+  const path  = SPRITE_PATHS[key];
+  if (path) {
+    img.src = path; img.style.display = ''; ph.style.display = 'none';
+  } else {
+    img.style.display = 'none'; ph.style.display = 'flex';
+  }
+}
+
+function updateCustomPreview() {
+  const key   = document.getElementById('cep-sprite-custom-key').value.trim();
+  const img   = document.getElementById('cep-sprite-preview-c');
+  const ph    = document.getElementById('cep-sprite-ph-c');
+  const path  = SPRITE_PATHS[key];
+  if (path) {
+    img.src = path; img.style.display = ''; ph.style.display = 'none';
+  } else {
+    img.style.display = 'none'; ph.style.display = 'flex';
+  }
+}
+
+function switchToCatalogMode(e) {
+  e.preventDefault();
+  const customKey = document.getElementById('cep-sprite-custom-key').value.trim();
+  civilSpriteMode = 'catalog';
+  const inCatalog = catalogSprites.some(s => s.spriteKey === customKey);
+  populateSpriteDropdown(inCatalog ? customKey : (catalogSprites[0]?.spriteKey ?? ''));
+  applyCivilSpriteMode();
+  applySpriteToMemory();
+}
+
+function switchToCustomMode(e) {
+  e.preventDefault();
+  const catalogKey = document.getElementById('cep-sprite-sel').value;
+  civilSpriteMode  = 'custom';
+  document.getElementById('cep-sprite-custom-key').value = catalogKey;
+  applyCivilSpriteMode();
+  applySpriteToMemory();
+}
+
+function applySpriteToMemory() {
+  const c = selection && selection.type === 'civil' ? selection.ref : null;
+  if (!c) return;
+  const newKey = civilSpriteMode === 'catalog'
+    ? document.getElementById('cep-sprite-sel').value
+    : document.getElementById('cep-sprite-custom-key').value.trim();
+  c.spriteKey = newKey;
+  loadSpriteIfNeeded(newKey);
+  render();
+}
+
+function loadSpriteIfNeeded(key) {
+  if (!key || spriteImages[key]) return;
+  const path = SPRITE_PATHS[key];
+  if (!path) return;
+  const img  = new Image();
+  img.onload = () => { spriteImages[key] = img; render(); };
+  img.onerror = () => {};
+  img.src = path;
+}
+
+function onCivilNombreChange() {
+  const c = selection && selection.type === 'civil' ? selection.ref : null;
+  if (!c) return;
+  c.nombre = document.getElementById('cep-nombre').value;
+  document.getElementById('cep-display-name').textContent = c.nombre || '(sin nombre)';
+  markPanelDirty();
+  render();
+}
+
+function onCivilSpriteSelectChange() {
+  updateCatalogPreview();
+  applySpriteToMemory();
+  markPanelDirty();
+}
+
+function onCivilSpriteCustomChange() {
+  const key = document.getElementById('cep-sprite-custom-key').value.trim();
+  if (!SPRITE_PATHS[key]) {
+    const path = `/assets/raw_sprites/characters/${key}.png`;
+    SPRITE_PATHS[key] = path;
+  }
+  updateCustomPreview();
+  applySpriteToMemory();
+  markPanelDirty();
+}
+
+function buildDialogsList() {
+  const c   = selection && selection.type === 'civil' ? selection.ref : null;
+  if (!c) return;
+  const box = document.getElementById('cep-dialogos');
+  box.innerHTML = '';
+  c.dialogos.forEach((text, idx) => {
+    const row  = document.createElement('div');
+    row.className = 'cep-dialog-row';
+
+    const ta   = document.createElement('textarea');
+    ta.className = 'cep-dialog-ta';
+    ta.rows  = 2;
+    ta.value = text;
+    ta.addEventListener('input', () => { c.dialogos[idx] = ta.value; markPanelDirty(); });
+
+    const del  = document.createElement('button');
+    del.className = 'cep-del-btn';
+    del.textContent = '✕';
+    del.title    = 'Eliminar diálogo';
+    del.disabled = c.dialogos.length <= 1;
+    del.onclick  = () => {
+      if (c.dialogos.length <= 1) return;
+      c.dialogos.splice(idx, 1);
+      markPanelDirty();
+      buildDialogsList();
+    };
+
+    row.appendChild(ta);
+    row.appendChild(del);
+    box.appendChild(row);
+  });
+}
+
+function addDialogo() {
+  const c = selection && selection.type === 'civil' ? selection.ref : null;
+  if (!c) return;
+  c.dialogos.push('');
+  markPanelDirty();
+  buildDialogsList();
+  const tas = document.getElementById('cep-dialogos').querySelectorAll('textarea');
+  if (tas.length) tas[tas.length - 1].focus();
+}
+
+function clearCivilErrors() {
+  ['cep-err-id', 'cep-err-nombre', 'cep-err-sprite', 'cep-err-dialogos'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.textContent = ''; el.classList.remove('vis'); }
+  });
+  document.getElementById('cep-id-input').classList.remove('err');
+  document.getElementById('cep-nombre').classList.remove('err');
+  document.querySelectorAll('.cep-dialog-ta').forEach(ta => ta.classList.remove('err'));
+}
+
+function validateCivilPanel() {
+  let valid = true;
+
+  // Validar ID si el civil es nuevo (no guardado)
+  const c = selection && selection.type === 'civil' ? selection.ref : null;
+  if (c && newNpcIds.has(c.id)) {
+    const idVal = c.id; // ya sincronizado por onCivilIdChange
+    const idErr = document.getElementById('cep-err-id');
+    if (!idVal) {
+      idErr.textContent = 'El ID no puede estar vacío.'; idErr.classList.add('vis');
+      document.getElementById('cep-id-input').classList.add('err');
+      valid = false;
+    } else if (!/^[a-zA-Z0-9_]+$/.test(idVal)) {
+      idErr.textContent = 'Solo letras, dígitos y guión bajo (sin espacios).'; idErr.classList.add('vis');
+      document.getElementById('cep-id-input').classList.add('err');
+      valid = false;
+    } else {
+      const allIds = [...civilians.map(cv => cv.id), ...trainers.map(tr => tr.id)];
+      if (allIds.filter(id => id === idVal).length > 1) {
+        idErr.textContent = 'Este ID ya existe. Debe ser único entre civiles y entrenadores.'; idErr.classList.add('vis');
+        document.getElementById('cep-id-input').classList.add('err');
+        valid = false;
+      }
+    }
+  }
+
+  const nombre = document.getElementById('cep-nombre').value.trim();
+  if (!nombre) {
+    const err = document.getElementById('cep-err-nombre');
+    err.textContent = 'El nombre no puede estar vacío.'; err.classList.add('vis');
+    document.getElementById('cep-nombre').classList.add('err');
+    valid = false;
+  }
+
+  const spriteKey = civilSpriteMode === 'catalog'
+    ? document.getElementById('cep-sprite-sel').value
+    : document.getElementById('cep-sprite-custom-key').value.trim();
+  if (!spriteKey) {
+    const err = document.getElementById('cep-err-sprite');
+    err.textContent = 'El sprite no puede estar vacío.'; err.classList.add('vis');
+    valid = false;
+  }
+
+  const tas = document.getElementById('cep-dialogos').querySelectorAll('textarea');
+  let anyEmpty = false;
+  tas.forEach(ta => { if (!ta.value.trim()) { ta.classList.add('err'); anyEmpty = true; } });
+  if (tas.length === 0 || anyEmpty) {
+    const err = document.getElementById('cep-err-dialogos');
+    err.textContent = 'Cada diálogo debe tener texto, y debe haber al menos uno.'; err.classList.add('vis');
+    valid = false;
+  }
+
+  return valid;
+}
+
+async function saveCivilesFromPanel() {
+  clearCivilErrors();
+  if (!validateCivilPanel()) return;
+
+  const c = selection && selection.type === 'civil' ? selection.ref : null;
+  if (c) {
+    c.nombre   = document.getElementById('cep-nombre').value.trim();
+    c.dialogos = c.dialogos.map(d => d.trim()).filter(d => d);
+    document.getElementById('cep-nombre').value             = c.nombre;
+    document.getElementById('cep-display-name').textContent = c.nombre;
+    buildDialogsList();
+  }
+
+  await saveCiviles(); // resets panelDirty and updates the save button
+}
+
+// ── Cone toggle ───────────────────────────────────────────────────────────────
+function onConesToggle() {
+  showCones = document.getElementById('chk-cones').checked;
+  localStorage.setItem('map_editor_show_cones', showCones ? 'true' : 'false');
+  render();
+}
+
+// ── Cone calculation (mirrors enLineaDeVision logic in OverworldScene) ────────
+function calcTrainerCone(trainer) {
+  const modo = trainer.modoActivacion || 'vision';
+  if (modo !== 'vision') return [];
+  const dir = trainer.direccion || 'down';
+  const dx = dir === 'right' ? 1 : dir === 'left' ? -1 : 0;
+  const dy = dir === 'down'  ? 1 : dir === 'up'   ? -1 : 0;
+  const maxSteps = trainer.visionTiles || 1;
+  const cone = [];
+  for (let step = 1; step <= maxSteps; step++) {
+    const tx = trainer.tileX + dx * step;
+    const ty = trainer.tileY + dy * step;
+    if (tx < 0 || tx >= MAP_W || ty < 0 || ty >= MAP_H) break;
+    if (tiles[ty][tx] === 'agua') break;
+    if (trees.has(`${tx},${ty}`)) break;
+    if (worldObjects.some(o => resolveFootprint(o).some(fp => fp.x === tx && fp.y === ty))) break;
+    cone.push({ x: tx, y: ty });
+  }
+  return cone;
+}
+
+function renderCones() {
+  const selectedTrainer = selection && selection.type === 'trainer' ? selection.ref : null;
+
+  if (showCones) {
+    ctx.fillStyle = 'rgba(200,60,40,0.18)';
+    for (const tr of trainers) {
+      if (tr === selectedTrainer) continue;
+      if ((tr.modoActivacion || 'vision') !== 'vision') continue;
+      if (tr.flagDerrota) continue;
+      for (const { x, y } of calcTrainerCone(tr))
+        ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+    }
+  }
+
+  if (selectedTrainer && (selectedTrainer.modoActivacion || 'vision') === 'vision') {
+    ctx.fillStyle = 'rgba(200,60,40,0.40)';
+    for (const { x, y } of calcTrainerCone(selectedTrainer))
+      ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+  }
+}
+
+// ── Trainer Edit Panel ────────────────────────────────────────────────────────
+
+function openTrainerPanel(trainer) {
+  trainerSnapshot = {
+    nombre:             trainer.nombre,
+    spriteKey:          trainer.spriteKey || '',
+    modoActivacion:     trainer.modoActivacion || 'vision',
+    direccion:          trainer.direccion || 'down',
+    visionTiles:        trainer.visionTiles || 1,
+    esJefeFinal:        !!trainer.esJefeFinal,
+    dialogoPreBatalla:  trainer.dialogoPreBatalla  || '',
+    dialogoPostDerrota: trainer.dialogoPostDerrota || '',
+    equipo:             trainer.equipo.map(e => ({ ...e })),
+  };
+  trainerPanelDirty = false;
+
+  document.getElementById('tep-display-name').textContent = trainer.nombre;
+  document.getElementById('tep-id').textContent           = trainer.id;
+  document.getElementById('tep-pos').textContent          = `${trainer.tileX}, ${trainer.tileY}`;
+
+  // Campo ID: editable si el entrenador es nuevo; readonly si ya existe en server.
+  const isNewTrainer = newNpcIds.has(trainer.id);
+  document.getElementById('tep-id').style.display       = isNewTrainer ? 'none' : '';
+  document.getElementById('tep-id-input').style.display = isNewTrainer ? '' : 'none';
+  document.getElementById('tep-id-input').value         = trainer.id;
+
+  document.getElementById('tep-nombre').value             = trainer.nombre;
+  document.getElementById('tep-nombre').classList.remove('err');
+
+  // Badge
+  const badge = document.getElementById('tep-badge');
+  if (trainer.esJefeFinal) { badge.textContent = 'Jefe Final'; badge.className = 'cep-badge-jefe'; }
+  else                     { badge.textContent = 'Entrenador'; badge.className = 'cep-badge'; }
+
+  // Sprite
+  const key       = trainer.spriteKey || '';
+  const inCatalog = catalogSprites.some(s => s.spriteKey === key);
+  trainerSpriteMode = inCatalog ? 'catalog' : 'custom';
+  populateTrainerSpriteDropdown(key);
+  document.getElementById('tep-sprite-custom-key').value = key;
+  applyTrainerSpriteMode();
+
+  // Modo activación
+  document.getElementById('tep-activacion').value = trainer.modoActivacion || 'vision';
+
+  // Dirección
+  updateTrainerDirButtons(trainer.direccion || 'down');
+
+  // Vision tiles
+  document.getElementById('tep-vision-tiles').value = trainer.visionTiles || 1;
+
+  // Jefe final
+  document.getElementById('tep-jefe-final').checked = !!trainer.esJefeFinal;
+
+  // Flag derrota (siempre editable)
+  document.getElementById('tep-flag-derrota').value = trainer.flagDerrota || '';
+  updateFlagWarning();
+
+  // Diálogos
+  document.getElementById('tep-dialogo-pre').value  = trainer.dialogoPreBatalla  || '';
+  document.getElementById('tep-dialogo-post').value = trainer.dialogoPostDerrota || '';
+
+  // Warning almacenero
+  document.getElementById('tep-almacenero-warn').style.display = (trainer.id === 'almacenero') ? '' : 'none';
+
+  buildEquipList();
+  updateTrainerActivacionUI();
+  clearTrainerErrors();
+  updateTepSaveBtn();
+
+  document.getElementById('panel-objects').style.display      = 'none';
+  document.getElementById('panel-trainer-edit').style.display = '';
+}
+
+function closeTrainerPanel(force) {
+  if (!force && trainerPanelDirty) {
+    if (!confirm('Hay cambios sin guardar. ¿Descartar?')) return false;
+    const tr = selection && selection.type === 'trainer' ? selection.ref : null;
+    if (tr && trainerSnapshot) {
+      tr.nombre             = trainerSnapshot.nombre;
+      tr.spriteKey          = trainerSnapshot.spriteKey;
+      tr.modoActivacion     = trainerSnapshot.modoActivacion;
+      tr.direccion          = trainerSnapshot.direccion;
+      tr.visionTiles        = trainerSnapshot.visionTiles;
+      tr.esJefeFinal        = trainerSnapshot.esJefeFinal;
+      tr.dialogoPreBatalla  = trainerSnapshot.dialogoPreBatalla  || undefined;
+      tr.dialogoPostDerrota = trainerSnapshot.dialogoPostDerrota || undefined;
+      tr.equipo             = trainerSnapshot.equipo.map(e => ({ ...e }));
+    }
+  }
+  trainerPanelDirty = false;
+  trainerSnapshot   = null;
+
+  document.getElementById('panel-trainer-edit').style.display = 'none';
+  document.getElementById('panel-objects').style.display      = '';
+
+  selection = null;
+  document.getElementById('btn-delete-selected').disabled = true;
+  buildAllLists();
+  render();
+  return true;
+}
+
+function updateTepSaveBtn() {
+  const btn = document.getElementById('tep-save-btn');
+  if (btn) btn.classList.toggle('dirty', trainerPanelDirty);
+}
+
+function markTrainerPanelDirty() {
+  trainerPanelDirty = true;
+  dirtyTrainers     = true;
+  markDirty('trainers');
+  updateTepSaveBtn();
+}
+
+function populateTrainerSpriteDropdown(selectedKey) {
+  const sel = document.getElementById('tep-sprite-sel');
+  sel.innerHTML = '';
+  // Catalog sprites (char_*)
+  for (const s of catalogSprites) {
+    const opt = document.createElement('option');
+    opt.value       = s.spriteKey;
+    opt.textContent = s.displayName;
+    if (s.spriteKey === selectedKey) opt.selected = true;
+    sel.appendChild(opt);
+  }
+  // Custom NPC sprites not in catalog
+  for (const key of Object.keys(SPRITE_PATHS_CUSTOM)) {
+    if (!catalogSprites.some(s => s.spriteKey === key)) {
+      const opt = document.createElement('option');
+      opt.value       = key;
+      opt.textContent = key;
+      if (key === selectedKey) opt.selected = true;
+      sel.appendChild(opt);
+    }
+  }
+}
+
+function applyTrainerSpriteMode() {
+  document.getElementById('tep-sprite-catalog').style.display = trainerSpriteMode === 'catalog' ? '' : 'none';
+  document.getElementById('tep-sprite-custom').style.display  = trainerSpriteMode === 'custom'  ? '' : 'none';
+  if (trainerSpriteMode === 'catalog') updateTrainerCatalogPreview();
+  else                                 updateTrainerCustomPreview();
+}
+
+function updateTrainerCatalogPreview() {
+  const key  = document.getElementById('tep-sprite-sel').value;
+  const img  = document.getElementById('tep-sprite-preview');
+  const ph   = document.getElementById('tep-sprite-ph');
+  const path = SPRITE_PATHS[key];
+  if (path) { img.src = path; img.style.display = ''; ph.style.display = 'none'; }
+  else       { img.style.display = 'none'; ph.style.display = 'flex'; }
+}
+
+function updateTrainerCustomPreview() {
+  const key  = document.getElementById('tep-sprite-custom-key').value.trim();
+  const img  = document.getElementById('tep-sprite-preview-c');
+  const ph   = document.getElementById('tep-sprite-ph-c');
+  const path = SPRITE_PATHS[key];
+  if (path) { img.src = path; img.style.display = ''; ph.style.display = 'none'; }
+  else       { img.style.display = 'none'; ph.style.display = 'flex'; }
+}
+
+function switchTrainerToCatalogMode(e) {
+  e.preventDefault();
+  const customKey   = document.getElementById('tep-sprite-custom-key').value.trim();
+  trainerSpriteMode = 'catalog';
+  const inCatalog   = catalogSprites.some(s => s.spriteKey === customKey);
+  populateTrainerSpriteDropdown(inCatalog ? customKey : (catalogSprites[0]?.spriteKey ?? ''));
+  applyTrainerSpriteMode();
+  applyTrainerSpriteToMemory();
+}
+
+function switchTrainerToCustomMode(e) {
+  e.preventDefault();
+  const catalogKey  = document.getElementById('tep-sprite-sel').value;
+  trainerSpriteMode = 'custom';
+  document.getElementById('tep-sprite-custom-key').value = catalogKey;
+  applyTrainerSpriteMode();
+  applyTrainerSpriteToMemory();
+}
+
+function applyTrainerSpriteToMemory() {
+  const tr = selection && selection.type === 'trainer' ? selection.ref : null;
+  if (!tr) return;
+  const newKey = trainerSpriteMode === 'catalog'
+    ? document.getElementById('tep-sprite-sel').value
+    : document.getElementById('tep-sprite-custom-key').value.trim();
+  tr.spriteKey = newKey;
+  loadSpriteIfNeeded(newKey);
+  render();
+}
+
+function onTrainerNombreChange() {
+  const tr = selection && selection.type === 'trainer' ? selection.ref : null;
+  if (!tr) return;
+  tr.nombre = document.getElementById('tep-nombre').value;
+  document.getElementById('tep-display-name').textContent = tr.nombre || '(sin nombre)';
+  markTrainerPanelDirty();
+  render();
+}
+
+function onTrainerSpriteSelectChange() {
+  updateTrainerCatalogPreview();
+  applyTrainerSpriteToMemory();
+  markTrainerPanelDirty();
+}
+
+function onTrainerSpriteCustomChange() {
+  const key = document.getElementById('tep-sprite-custom-key').value.trim();
+  if (key && !SPRITE_PATHS[key]) {
+    SPRITE_PATHS[key] = `/assets/raw_sprites/characters/${key}.png`;
+  }
+  updateTrainerCustomPreview();
+  applyTrainerSpriteToMemory();
+  markTrainerPanelDirty();
+}
+
+function onTrainerActivacionChange() {
+  const tr = selection && selection.type === 'trainer' ? selection.ref : null;
+  if (!tr) return;
+  tr.modoActivacion = document.getElementById('tep-activacion').value;
+  updateTrainerActivacionUI();
+  markTrainerPanelDirty();
+  render();
+}
+
+function updateTrainerActivacionUI() {
+  const tr = selection && selection.type === 'trainer' ? selection.ref : null;
+  const isVision = !tr || (tr.modoActivacion || 'vision') === 'vision';
+  const group = document.getElementById('tep-vision-group');
+  group.classList.toggle('disabled', !isVision);
+  group.querySelectorAll('button, input').forEach(el => {
+    if (!isVision) el.setAttribute('disabled', 'disabled');
+    else el.removeAttribute('disabled');
+  });
+}
+
+function updateTrainerDirButtons(dir) {
+  document.querySelectorAll('.tep-dir-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.dir === dir);
+  });
+}
+
+function onTrainerDirChange(dir) {
+  const tr = selection && selection.type === 'trainer' ? selection.ref : null;
+  if (!tr) return;
+  tr.direccion = dir;
+  updateTrainerDirButtons(dir);
+  markTrainerPanelDirty();
+  render();
+}
+
+function onTrainerVisionTilesChange() {
+  const tr = selection && selection.type === 'trainer' ? selection.ref : null;
+  if (!tr) return;
+  const val = parseInt(document.getElementById('tep-vision-tiles').value, 10);
+  if (!isNaN(val)) tr.visionTiles = Math.max(1, Math.min(10, val));
+  markTrainerPanelDirty();
+  render();
+}
+
+function onTrainerJefeChange() {
+  const tr = selection && selection.type === 'trainer' ? selection.ref : null;
+  if (!tr) return;
+  tr.esJefeFinal = document.getElementById('tep-jefe-final').checked;
+  const badge = document.getElementById('tep-badge');
+  if (tr.esJefeFinal) { badge.textContent = 'Jefe Final'; badge.className = 'cep-badge-jefe'; }
+  else                { badge.textContent = 'Entrenador'; badge.className = 'cep-badge'; }
+  markTrainerPanelDirty();
+  render();
+}
+
+function onTrainerDialogoPreChange() {
+  const tr = selection && selection.type === 'trainer' ? selection.ref : null;
+  if (!tr) return;
+  const val = document.getElementById('tep-dialogo-pre').value;
+  tr.dialogoPreBatalla = val || undefined;
+  markTrainerPanelDirty();
+}
+
+function onTrainerDialogoPostChange() {
+  const tr = selection && selection.type === 'trainer' ? selection.ref : null;
+  if (!tr) return;
+  const val = document.getElementById('tep-dialogo-post').value;
+  tr.dialogoPostDerrota = val || undefined;
+  markTrainerPanelDirty();
+}
+
+function buildEquipList() {
+  const tr = selection && selection.type === 'trainer' ? selection.ref : null;
+  if (!tr) return;
+  const box = document.getElementById('tep-equip-list');
+  box.innerHTML = '';
+  tr.equipo.forEach((entry, idx) => {
+    const row = document.createElement('div');
+    row.className = 'tep-equip-row';
+
+    const sp = document.createElement('select');
+    sp.className = 'cep-select';
+    sp.style.flex = '1';
+    for (const cr of creatures) {
+      const opt = document.createElement('option');
+      opt.value       = cr.id;
+      opt.textContent = cr.nombre;
+      if (cr.id === entry.especieId) opt.selected = true;
+      sp.appendChild(opt);
+    }
+    sp.addEventListener('change', () => {
+      tr.equipo[idx].especieId = sp.value;
+      markTrainerPanelDirty();
+    });
+
+    const lvl = document.createElement('input');
+    lvl.type      = 'number';
+    lvl.className = 'cep-input tep-equip-lvl';
+    lvl.min       = 1;
+    lvl.max       = 100;
+    lvl.value     = entry.nivel;
+    lvl.addEventListener('input', () => {
+      const v = parseInt(lvl.value, 10);
+      if (!isNaN(v)) tr.equipo[idx].nivel = Math.max(1, Math.min(100, v));
+      markTrainerPanelDirty();
+    });
+
+    const del = document.createElement('button');
+    del.className   = 'tep-equip-del';
+    del.textContent = '🗑';
+    del.title       = 'Eliminar criatura';
+    del.disabled    = tr.equipo.length <= 1;
+    del.onclick     = () => {
+      if (tr.equipo.length <= 1) return;
+      tr.equipo.splice(idx, 1);
+      markTrainerPanelDirty();
+      buildEquipList();
+    };
+
+    row.appendChild(sp);
+    row.appendChild(lvl);
+    row.appendChild(del);
+    box.appendChild(row);
+  });
+}
+
+function addEquipRow() {
+  const tr = selection && selection.type === 'trainer' ? selection.ref : null;
+  if (!tr) return;
+  tr.equipo.push({ especieId: creatures[0]?.id ?? '', nivel: 5 });
+  markTrainerPanelDirty();
+  buildEquipList();
+}
+
+function clearTrainerErrors() {
+  ['tep-err-id', 'tep-err-nombre', 'tep-err-sprite', 'tep-err-vision', 'tep-err-equip', 'tep-err-flag'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.textContent = ''; el.classList.remove('vis'); }
+  });
+  const idInp = document.getElementById('tep-id-input');
+  if (idInp) idInp.classList.remove('err');
+  const nom = document.getElementById('tep-nombre');
+  if (nom) nom.classList.remove('err');
+}
+
+function validateTrainerPanel() {
+  let valid = true;
+
+  // Validar ID si el entrenador es nuevo (no guardado)
+  const trSel = selection && selection.type === 'trainer' ? selection.ref : null;
+  if (trSel && newNpcIds.has(trSel.id)) {
+    const idVal = trSel.id; // ya sincronizado por onTrainerIdChange
+    const idErr = document.getElementById('tep-err-id');
+    if (!idVal) {
+      idErr.textContent = 'El ID no puede estar vacío.'; idErr.classList.add('vis');
+      document.getElementById('tep-id-input').classList.add('err');
+      valid = false;
+    } else if (!/^[a-zA-Z0-9_]+$/.test(idVal)) {
+      idErr.textContent = 'Solo letras, dígitos y guión bajo (sin espacios).'; idErr.classList.add('vis');
+      document.getElementById('tep-id-input').classList.add('err');
+      valid = false;
+    } else {
+      const allIds = [...civilians.map(cv => cv.id), ...trainers.map(tr => tr.id)];
+      if (allIds.filter(id => id === idVal).length > 1) {
+        idErr.textContent = 'Este ID ya existe. Debe ser único entre civiles y entrenadores.'; idErr.classList.add('vis');
+        document.getElementById('tep-id-input').classList.add('err');
+        valid = false;
+      }
+    }
+  }
+
+  const nombre = document.getElementById('tep-nombre').value.trim();
+  if (!nombre) {
+    const err = document.getElementById('tep-err-nombre');
+    err.textContent = 'El nombre no puede estar vacío.'; err.classList.add('vis');
+    document.getElementById('tep-nombre').classList.add('err');
+    valid = false;
+  }
+
+  const spriteKey = trainerSpriteMode === 'catalog'
+    ? document.getElementById('tep-sprite-sel').value
+    : document.getElementById('tep-sprite-custom-key').value.trim();
+  if (!spriteKey) {
+    const err = document.getElementById('tep-err-sprite');
+    err.textContent = 'El sprite no puede estar vacío.'; err.classList.add('vis');
+    valid = false;
+  }
+
+  const tr = selection && selection.type === 'trainer' ? selection.ref : null;
+  if (tr) {
+    if ((tr.modoActivacion || 'vision') === 'vision') {
+      const vt = parseInt(document.getElementById('tep-vision-tiles').value, 10);
+      if (isNaN(vt) || vt < 1 || vt > 10) {
+        const err = document.getElementById('tep-err-vision');
+        err.textContent = 'Los tiles de visión deben estar entre 1 y 10.'; err.classList.add('vis');
+        valid = false;
+      }
+    }
+
+    if (!tr.equipo || tr.equipo.length === 0) {
+      const err = document.getElementById('tep-err-equip');
+      err.textContent = 'El equipo debe tener al menos 1 criatura.'; err.classList.add('vis');
+      valid = false;
+    } else {
+      const validIds = new Set(creatures.map(c => c.id));
+      const equipBad = tr.equipo.some(e => !validIds.has(e.especieId) || e.nivel < 1 || e.nivel > 100);
+      if (equipBad) {
+        const err = document.getElementById('tep-err-equip');
+        err.textContent = 'Verificá especie válida y nivel entre 1 y 100 para cada criatura.'; err.classList.add('vis');
+        valid = false;
+      }
+    }
+  }
+
+  return valid;
+}
+
+async function saveTrainersFromPanel() {
+  clearTrainerErrors();
+  if (!validateTrainerPanel()) return;
+
+  const tr = selection && selection.type === 'trainer' ? selection.ref : null;
+  if (tr) {
+    tr.nombre = document.getElementById('tep-nombre').value.trim();
+    document.getElementById('tep-nombre').value             = tr.nombre;
+    document.getElementById('tep-display-name').textContent = tr.nombre;
+  }
+
+  await saveTrainers();
+}
+
+// ── NPC creation ─────────────────────────────────────────────────────────────
+function addCivil() {
+  const id = 'civil_' + Date.now();
+  const defaultKey = catalogSprites[0]?.spriteKey ?? '';
+  const newCivil = {
+    id,
+    nombre:   'Civil sin nombre',
+    tileX:    1,
+    tileY:    1,
+    spriteKey: defaultKey,
+    dialogos: ['...'],
+  };
+  civilians.push(newCivil);
+  newNpcIds.add(id);
+  dirtyCiviles = true;
+  markDirty('civiles');
+  loadSpriteIfNeeded(defaultKey);
+  buildAllLists();
+  render();
+  select('civil', newCivil);
+}
+
+function addTrainer() {
+  const id = 'trainer_' + Date.now();
+  const defaultKey      = catalogSprites[0]?.spriteKey ?? '';
+  const defaultCreature = creatures[0]?.id ?? '';
+  const autoFlag        = 'trainer.' + id + '_defeated';
+  const newTrainer = {
+    id,
+    nombre:         'Entrenador sin nombre',
+    tileX:          1,
+    tileY:          1,
+    spriteKey:      defaultKey,
+    direccion:      'down',
+    visionTiles:    4,
+    equipo:         [{ especieId: defaultCreature, nivel: 5 }],
+    esJefeFinal:    false,
+    modoActivacion: 'vision',
+    flagDerrota:    autoFlag,
+  };
+  // Auto-declare the flag in progress if it doesn't already exist
+  if (!progressData.flags[autoFlag]) {
+    progressData.flags[autoFlag] = { default: false, desc: 'El jugador derrotó a Entrenador sin nombre' };
+    markProgressDirty();
+  }
+  trainers.push(newTrainer);
+  newNpcIds.add(id);
+  dirtyTrainers = true;
+  markDirty('trainers');
+  loadSpriteIfNeeded(defaultKey);
+  buildAllLists();
+  render();
+  select('trainer', newTrainer);
+}
+
+// ── NPC id / flag change handlers ─────────────────────────────────────────────
+function onCivilIdChange() {
+  const c = selection && selection.type === 'civil' ? selection.ref : null;
+  if (!c) return;
+  const newId = document.getElementById('cep-id-input').value;
+  const oldId = c.id;
+  if (oldId !== newId) {
+    newNpcIds.delete(oldId);
+    c.id = newId;
+    newNpcIds.add(newId);
+  }
+  markPanelDirty();
+}
+
+function onTrainerIdChange() {
+  const tr = selection && selection.type === 'trainer' ? selection.ref : null;
+  if (!tr) return;
+  const newId = document.getElementById('tep-id-input').value;
+  const oldId = tr.id;
+  if (oldId !== newId && newNpcIds.has(oldId)) {
+    // If the current flagDerrota matches the autogenerated pattern for oldId, rename it
+    const expectedOldFlag = 'trainer.' + oldId + '_defeated';
+    if (tr.flagDerrota === expectedOldFlag && progressData.flags[expectedOldFlag]) {
+      const oldEntry = progressData.flags[expectedOldFlag];
+      delete progressData.flags[expectedOldFlag];
+      const newFlag = 'trainer.' + newId + '_defeated';
+      progressData.flags[newFlag] = { default: false, desc: oldEntry.desc };
+      tr.flagDerrota = newFlag;
+      document.getElementById('tep-flag-derrota').value = newFlag;
+      markProgressDirty();
+    }
+    newNpcIds.delete(oldId);
+    tr.id = newId;
+    newNpcIds.add(newId);
+  }
+  markTrainerPanelDirty();
+}
+
+function onTrainerFlagChange() {
+  const tr = selection && selection.type === 'trainer' ? selection.ref : null;
+  if (!tr) return;
+  const val = document.getElementById('tep-flag-derrota').value.trim();
+  // TODO: if the trainer is NEW and had an autogenerated flag, and the user changes
+  // the field to something else, the old autogenerated flag stays as an orphan in
+  // progressData. Marked for future cleanup.
+  tr.flagDerrota = val || undefined;
+  updateFlagWarning();
+  markTrainerPanelDirty();
+}
+
+// ── NPC deletion from panel ───────────────────────────────────────────────────
+function deleteCivilFromPanel() {
+  const c = selection && selection.type === 'civil' ? selection.ref : null;
+  if (!c) return;
+  if (!confirm(`¿Eliminar a ${c.nombre}? Esta acción no se puede deshacer.`)) return;
+  const idx = civilians.indexOf(c);
+  if (idx !== -1) civilians.splice(idx, 1);
+  newNpcIds.delete(c.id);
+  dirtyCiviles = true;
+  markDirty('civiles');
+  panelDirty = false; // evita prompt de discard en closeCivilPanel
+  closeCivilPanel(true);
+}
+
+function deleteTrainerFromPanel() {
+  const tr = selection && selection.type === 'trainer' ? selection.ref : null;
+  if (!tr) return;
+  if (!confirm(`¿Eliminar a ${tr.nombre}? Esta acción no se puede deshacer.`)) return;
+
+  const flagToCheck = tr.flagDerrota;
+  const idx = trainers.indexOf(tr);
+  if (idx !== -1) trainers.splice(idx, 1);
+  newNpcIds.delete(tr.id);
+  dirtyTrainers = true;
+  markDirty('trainers');
+  trainerPanelDirty = false;
+
+  if (flagToCheck && progressData.flags[flagToCheck]) {
+    const borrar = confirm(
+      `¿Borrar también la flag '${flagToCheck}' de progress.json?\n` +
+      `⚠ Puede estar siendo usada por quests o diálogos condicionales.\n` +
+      `(Recomendado: NO borrar.)`
+    );
+    if (borrar) {
+      delete progressData.flags[flagToCheck];
+      markProgressDirty();
+    }
+  }
+
+  closeTrainerPanel(true);
+}
+
+// ── Validate all new NPC ids before any save ──────────────────────────────────
+function validateAllNewNpcs() {
+  if (newNpcIds.size === 0) return true;
+  const allIds = [...civilians.map(c => c.id), ...trainers.map(tr => tr.id)];
+  const idRe   = /^[a-zA-Z0-9_]+$/;
+
+  for (const c of civilians) {
+    if (!newNpcIds.has(c.id)) continue;
+    if (!c.id || !idRe.test(c.id)) {
+      toast(`Civil con ID inválido: "${c.id}". Abrí su panel para corregirlo.`, false); return false;
+    }
+    if (allIds.filter(id => id === c.id).length > 1) {
+      toast(`ID duplicado: "${c.id}". Debe ser único entre civiles y entrenadores.`, false); return false;
+    }
+  }
+
+  for (const tr of trainers) {
+    if (!newNpcIds.has(tr.id)) continue;
+    if (!tr.id || !idRe.test(tr.id)) {
+      toast(`Entrenador con ID inválido: "${tr.id}". Abrí su panel para corregirlo.`, false); return false;
+    }
+    if (allIds.filter(id => id === tr.id).length > 1) {
+      toast(`ID duplicado: "${tr.id}". Debe ser único entre civiles y entrenadores.`, false); return false;
+    }
+  }
+
+  return true;
+}
+
+// ── Progress helpers ──────────────────────────────────────────────────────────
+
+function markProgressDirty() {
+  progressDirty = true;
+}
+
+function checkFlagExists(flag) {
+  return flag && !!progressData.flags[flag];
+}
+
+function updateFlagWarning() {
+  const inp  = document.getElementById('tep-flag-derrota');
+  const warn = document.getElementById('tep-flag-warn');
+  if (!inp || !warn) return;
+  const val = inp.value.trim();
+  if (!val || checkFlagExists(val)) {
+    warn.style.display = 'none';
+  } else {
+    warn.style.display = '';
+  }
+}
+
+function createMissingFlag() {
+  const inp = document.getElementById('tep-flag-derrota');
+  if (!inp) return;
+  const flag = inp.value.trim();
+  if (!flag) return;
+  const tr = selection && selection.type === 'trainer' ? selection.ref : null;
+  const desc = tr ? 'El jugador derrotó a ' + (tr.nombre || flag) : flag;
+  if (!progressData.flags[flag]) {
+    progressData.flags[flag] = { default: false, desc };
+    markProgressDirty();
+  }
+  updateFlagWarning();
+}
+
+function logOrphanedFlags() {
+  const usedByTrainers = new Set(trainers.map(tr => tr.flagDerrota).filter(Boolean));
+  const orphaned = Object.keys(progressData.flags)
+    .filter(k => k.startsWith('trainer.') && !usedByTrainers.has(k));
+  if (orphaned.length > 0) {
+    console.info(
+      'ℹ Flags declaradas en progress.json no usadas por ningún entrenador actual:',
+      orphaned
+    );
+  }
+}
+
+function validateFlagsBeforeSave() {
+  for (const tr of trainers) {
+    if (!tr.flagDerrota) continue;
+    if (!progressData.flags[tr.flagDerrota]) {
+      toast(
+        `No se puede guardar: el entrenador '${tr.nombre}' tiene flagDerrota ` +
+        `'${tr.flagDerrota}' que no existe en progress.json. ` +
+        `Creala con el botón del panel o cambiá el valor.`,
+        false
+      );
+      return false;
+    }
+  }
+  return true;
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 async function init() {
   resizeCanvas();
@@ -964,12 +2493,27 @@ async function init() {
   try {
     const res = await fetch('/api/map-editor/data');
     if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
-    const [data] = await Promise.all([res.json(), preloadSprites()]);
+    const data = await res.json();
+
+    // Populate SPRITE_PATHS and catalogSprites from the character sprite catalog.
+    for (const sprite of (data.characterSprites?.sprites ?? [])) {
+      SPRITE_PATHS[sprite.spriteKey] = `/assets/raw_sprites/characters/${sprite.spriteKey}.png`;
+    }
+    catalogSprites = (data.characterSprites?.sprites ?? []).map(s => ({
+      spriteKey:   s.spriteKey,
+      displayName: s.displayName || s.spriteKey,
+    }));
+    await preloadSprites();
 
     tiles        = data.mapData.tiles;
     worldObjects = data.worldObjects.objetos;
     civilians    = data.civilians.civiles;
     trainers     = data.trainers;
+    creatures    = data.creatures ?? [];
+    progressData = data.progress ?? { flags: {}, counters: {}, variables: {} };
+
+    // Initialize cones toggle from localStorage
+    document.getElementById('chk-cones').checked = showCones;
 
     // Load trees — new format has trees:[{x,y}], old format has 'arbol' in tiles[]
     trees.clear();
@@ -985,6 +2529,7 @@ async function init() {
     }
 
     refreshAddButtons();
+    logOrphanedFlags();
     render();
   } catch (e) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -1000,7 +2545,7 @@ async function init() {
 }
 
 window.addEventListener('beforeunload', e => {
-  if (dirtyMap || dirtyEdificios || dirtyCiviles || dirtyTrainers) {
+  if (dirtyMap || dirtyEdificios || dirtyCiviles || dirtyTrainers || progressDirty) {
     e.preventDefault(); e.returnValue = '';
   }
 });

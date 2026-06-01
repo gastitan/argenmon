@@ -34,3 +34,8 @@ export const SCENE_KEYS = {
 } as const;
 
 export type SceneKey = (typeof SCENE_KEYS)[keyof typeof SCENE_KEYS];
+
+// Punto de reaparición por bioma. En el futuro apuntará a la veterinaria más cercana.
+export const RESPAWN_POR_BIOMA: Record<string, { x: number; y: number }> = {
+  pampa: { x: 2, y: 15 },
+};
