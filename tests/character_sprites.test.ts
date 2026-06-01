@@ -6,8 +6,8 @@ import characterSpritesJson from '@/data/json/character_sprites.json';
 import { CharacterSpritesCatalogSchema } from '@/data/schemas/character_sprite.schema';
 
 describe('Catálogo de sprites — carga y estructura', () => {
-  it('carga exactamente 12 sprites', () => {
-    expect(CHARACTER_SPRITES).toHaveLength(12);
+  it('carga exactamente 13 sprites', () => {
+    expect(CHARACTER_SPRITES).toHaveLength(13);
   });
 
   it('todos tienen id, spriteKey, displayName, category y gender', () => {

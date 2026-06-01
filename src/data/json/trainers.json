@@ -57,7 +57,8 @@
     ],
     "esJefeFinal": false,
     "spriteKey": "char_worker_apron",
-    "modoActivacion": "dialogo"
+    "modoActivacion": "dialogo",
+    "esComercio": true
   },
   {
     "id": "cazador_1",

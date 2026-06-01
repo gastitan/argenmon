@@ -21,6 +21,7 @@ export interface DatosEntrenador {
   dialogoPreBatalla?: string;
   dialogoPostDerrota?: string;
   modoActivacion: 'vision' | 'dialogo';
+  esComercio: boolean;
 }
 
 function loadTrainers(): DatosEntrenador[] {
@@ -48,6 +49,7 @@ function loadTrainers(): DatosEntrenador[] {
     dialogoPreBatalla: t.dialogoPreBatalla,
     dialogoPostDerrota: t.dialogoPostDerrota,
     modoActivacion: t.modoActivacion,
+    esComercio: t.esComercio,
   }));
 }
 

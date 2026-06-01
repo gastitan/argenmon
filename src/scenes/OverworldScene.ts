@@ -200,7 +200,7 @@ export class OverworldScene extends Phaser.Scene {
       if (marcador.datos.flagDerrota && GameState.obtenerFlag(marcador.datos.flagDerrota)) continue;
       const { tileX, tileY } = marcador.datos;
       if (adyacentes.some((a) => a.x === tileX && a.y === tileY)) {
-        if (marcador.datos.id === 'almacenero') {
+        if (marcador.datos.esComercio) {
           this.mostrarDialogoAlmacenero();
         } else {
           this.iniciarBatallaEntrenador(marcador.datos);

@@ -219,7 +219,7 @@ function mapEditorPlugin(): Plugin {
             try {
               const parsed = JSON.parse(body) as { civiles: Array<Record<string, unknown>> };
               if (!parsed || !Array.isArray(parsed.civiles)) throw new Error('Invalid payload: missing civiles array');
-              writeFileSync(civiliansPath, JSON.stringify(parsed, null, 2), 'utf-8');
+              writeFileSync(civiliansPath, JSON.stringify(parsed, null, 2) + '\n', 'utf-8');
               jsonOk(res, { ok: true });
             } catch (e) {
               jsonErr(res, String(e), 400);
@@ -232,8 +232,14 @@ function mapEditorPlugin(): Plugin {
         if (req.method === 'POST' && url === '/api/map-editor/save-progress') {
           readBody(req).then(body => {
             try {
-              JSON.parse(body);
-              writeFileSync(progressPath, body, 'utf-8');
+              const parsed = JSON.parse(body) as Record<string, unknown>;
+              if (typeof parsed !== 'object' || parsed === null
+                || typeof parsed['flags'] !== 'object'
+                || typeof parsed['counters'] !== 'object'
+                || typeof parsed['variables'] !== 'object') {
+                throw new Error('Invalid payload: progress.json must have flags, counters and variables objects');
+              }
+              writeFileSync(progressPath, JSON.stringify(parsed, null, 2) + '\n', 'utf-8');
               jsonOk(res, { ok: true });
             } catch (e) {
               jsonErr(res, String(e), 400);
@@ -249,7 +255,7 @@ function mapEditorPlugin(): Plugin {
             try {
               const parsed = JSON.parse(body) as Array<Record<string, unknown>>;
               if (!Array.isArray(parsed)) throw new Error('Invalid payload: expected array');
-              writeFileSync(trainersPath, JSON.stringify(parsed, null, 2), 'utf-8');
+              writeFileSync(trainersPath, JSON.stringify(parsed, null, 2) + '\n', 'utf-8');
               jsonOk(res, { ok: true });
             } catch (e) {
               jsonErr(res, String(e), 400);

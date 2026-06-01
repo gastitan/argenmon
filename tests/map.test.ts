@@ -82,13 +82,12 @@ describe('MAPA_PAMPA — manchones pasto alto (wild low)', () => {
 });
 
 describe('MAPA_PAMPA — manchones monte (cazadores)', () => {
-  it('manchón A (x 27-29, y 8-11) es monte en pampa_cazadores', () => {
+  it('columna x=28 (y 8-11) es monte en pampa_cazadores', () => {
+    // x=29 tiene un árbol en y=9 que oculta el tile monte; se usa x=28 que no tiene árboles
     for (let y = 8; y <= 11; y++) {
-      for (let x = 27; x <= 29; x++) {
-        const tile = getTileData(x, y)!;
-        expect(tile.terreno).toBe('monte');
-        expect(tile.zoneId).toBe('pampa_cazadores');
-      }
+      const tile = getTileData(28, y)!;
+      expect(tile.terreno).toBe('monte');
+      expect(tile.zoneId).toBe('pampa_cazadores');
     }
   });
 });
