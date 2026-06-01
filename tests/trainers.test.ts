@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { DATOS_ENTRENADORES } from '@/data/trainers';
+import { EntrenadorJSONSchema, EntrenadoresArraySchema } from '@/data/schemas/trainer.schema';
+import trainersJson from '@/data/json/trainers.json';
 
 function findTrainer(id: string) {
   return DATOS_ENTRENADORES.find((t) => t.id === id);
@@ -109,6 +111,55 @@ describe('Peones de la Estancia', () => {
     expect(t.flagDerrota).toBe('trainer.peon_evaristo_defeated');
     expect(t.dialogoPreBatalla).toBeTruthy();
     expect(t.dialogoPostDerrota).toBeTruthy();
+  });
+});
+
+describe('modoActivacion — schema', () => {
+  const baseTrainer = {
+    id: 'test',
+    nombre: 'Test',
+    tileX: 0,
+    tileY: 0,
+    direccion: 'down' as const,
+    visionTiles: 3,
+    equipo: [{ especieId: 'hornero', nivel: 5 }],
+    esJefeFinal: false,
+  };
+
+  it('sin modoActivacion defaultea a "vision"', () => {
+    const result = EntrenadorJSONSchema.parse(baseTrainer);
+    expect(result.modoActivacion).toBe('vision');
+  });
+
+  it('con modoActivacion "dialogo" carga OK', () => {
+    const result = EntrenadorJSONSchema.parse({ ...baseTrainer, modoActivacion: 'dialogo' });
+    expect(result.modoActivacion).toBe('dialogo');
+  });
+
+  it('con modoActivacion inválido falla validación', () => {
+    expect(() => EntrenadorJSONSchema.parse({ ...baseTrainer, modoActivacion: 'invalido' })).toThrow();
+  });
+});
+
+describe('modoActivacion — trainers.json', () => {
+  it('trainers.json carga sin errores con los nuevos campos', () => {
+    expect(() => EntrenadoresArraySchema.parse(trainersJson)).not.toThrow();
+  });
+
+  it('almacenero, maestra y capataz tienen modoActivacion "dialogo"', () => {
+    for (const id of ['almacenero', 'maestra', 'capataz']) {
+      const t = DATOS_ENTRENADORES.find((e) => e.id === id)!;
+      expect(t, `entrenador ${id} no encontrado`).toBeDefined();
+      expect(t.modoActivacion).toBe('dialogo');
+    }
+  });
+
+  it('peon, cazador_1, cazador_2, peon_eulogio, peon_evaristo tienen modoActivacion "vision"', () => {
+    for (const id of ['peon', 'cazador_1', 'cazador_2', 'peon_eulogio', 'peon_evaristo']) {
+      const t = DATOS_ENTRENADORES.find((e) => e.id === id)!;
+      expect(t, `entrenador ${id} no encontrado`).toBeDefined();
+      expect(t.modoActivacion).toBe('vision');
+    }
   });
 });
 

@@ -5,7 +5,7 @@
       "nombre": "Don Ramón",
       "tileX": 20,
       "tileY": 12,
-      "spriteKey": "npc_man_1",
+      "spriteKey": "char_old_man_rural",
       "dialogos": [
         "Cuidá tus animales, pibe. El campo no perdona."
       ]
@@ -13,9 +13,9 @@
     {
       "id": "nina_honda",
       "nombre": "Niña",
-      "tileX": 24,
+      "tileX": 6,
       "tileY": 25,
-      "spriteKey": "npc_girl_1",
+      "spriteKey": "char_girl_1",
       "dialogos": [
         "¿Viste el ñandú que pasó ayer? Corre más rápido que el viento."
       ]
@@ -25,7 +25,7 @@
       "nombre": "Mujer",
       "tileX": 22,
       "tileY": 16,
-      "spriteKey": "npc_woman_1",
+      "spriteKey": "char_woman_adult_2",
       "dialogos": [
         "El Capataz no quiere visitas en la estancia. Andá con cuidado si vas pa'allá."
       ]
@@ -35,9 +35,9 @@
       "nombre": "Almacenera",
       "tileX": 20,
       "tileY": 6,
-      "spriteKey": "npc_woman_1",
+      "spriteKey": "char_woman_adult_1",
       "dialogos": [
-        "Los cazadores pasaron hace un rato. Llevaban un sabueso bravo."
+        "La Pampa tiene el ombú... pero también tiene Algarrobos y ceibos. Los viste?"
       ]
     },
     {
@@ -45,7 +45,7 @@
       "nombre": "Don Aniceto",
       "tileX": 40,
       "tileY": 14,
-      "spriteKey": "npc_man_2",
+      "spriteKey": "char_old_man_rural",
       "dialogos": [
         "El Capataz no es mala persona, pibe. Pero esos bichos suyos... esos sí que muerden."
       ]
@@ -55,7 +55,7 @@
       "nombre": "Peón",
       "tileX": 38,
       "tileY": 20,
-      "spriteKey": "npc_man_1",
+      "spriteKey": "char_peon_gaucho",
       "dialogos": [
         "Acá el viento corre solo. Cuidate."
       ]
@@ -65,9 +65,19 @@
       "nombre": "Peón",
       "tileX": 45,
       "tileY": 3,
-      "spriteKey": "npc_man_2",
+      "spriteKey": "char_peon_gaucho",
       "dialogos": [
         "Si ves un peludo grande, no lo molestes. Es un viejito que vive ahí hace años."
+      ]
+    },
+    {
+      "id": "civil_1780193402917",
+      "nombre": "Explorador",
+      "tileX": 28,
+      "tileY": 26,
+      "spriteKey": "char_man_adult_1",
+      "dialogos": [
+        "En esta zona suele haber cazadores, tené cuidado"
       ]
     }
   ]

@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { SCENE_KEYS, PALETA, TILE_SIZE } from '@/config';
+import { CHARACTER_SPRITES } from '@/data/loaders/loadCharacterSprites';
 
 /**
  * Genera placeholders gráficos en lugar de cargar assets externos.
@@ -22,18 +23,12 @@ export class BootScene extends Phaser.Scene {
     this.load.image('sprite_jabali', 'assets/sprites/jabali.png');
     // PLAYER
     this.load.image('player_sprite', 'assets/sprites/player.png');
-    // CIVILIAN NPCs
-    this.load.image('npc_man_1', 'assets/sprites/man_1.png');
-    this.load.image('npc_man_2', 'assets/sprites/man_2.png');
-    this.load.image('npc_woman_1', 'assets/sprites/woman_1.png');
-    this.load.image('npc_girl_1', 'assets/sprites/girl_1.png');
-    // TRAINER NPCs
-    this.load.image('npc_peon', 'assets/sprites/peon.png');
-    this.load.image('npc_almacenero', 'assets/sprites/almacenero.png');
+    // NPC sprites del catálogo genérico
+    for (const sprite of CHARACTER_SPRITES) {
+      this.load.image(sprite.spriteKey, `assets/raw_sprites/characters/${sprite.spriteKey}.png`);
+    }
+    // NPCs custom (no están en el catálogo: sprites únicos o no migrados)
     this.load.image('npc_capataz', 'assets/sprites/capataz.png');
-    this.load.image('npc_maestra_rural', 'assets/sprites/maestra_rural.png');
-    this.load.image('npc_cazador_1', 'assets/sprites/cazador_1.png');
-    this.load.image('npc_cazador_2', 'assets/sprites/cazador_2.png');
     this.load.image('npc_peon_2', 'assets/sprites/peon_2.png');
     this.load.image('npc_peon_3', 'assets/sprites/peon_3.png');
     // TEST: pasto_1.png pintado a mano, evaluación visual antes de pintar las otras variantes.

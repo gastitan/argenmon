@@ -20,6 +20,7 @@ export interface DatosEntrenador {
   flagDerrota?: string;
   dialogoPreBatalla?: string;
   dialogoPostDerrota?: string;
+  modoActivacion: 'vision' | 'dialogo';
 }
 
 function loadTrainers(): DatosEntrenador[] {
@@ -46,6 +47,7 @@ function loadTrainers(): DatosEntrenador[] {
     flagDerrota: t.flagDerrota,
     dialogoPreBatalla: t.dialogoPreBatalla,
     dialogoPostDerrota: t.dialogoPostDerrota,
+    modoActivacion: t.modoActivacion,
   }));
 }
 

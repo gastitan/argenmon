@@ -20,6 +20,7 @@ export const EntrenadorJSONSchema = z.object({
   flagDerrota: z.string().optional(),
   dialogoPreBatalla: z.string().optional(),
   dialogoPostDerrota: z.string().optional(),
+  modoActivacion: z.enum(['vision', 'dialogo']).default('vision'),
 });
 
 export type EntrenadorJSON = z.infer<typeof EntrenadorJSONSchema>;

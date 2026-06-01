@@ -100,7 +100,7 @@ export class OverworldScene extends Phaser.Scene {
     });
 
     this.input.keyboard?.on('keydown-Z', () => {
-      if (!this.dialogoActivo) this.intentarHablarConCivil();
+      if (!this.dialogoActivo) this.intentarInteraccionAdyacente();
     });
 
     this.events.on('player-step', (tx: number, ty: number) => {
@@ -175,9 +175,9 @@ export class OverworldScene extends Phaser.Scene {
     }
   }
 
-  // ── Interacción con civiles ─────────────────────────────────────────────────
+  // ── Interacción adyacente (civiles y entrenadores modo diálogo) ────────────
 
-  private intentarHablarConCivil(): void {
+  private intentarInteraccionAdyacente(): void {
     const { x: px, y: py } = this.player.posicionTile;
     const adyacentes = [
       { x: px, y: py - 1 },
@@ -185,10 +185,26 @@ export class OverworldScene extends Phaser.Scene {
       { x: px - 1, y: py },
       { x: px + 1, y: py },
     ];
+
     for (const marcador of this.marcadoresCiviles) {
       const { tileX, tileY } = marcador.datos;
       if (adyacentes.some((a) => a.x === tileX && a.y === tileY)) {
         this.mostrarDialogoCivil(marcador.datos);
+        return;
+      }
+    }
+
+    for (const marcador of this.marcadores) {
+      if (!marcador.visual.visible) continue;
+      if (marcador.datos.modoActivacion !== 'dialogo') continue;
+      if (marcador.datos.flagDerrota && GameState.obtenerFlag(marcador.datos.flagDerrota)) continue;
+      const { tileX, tileY } = marcador.datos;
+      if (adyacentes.some((a) => a.x === tileX && a.y === tileY)) {
+        if (marcador.datos.id === 'almacenero') {
+          this.mostrarDialogoAlmacenero();
+        } else {
+          this.iniciarBatallaEntrenador(marcador.datos);
+        }
         return;
       }
     }
@@ -240,12 +256,9 @@ export class OverworldScene extends Phaser.Scene {
     // Verificar línea de visión de entrenadores (tiene prioridad sobre encuentros)
     for (const marcador of this.marcadores) {
       if (!marcador.visual.visible) continue;
+      if (marcador.datos.modoActivacion === 'dialogo') continue;
       if (this.enLineaDeVision(tx, ty, marcador.datos)) {
-        if (marcador.datos.id === 'almacenero') {
-          this.mostrarDialogoAlmacenero();
-        } else {
-          this.iniciarBatallaEntrenador(marcador.datos);
-        }
+        this.iniciarBatallaEntrenador(marcador.datos);
         return;
       }
     }
@@ -285,10 +298,9 @@ export class OverworldScene extends Phaser.Scene {
   }
 
   private iniciarBatallaEntrenador(datos: DatosEntrenador): void {
-    const marcador = this.marcadores.find((m) => m.datos.id === datos.id);
-    if (marcador) marcador.visual.setVisible(false);
-
     const comenzar = () => {
+      const marcador = this.marcadores.find((m) => m.datos.id === datos.id);
+      if (marcador) marcador.visual.setVisible(false);
       this.scene.start(SCENE_KEYS.Battle, { tipo: 'entrenador', entrenadorId: datos.id });
     };
 

@@ -468,7 +468,7 @@ export class BattleScene extends Phaser.Scene {
 
     const msgs: Record<string, string> = {
       victoria: '¡Ganaste la batalla!',
-      derrota: '¡Te quedaste sin criaturas...',
+      derrota: '¡Te quedaste sin animales!',
       huida: 'Huiste de la batalla.',
       captura: `¡${rival.especie.nombre} fue capturado!`,
     };
@@ -610,6 +610,9 @@ export class BattleScene extends Phaser.Scene {
       });
     });
     GameState.resetearModificadoresCombate();
+    if (resultado === 'derrota') {
+      GameState.respawnTrasDerrota();
+    }
     if (resultado === 'victoria') {
       GameState.incrementarContador('stats.battles_won');
     } else if (resultado === 'captura') {
