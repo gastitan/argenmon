@@ -13,7 +13,7 @@
     {
       "id": "nina_honda",
       "nombre": "Niña",
-      "tileX": 6,
+      "tileX": 9,
       "tileY": 25,
       "spriteKey": "char_girl_1",
       "dialogos": [
@@ -24,10 +24,10 @@
       "id": "mujer_ropa",
       "nombre": "Mujer",
       "tileX": 22,
-      "tileY": 16,
+      "tileY": 26,
       "spriteKey": "char_woman_adult_2",
       "dialogos": [
-        "El Capataz no quiere visitas en la estancia. Andá con cuidado si vas pa'allá."
+        "¿Vas para la estancia? Mirá… el Capataz no es de recibir visitas. Y lo que tiene ahí adentro, mejor no preguntar."
       ]
     },
     {
@@ -47,7 +47,7 @@
       "tileY": 14,
       "spriteKey": "char_old_man_rural",
       "dialogos": [
-        "El Capataz no es mala persona, pibe. Pero esos bichos suyos... esos sí que muerden."
+        "Antes de la entrada al pueblo, cerca del agua ayer vi unas nutrias dando vueltas."
       ]
     },
     {
@@ -57,7 +57,7 @@
       "tileY": 20,
       "spriteKey": "char_peon_gaucho",
       "dialogos": [
-        "Acá el viento corre solo. Cuidate."
+        "Sabés cuál es el último venado de las pampas de por acá? Está en la estancia. Vivo, dicen. Por ahora."
       ]
     },
     {
@@ -77,7 +77,37 @@
       "tileY": 26,
       "spriteKey": "char_man_adult_1",
       "dialogos": [
-        "En esta zona suele haber cazadores, tené cuidado"
+        "En esta zona suele haber cazadores, tené cuidado."
+      ]
+    },
+    {
+      "id": "almacenero",
+      "nombre": "El Almacenero",
+      "tileX": 19,
+      "tileY": 19,
+      "spriteKey": "char_worker_apron",
+      "dialogos": [
+        "Pronto voy a tener de todo pa' vender. Si tus animales andan mal, hablá con la bióloga."
+      ]
+    },
+    {
+      "id": "civil_1780707028219",
+      "nombre": "Turista",
+      "tileX": 6,
+      "tileY": 12,
+      "spriteKey": "char_man_adult_2",
+      "dialogos": [
+        "Antes los venaditos cruzaban por acá de a montones. Ahora… capaz ves uno por año, si tenés suerte."
+      ]
+    },
+    {
+      "id": "civil_1780707778500",
+      "nombre": "Parroquiano",
+      "tileX": 23,
+      "tileY": 3,
+      "spriteKey": "char_man_adult_1",
+      "dialogos": [
+        "Al patrón de la estancia le gusta cazar. Pero no como caza uno para comer, ¿viste? Caza por el gusto de tener. Hay bichos que no deberían estar en jaula."
       ]
     }
   ]

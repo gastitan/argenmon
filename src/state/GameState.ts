@@ -6,9 +6,10 @@ import { movimientosAlNivel } from '@/systems/Movepool';
 import * as Progress from '@/systems/Progress';
 import type { ProgressoGuardado } from '@/systems/Progress';
 import { RESPAWN_POR_BIOMA } from '@/config';
+import { DATOS_ENTRENADORES } from '@/data/trainers';
 
-export const VERSION_SAVE = 4;
-const SAVE_KEY = 'pampamon_save_v4';
+export const VERSION_SAVE = 5;
+const SAVE_KEY = 'pampamon_save_v5';
 
 export interface CriaturaGuardada {
   uid: string;
@@ -39,6 +40,7 @@ export interface PlayerState {
   biomaActual: string;
   posicion: { x: number; y: number };
   equipo: CriaturaGuardada[];
+  deposito: CriaturaGuardada[];
   inventario: { trampaComun: number; trampaMonte: number; trampaFina: number };
   catalogo: Partial<Record<EspecieId, 'visto' | 'capturado'>>;
   mundo: {
@@ -92,6 +94,7 @@ function crearEstadoInicial(): PlayerState {
     biomaActual: 'pampa',
     posicion: { x: 2, y: 15 },
     equipo: [],
+    deposito: [],
     inventario: { trampaComun: 3, trampaMonte: 0, trampaFina: 0 },
     catalogo: {},
     mundo: {
@@ -119,6 +122,7 @@ class GameStateManager {
     this.state = crearEstadoInicial();
     this.state.nombreJugador = nombre;
     this.state.equipo = [crearCriaturaGuardada(criaturaInicial, 5)];
+    this.state.catalogo[criaturaInicial] = 'capturado';
     Progress.inicializarProgreso();
   }
 
@@ -128,9 +132,10 @@ class GameStateManager {
     try {
       const parsed = JSON.parse(raw) as PlayerState;
       if (!parsed.version || parsed.version < VERSION_SAVE) {
-        console.log('[GameState] Save descartado: versión incompatible (se requiere v4). El mapa cambió — iniciando partida nueva.');
+        console.log('[GameState] Save descartado: versión incompatible (se requiere v5, estructura de depósito). Iniciando partida nueva.');
         return false;
       }
+      if (!parsed.deposito) parsed.deposito = [];
       this.state = parsed;
       Progress.inicializarProgreso(parsed.progreso);
       return true;
@@ -155,12 +160,22 @@ class GameStateManager {
     return true;
   }
 
+  agregarTrampas(trampaId: TrampaId, cantidad: number): void {
+    this.state.inventario[trampaId] += cantidad;
+  }
+
+  totalTrampas(): number {
+    const { trampaComun, trampaMonte, trampaFina } = this.state.inventario;
+    return trampaComun + trampaMonte + trampaFina;
+  }
+
   curarEquipoCompleto(): void {
     for (const criatura of this.state.equipo) {
       criatura.hpActual = criatura.hpMaxCacheado;
       criatura.estadoAlterado = 'ninguno';
       const pps = criatura.movimientosActuales.map((id) => MOVIMIENTOS[id]?.pp ?? 0);
       criatura.ppActuales = [pps[0] ?? 0, pps[1] ?? 0, pps[2] ?? 0, pps[3] ?? 0];
+      criatura.modificadores = { atk: 0, def: 0, atkEsp: 0, defEsp: 0, vel: 0, evasion: 0, precision: 0 };
     }
   }
 
@@ -168,12 +183,48 @@ class GameStateManager {
   // Llamar ANTES de guardar() para que el save quede con el estado curado.
   respawnTrasDerrota(): void {
     this.curarEquipoCompleto();
-    const spawn = RESPAWN_POR_BIOMA[this.state.biomaActual] ?? RESPAWN_POR_BIOMA['pampa'];
-    this.state.posicion = { x: spawn.x, y: spawn.y };
+    const vet = DATOS_ENTRENADORES.find((t) => t.esVeterinario);
+    if (vet) {
+      this.state.posicion = { x: vet.tileX + 1, y: vet.tileY };
+    } else {
+      const spawn = RESPAWN_POR_BIOMA[this.state.biomaActual] ?? RESPAWN_POR_BIOMA['pampa'];
+      this.state.posicion = { x: spawn.x, y: spawn.y };
+    }
   }
 
   agregarAlEquipo(criatura: CriaturaGuardada): boolean {
     if (this.state.equipo.length >= 3) return false;
+    this.state.equipo.push(criatura);
+    this.state.catalogo[criatura.especieId] = 'capturado';
+    return true;
+  }
+
+  agregarAlDeposito(criatura: CriaturaGuardada): void {
+    this.state.deposito.push(criatura);
+    this.state.catalogo[criatura.especieId] = 'capturado';
+  }
+
+  tieneCriaturaEspecie(especieId: EspecieId): boolean {
+    return (
+      this.state.equipo.some((c) => c.especieId === especieId) ||
+      this.state.deposito.some((c) => c.especieId === especieId)
+    );
+  }
+
+  moverDeEquipoADeposito(uid: string): boolean {
+    if (this.state.equipo.length <= 1) return false;
+    const idx = this.state.equipo.findIndex((c) => c.uid === uid);
+    if (idx === -1) return false;
+    const [criatura] = this.state.equipo.splice(idx, 1);
+    this.state.deposito.push(criatura);
+    return true;
+  }
+
+  moverDeDepositoAEquipo(uid: string): boolean {
+    if (this.state.equipo.length >= 3) return false;
+    const idx = this.state.deposito.findIndex((c) => c.uid === uid);
+    if (idx === -1) return false;
+    const [criatura] = this.state.deposito.splice(idx, 1);
     this.state.equipo.push(criatura);
     return true;
   }

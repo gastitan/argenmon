@@ -229,6 +229,16 @@
       },
       "spriteWidth": 32,
       "spriteHeight": 48
+    },
+    {
+      "id": "veterinaria_1780332836518",
+      "spriteId": "veterinaria",
+      "posicion": {
+        "x": 23,
+        "y": 17
+      },
+      "spriteWidth": 48,
+      "spriteHeight": 48
     }
   ]
 }

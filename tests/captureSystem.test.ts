@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { intentarCaptura } from '@/systems/CaptureSystem';
+import { captureFormula } from '@/utils/formulas';
 import { Criatura } from '@/entities/Criatura';
 import { ESPECIES } from '@/data/creatures';
 import { TRAMPAS } from '@/data/items';
@@ -11,14 +12,14 @@ function mkMara(nivel = 5): Criatura {
 
 describe('intentarCaptura — probabilidad', () => {
   it('a HP máximo la captura es difícil con trampa común', () => {
-    // Prob ≈ 0.133 al 100% HP (tasaBase=0.4, bonusTrampa=1)
+    // Prob ≈ 0.20 al 100% HP (tasaBase=0.4, bonusTrampa=1.5)
     let capturas = 0;
     for (let i = 0; i < 1000; i++) {
       if (intentarCaptura(mkMara(5), TRAMPAS.trampaComun, crearRNG(i)).exito) capturas++;
     }
-    // Esperamos ~13% de éxito → entre 5% y 25%
-    expect(capturas).toBeGreaterThan(50);
-    expect(capturas).toBeLessThan(250);
+    // Esperamos ~20% de éxito → entre 10% y 35%
+    expect(capturas).toBeGreaterThan(100);
+    expect(capturas).toBeLessThan(350);
   });
 
   it('a HP bajo la captura es más fácil', () => {
@@ -93,5 +94,30 @@ describe('intentarCaptura — determinismo', () => {
     const r2 = intentarCaptura(c2, TRAMPAS.trampaComun, crearRNG(77));
     expect(r1.exito).toBe(r2.exito);
     expect(r1.sacudidas).toBe(r2.sacudidas);
+  });
+});
+
+describe('captureFormula — objetivo de diseño con nuevos bonus', () => {
+  it('debilitar al borde + Trampa Común da ~50% contra tasa 0.35', () => {
+    // Objetivo de diseño: el jugador que jugó bien (HP mínimo) tiene moneda al aire honesta
+    const prob = captureFormula({
+      hpMax: 100,
+      hpActual: 1,
+      tasaBase: 0.35,
+      bonusTrampa: TRAMPAS.trampaComun.bonusTrampa, // 1.5
+      conEstadoAlterado: false,
+    });
+    // (3×100 - 2×1) / (3×100) × 0.35 × 1.5 = 298/300 × 0.525 ≈ 0.522
+    expect(prob).toBeGreaterThan(0.45);
+    expect(prob).toBeLessThan(0.60);
+  });
+
+  it('trampaComun < trampaMonte < trampaFina en probabilidad (mismo HP)', () => {
+    const base = { hpMax: 100, hpActual: 30, tasaBase: 0.35, conEstadoAlterado: false };
+    const pComun = captureFormula({ ...base, bonusTrampa: TRAMPAS.trampaComun.bonusTrampa });
+    const pMonte = captureFormula({ ...base, bonusTrampa: TRAMPAS.trampaMonte.bonusTrampa });
+    const pFina  = captureFormula({ ...base, bonusTrampa: TRAMPAS.trampaFina.bonusTrampa });
+    expect(pComun).toBeLessThan(pMonte);
+    expect(pMonte).toBeLessThan(pFina);
   });
 });

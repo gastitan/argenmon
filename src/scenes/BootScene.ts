@@ -21,6 +21,9 @@ export class BootScene extends Phaser.Scene {
     this.load.image('sprite_vizcacha', 'assets/sprites/vizcacha.png');
     this.load.image('sprite_dogo', 'assets/sprites/dogo.png');
     this.load.image('sprite_jabali', 'assets/sprites/jabali.png');
+    this.load.image('sprite_coipo', 'assets/sprites/coipo.png');
+    this.load.image('sprite_zorro', 'assets/sprites/zorro.png');
+    this.load.image('sprite_ciervo', 'assets/sprites/ciervo.png');
     // PLAYER
     this.load.image('player_sprite', 'assets/sprites/player.png');
     // NPC sprites del catálogo genérico
@@ -41,6 +44,8 @@ export class BootScene extends Phaser.Scene {
     this.load.image('tile_monte', 'assets/raw_sprites/tilesets/monte.png');
     this.load.image('tile_tierra_pelada', 'assets/raw_sprites/tilesets/tierra_pelada.png');
     this.load.image('tile_camino', 'assets/raw_sprites/tilesets/camino_tierra.png');
+    this.load.image('tile_orilla', 'assets/raw_sprites/tilesets/orilla.png');
+    this.load.image('tile_orilla_2', 'assets/raw_sprites/tilesets/orilla-2.png');
     // TREES
     this.load.image('arbol_ombu', 'assets/raw_sprites/tilesets/ombu.png');
     this.load.image('arbol_ceibo', 'assets/raw_sprites/tilesets/ceibo.png');
@@ -55,6 +60,7 @@ export class BootScene extends Phaser.Scene {
     this.load.image('cerco_vertical', 'assets/sprites/cerco-vertical.png');
     this.load.image('cerco_horizontal', 'assets/sprites/cerco-horizontal.png');
     this.load.image('iglesia', 'assets/sprites/iglesia.png');
+    this.load.image('veterinaria', 'assets/sprites/veterinaria.png');
     this.crearTileset();
   }
 
@@ -99,6 +105,14 @@ export class BootScene extends Phaser.Scene {
     ctx.clearRect(TILE_SIZE * 7, 0, TILE_SIZE, TILE_SIZE);
     ctx.drawImage(caminoImg, TILE_SIZE * 7, 0, TILE_SIZE, TILE_SIZE);
 
+    const orillaImg = this.textures.get('tile_orilla').getSourceImage() as HTMLImageElement;
+    ctx.clearRect(TILE_SIZE * 8, 0, TILE_SIZE, TILE_SIZE);
+    ctx.drawImage(orillaImg, TILE_SIZE * 8, 0, TILE_SIZE, TILE_SIZE);
+
+    const orilla2Img = this.textures.get('tile_orilla_2').getSourceImage() as HTMLImageElement;
+    ctx.clearRect(TILE_SIZE * 9, 0, TILE_SIZE, TILE_SIZE);
+    ctx.drawImage(orilla2Img, TILE_SIZE * 9, 0, TILE_SIZE, TILE_SIZE);
+
     tilesetTex.source[0].update();
 
     this.scene.start(SCENE_KEYS.Menu);
@@ -106,7 +120,7 @@ export class BootScene extends Phaser.Scene {
 
   private crearTileset(): void {
     const g = this.make.graphics({ x: 0, y: 0 }, false);
-    const TILES = 8;
+    const TILES = 10;
     const W = TILE_SIZE * TILES;
     const H = TILE_SIZE;
 
@@ -151,6 +165,12 @@ export class BootScene extends Phaser.Scene {
 
     const caminoOff = TILE_SIZE * 7;
     g.fillStyle(0xc9a576, 1).fillRect(caminoOff, 0, TILE_SIZE, H);
+
+    const orillaOff = TILE_SIZE * 8;
+    g.fillStyle(0x5a8a6a, 1).fillRect(orillaOff, 0, TILE_SIZE, H);
+
+    const orilla2Off = TILE_SIZE * 9;
+    g.fillStyle(0x4a7a60, 1).fillRect(orilla2Off, 0, TILE_SIZE, H);
 
     g.generateTexture('tileset', W, H);
     g.destroy();

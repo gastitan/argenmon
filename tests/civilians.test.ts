@@ -3,8 +3,8 @@ import { DATOS_CIVILES } from '@/data/loaders/loadCivilians';
 import { MAPA_PAMPA } from '@/data/maps';
 
 describe('Civiles — cantidad y estructura', () => {
-  it('existen exactamente 8 civiles', () => {
-    expect(DATOS_CIVILES).toHaveLength(8);
+  it('existen exactamente 11 civiles', () => {
+    expect(DATOS_CIVILES).toHaveLength(11);
   });
 
   it('todos tienen id, nombre, posición y al menos un diálogo', () => {

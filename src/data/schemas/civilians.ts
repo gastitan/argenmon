@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { TrampaIdEnum } from './item.schema';
 
 export const CivilSchema = z.object({
   id: z.string().min(1),
@@ -7,6 +8,11 @@ export const CivilSchema = z.object({
   tileY: z.number().int().min(0),
   spriteKey: z.string().min(1),
   dialogos: z.array(z.string().min(1)).min(1),
+  regaloTrampas: z.object({
+    tipo: TrampaIdEnum,
+    cantidad: z.number().int().min(1),
+    flag: z.string().min(1),
+  }).optional(),
 });
 
 export type CivilJSON = z.infer<typeof CivilSchema>;

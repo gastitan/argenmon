@@ -103,6 +103,14 @@
       "category": "adult",
       "gender": "female",
       "tags": ["worker"]
+    },
+    {
+      "id": "vet",
+      "spriteKey": "char_vet",
+      "displayName": "Veterinaria",
+      "category": "adult",
+      "gender": "female",
+      "tags": ["worker"]
     }
   ]
 }

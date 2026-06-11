@@ -93,3 +93,67 @@ describe('intentarEncuentro — pampa_cazadores', () => {
     }
   });
 });
+
+describe('intentarEncuentro — pampa_orilla (Coipo)', () => {
+  it('orilla en pampa_orilla produce solo coipo a Lv 3-7', () => {
+    const rng = crearRNG(2222);
+    const encuentros: Array<{ especieId: string; nivel: number }> = [];
+    for (let i = 0; i < 2000; i++) {
+      const r = intentarEncuentro('pampa_orilla', 'orilla', rng);
+      if (r) encuentros.push(r);
+    }
+    expect(encuentros.length).toBeGreaterThan(0);
+    for (const e of encuentros) {
+      expect(e.especieId).toBe('coipo');
+      expect(e.nivel).toBeGreaterThanOrEqual(3);
+      expect(e.nivel).toBeLessThanOrEqual(7);
+    }
+  });
+
+  it('pasto_alto en pampa_orilla → null (tipoTile no coincide)', () => {
+    const rng = crearRNG(3333);
+    let alguno = false;
+    for (let i = 0; i < 500; i++) {
+      if (intentarEncuentro('pampa_orilla', 'pasto_alto', rng) !== null) alguno = true;
+    }
+    expect(alguno).toBe(false);
+  });
+
+  it('pasto_alto en pampa_wild_low nunca produce coipo', () => {
+    const rng = crearRNG(4444);
+    for (let i = 0; i < 2000; i++) {
+      const r = intentarEncuentro('pampa_wild_low', 'pasto_alto', rng);
+      if (r) expect(r.especieId).not.toBe('coipo');
+    }
+  });
+});
+
+describe('intentarEncuentro — pampa_wild_high con Zorro', () => {
+  it('pampa_wild_high puede producir zorro al rango Lv 8-12', () => {
+    const rng = crearRNG(5555);
+    const especieIds = new Set<string>();
+    for (let i = 0; i < 5000; i++) {
+      const r = intentarEncuentro('pampa_wild_high', 'pasto_alto', rng);
+      if (r) {
+        especieIds.add(r.especieId);
+        expect(r.nivel).toBeGreaterThanOrEqual(8);
+        expect(r.nivel).toBeLessThanOrEqual(12);
+      }
+    }
+    expect(especieIds.has('zorro')).toBe(true);
+  });
+
+  it('zorro no domina la tabla de wild_high (peso bajo-medio)', () => {
+    const rng = crearRNG(6666);
+    const conteo: Record<string, number> = {};
+    for (let i = 0; i < 10000; i++) {
+      const r = intentarEncuentro('pampa_wild_high', 'pasto_alto', rng);
+      if (r) conteo[r.especieId] = (conteo[r.especieId] ?? 0) + 1;
+    }
+    const totalEncuentros = Object.values(conteo).reduce((a, b) => a + b, 0);
+    const zorroShare = (conteo['zorro'] ?? 0) / totalEncuentros;
+    // peso 15/115 ≈ 13% — esperamos entre 7% y 22% con margen estadístico
+    expect(zorroShare).toBeGreaterThan(0.07);
+    expect(zorroShare).toBeLessThan(0.22);
+  });
+});
