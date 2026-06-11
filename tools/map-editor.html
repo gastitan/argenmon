@@ -391,6 +391,8 @@
       <button class="tile-btn"          id="tile-tierra_pelada" onclick="selectTerrain('tierra_pelada')"><div class="swatch" style="background:#a87b4f"></div>tierra pelada</button>
       <button class="tile-btn"          id="tile-camino"        onclick="selectTerrain('camino')">       <div class="swatch" style="background:#c9a576"></div>camino</button>
       <button class="tile-btn"          id="tile-vereda"        onclick="selectTerrain('vereda')">       <div class="swatch" style="background:#8a8a85"></div>vereda</button>
+      <button class="tile-btn"          id="tile-orilla"        onclick="selectTerrain('orilla')">       <div class="swatch" style="background:#5a8a6a"></div>orilla</button>
+      <button class="tile-btn"          id="tile-orilla-2"      onclick="selectTerrain('orilla-2')">     <div class="swatch" style="background:#4a7a60"></div>orilla-2</button>
 
       <div class="panel-title">Leyenda NPCs</div>
       <div class="legend-item"><div style="width:10px;height:10px;border-radius:50%;background:#4a8aff;border:1px solid #fff4"></div>Civil</div>
@@ -412,7 +414,7 @@
         Click izq → pintar<br>
         Click der → pipeta<br>
         Arrastrar → área<br>
-        1–8 → terreno rápido<br>
+        1–8, 9=orilla, 0=orilla-2<br>
         Ctrl+S → guardar
       </div>
     </div>
@@ -438,6 +440,7 @@
       <button class="save-section-btn" id="add-btn-rancho_a"         onclick="addWorldObject('rancho_a')">+ Rancho A</button>
       <button class="save-section-btn" id="add-btn-rancho_b"         onclick="addWorldObject('rancho_b')">+ Rancho B</button>
       <button class="save-section-btn" id="add-btn-iglesia"          onclick="addWorldObject('iglesia')">+ Iglesia ★</button>
+      <button class="save-section-btn" id="add-btn-veterinaria"      onclick="addWorldObject('veterinaria')">+ Veterinaria ★</button>
       <button class="save-section-btn" id="add-btn-cerco_vertical"   onclick="addWorldObject('cerco_vertical')">+ Cerco Vertical</button>
       <button class="save-section-btn" id="add-btn-cerco_horizontal" onclick="addWorldObject('cerco_horizontal')">+ Cerco Horizontal</button>
       <button class="save-section-btn" id="btn-delete-selected" onclick="deleteSelected()" disabled style="color:#d8a0a0;border-color:#7a3a3a">Eliminar seleccionado</button>
@@ -706,6 +709,8 @@ const TERRAIN_COLORS = {
   tierra_pelada: '#a87b4f',
   camino:        '#c9a576',
   vereda:        '#8a8a85',
+  orilla:        '#5a8a6a',
+  'orilla-2':    '#4a7a60',
 };
 
 const ZONE_RANGES = [
@@ -1231,6 +1236,7 @@ const PLACEABLE_SPRITES = {
   rancho_a:         { spriteWidth: 32, spriteHeight: 48, unique: false },
   rancho_b:         { spriteWidth: 48, spriteHeight: 48, unique: false },
   iglesia:          { spriteWidth: 48, spriteHeight: 64, unique: true  },
+  veterinaria:      { spriteWidth: 48, spriteHeight: 48, unique: true  },
   cerco_vertical:   { spriteWidth: 16, spriteHeight: 48, unique: false },
   cerco_horizontal: { spriteWidth: 48, spriteHeight: 16, unique: false },
 };
@@ -1432,7 +1438,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') deselect();
 
   // 1–8 quick-select terrain
-  const terrainMap = { '1':'pasto','2':'pasto_alto','3':'arbol','4':'agua','5':'monte','6':'tierra_pelada','7':'camino','8':'vereda' };
+  const terrainMap = { '1':'pasto','2':'pasto_alto','3':'arbol','4':'agua','5':'monte','6':'tierra_pelada','7':'camino','8':'vereda','9':'orilla','0':'orilla-2' };
   if (terrainMap[e.key] && mode === 'terrain') selectTerrain(terrainMap[e.key]);
 });
 

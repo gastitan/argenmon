@@ -164,5 +164,61 @@
       { "nivel": 19, "movimientoId": "ataque_acido" }
     ],
     "spriteKey": "sprite_yarara"
+  },
+  {
+    "id": "coipo",
+    "nombre": "Coipo",
+    "tipos": ["Agua"],
+    "hpBase": 75,
+    "atkBase": 55,
+    "defBase": 70,
+    "atkEspBase": 50,
+    "defEspBase": 60,
+    "velBase": 35,
+    "tasaCaptura": 0.35,
+    "movepool": [
+      { "nivel": 1, "movimientoId": "chapoteo" },
+      { "nivel": 1, "movimientoId": "golpe_cola" },
+      { "nivel": 14, "movimientoId": "coletazo" }
+    ],
+    "spriteKey": "sprite_coipo"
+  },
+  {
+    "id": "zorro",
+    "nombre": "Zorro",
+    "tipos": ["Normal"],
+    "hpBase": 55,
+    "atkBase": 60,
+    "defBase": 45,
+    "atkEspBase": 55,
+    "defEspBase": 50,
+    "velBase": 75,
+    "tasaCaptura": 0.30,
+    "movepool": [
+      { "nivel": 1, "movimientoId": "aranazo" },
+      { "nivel": 1, "movimientoId": "golpe_rapido" },
+      { "nivel": 12, "movimientoId": "escondite" },
+      { "nivel": 16, "movimientoId": "embestida" }
+    ],
+    "spriteKey": "sprite_zorro"
+  },
+  {
+    "id": "venado",
+    "nombre": "Venado",
+    "tipos": ["Normal"],
+    "hpBase": 60,
+    "atkBase": 65,
+    "defBase": 50,
+    "atkEspBase": 45,
+    "defEspBase": 55,
+    "velBase": 70,
+    "tasaCaptura": 0.30,
+    "movepool": [
+      { "nivel": 1, "movimientoId": "embestida" },
+      { "nivel": 1, "movimientoId": "zarpazo" },
+      { "nivel": 8, "movimientoId": "golpe_rapido" },
+      { "nivel": 14, "movimientoId": "carrera" }
+    ],
+    "spriteKey": "sprite_ciervo"
   }
 ]

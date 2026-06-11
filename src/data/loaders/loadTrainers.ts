@@ -1,5 +1,6 @@
 import trainersJson from '@/data/json/trainers.json';
 import { EntrenadoresArraySchema } from '@/data/schemas/trainer.schema';
+import type { TrampaId } from '@/data/schemas/item.schema';
 import { ESPECIES } from '@/data/loaders/loadCreatures';
 
 export interface EquipoEntrenador {
@@ -22,6 +23,9 @@ export interface DatosEntrenador {
   dialogoPostDerrota?: string;
   modoActivacion: 'vision' | 'dialogo';
   esComercio: boolean;
+  esVeterinario: boolean;
+  recompensaTrampas?: { tipo: TrampaId; cantidad: number };
+  recompensaCriatura?: { especieId: string; nivel: number };
 }
 
 function loadTrainers(): DatosEntrenador[] {
@@ -50,6 +54,9 @@ function loadTrainers(): DatosEntrenador[] {
     dialogoPostDerrota: t.dialogoPostDerrota,
     modoActivacion: t.modoActivacion,
     esComercio: t.esComercio,
+    esVeterinario: t.esVeterinario,
+    recompensaTrampas: t.recompensaTrampas,
+    recompensaCriatura: t.recompensaCriatura,
   }));
 }
 

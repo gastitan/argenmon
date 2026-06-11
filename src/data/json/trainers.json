@@ -2,8 +2,8 @@
   {
     "id": "peon",
     "nombre": "El Peón",
-    "tileX": 13,
-    "tileY": 6,
+    "tileX": 7,
+    "tileY": 4,
     "direccion": "down",
     "visionTiles": 4,
     "equipo": [
@@ -43,22 +43,22 @@
     "dialogoPostDerrota": "Aprendiste rápido. Ya tenés con qué arreglártelas en el monte."
   },
   {
-    "id": "almacenero",
-    "nombre": "El Almacenero",
-    "tileX": 19,
-    "tileY": 19,
-    "direccion": "right",
-    "visionTiles": 5,
+    "id": "veterinaria",
+    "nombre": "La Bióloga",
+    "tileX": 22,
+    "tileY": 18,
+    "direccion": "down",
+    "visionTiles": 1,
     "equipo": [
       {
-        "especieId": "nandu",
-        "nivel": 9
+        "especieId": "hornero",
+        "nivel": 5
       }
     ],
     "esJefeFinal": false,
-    "spriteKey": "char_worker_apron",
+    "spriteKey": "char_vet",
     "modoActivacion": "dialogo",
-    "esComercio": true
+    "esVeterinario": true
   },
   {
     "id": "cazador_1",
@@ -76,7 +76,12 @@
     "esJefeFinal": false,
     "spriteKey": "char_hunter_man",
     "flagDerrota": "trainer.hilario_defeated",
-    "dialogoPreBatalla": "Estoy cazando, no molestes"
+    "dialogoPreBatalla": "Estoy cazando, no molestes.",
+    "dialogoPostDerrota": "Vos serías un buen cazador.",
+    "recompensaTrampas": {
+      "tipo": "trampaMonte",
+      "cantidad": 2
+    }
   },
   {
     "id": "cazador_2",
@@ -98,7 +103,11 @@
     "esJefeFinal": false,
     "spriteKey": "char_peon_gaucho",
     "flagDerrota": "trainer.bartolo_defeated",
-    "dialogoPreBatalla": "Anda con cuidado, los jabalís están cerca"
+    "dialogoPreBatalla": "Escopeta y cuchillo, no necesito mas nada.",
+    "recompensaTrampas": {
+      "tipo": "trampaFina",
+      "cantidad": 1
+    }
   },
   {
     "id": "peon_eulogio",
@@ -121,13 +130,17 @@
     "spriteKey": "npc_peon_2",
     "flagDerrota": "trainer.peon_eulogio_defeated",
     "dialogoPreBatalla": "¿Y vos quién sos? Acá no entra cualquiera, mocoso.",
-    "dialogoPostDerrota": "Bah… andá nomás. El patrón te va a poner en tu lugar."
+    "dialogoPostDerrota": "Bah… andá nomás. El patrón te va a poner en tu lugar.",
+    "recompensaTrampas": {
+      "tipo": "trampaMonte",
+      "cantidad": 2
+    }
   },
   {
     "id": "peon_evaristo",
     "nombre": "Evaristo",
     "tileX": 54,
-    "tileY": 16,
+    "tileY": 15,
     "direccion": "left",
     "visionTiles": 2,
     "equipo": [
@@ -163,7 +176,7 @@
         "nivel": 16
       },
       {
-        "especieId": "nandu",
+        "especieId": "venado",
         "nivel": 17
       }
     ],
@@ -172,7 +185,11 @@
     "flagDerrota": "trainer.capataz_defeated",
     "modoActivacion": "dialogo",
     "dialogoPreBatalla": "Así que vos sos el que anduvo revolviendo todo. Bueno, acá se termina el paseo, pibe.",
-    "dialogoPostDerrota": "Carajo. Hace mucho que nadie me ponía las cosas tan difíciles."
+    "dialogoPostDerrota": "Carajo. Hace mucho que nadie me ponía las cosas tan difíciles.",
+    "recompensaCriatura": {
+      "especieId": "venado",
+      "nivel": 10
+    }
   },
   {
     "id": "trainer_1780193209975",
@@ -186,11 +203,20 @@
       {
         "especieId": "sabueso",
         "nivel": 15
+      },
+      {
+        "especieId": "nandu",
+        "nivel": 15
       }
     ],
     "esJefeFinal": false,
     "modoActivacion": "vision",
     "flagDerrota": "trainer.trainer_1780193209975_defeated",
-    "dialogoPreBatalla": "Pucha, ese bicho se me escapó justito..."
+    "dialogoPreBatalla": "Pucha, ese bicho se me escapó justito...",
+    "dialogoPostDerrota": "Voy a dejar de cazar por un tiempo.",
+    "recompensaTrampas": {
+      "tipo": "trampaComun",
+      "cantidad": 3
+    }
   }
 ]

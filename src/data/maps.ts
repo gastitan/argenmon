@@ -18,6 +18,8 @@
  *   monte        → 5  (encuentros en pampa_cazadores)
  *   tierra_pelada→ 6  (transitable, sin encuentros)
  *   camino       → 7  (transitable, sin encuentros)
+ *   orilla       → 8  (encuentros en pampa_orilla; orilla oeste)
+ *   orilla-2     → 9  (mismos encuentros; orilla norte)
  *
  * Los árboles NO usan tile índice 2. Su presencia se almacena en el campo
  * `trees` del JSON (o, en formato viejo, en tiles con valor 'arbol').
@@ -32,6 +34,8 @@ export type TipoTerreno =
   | 'agua'
   | 'arbol'
   | 'monte'
+  | 'orilla'
+  | 'orilla-2'
   | 'tierra_pelada'
   | 'camino'
   | 'vereda';
@@ -66,6 +70,8 @@ export function terrenoToTileIndex(terreno: TipoTerreno): number {
     case 'monte':         return 5;
     case 'tierra_pelada': return 6;
     case 'camino':        return 7;
+    case 'orilla':        return 8;
+    case 'orilla-2':      return 9;
     default:              return 0;  // pasto, arbol (fallback), etc.
   }
 }

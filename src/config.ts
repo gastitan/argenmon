@@ -31,6 +31,8 @@ export const SCENE_KEYS = {
   Overworld: 'OverworldScene',
   Battle: 'BattleScene',
   Catalog: 'CatalogScene',
+  Libreta: 'LibretaScene',
+  BiomeIntro: 'BiomeIntroScene',
 } as const;
 
 export type SceneKey = (typeof SCENE_KEYS)[keyof typeof SCENE_KEYS];

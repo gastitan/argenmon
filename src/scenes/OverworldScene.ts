@@ -9,6 +9,7 @@ import { DATOS_ENTRENADORES } from '@/data/trainers';
 import type { DatosEntrenador } from '@/data/trainers';
 import { DATOS_CIVILES } from '@/data/loaders/loadCivilians';
 import type { DatosCivil } from '@/data/loaders/loadCivilians';
+import { TRAMPAS } from '@/data/items';
 import { OBJETOS_MUNDO } from '@/data/loaders/loadWorldObjects';
 import { resolverFootprint } from '@/utils/worldObjectFootprint';
 import { intentarEncuentro } from '@/systems/EncounterSystem';
@@ -22,6 +23,7 @@ const COLOR_ENTRENADOR = 0x306230;
 interface MarcadorEntrenador {
   datos: DatosEntrenador;
   visual: Phaser.GameObjects.Image | Phaser.GameObjects.Rectangle;
+  derrotado: boolean;
 }
 
 interface MarcadorCivil {
@@ -46,14 +48,14 @@ export class OverworldScene extends Phaser.Scene {
   }
 
   create(): void {
+    this.marcadores = [];
+    this.marcadoresCiviles = [];
+    this.tilesObjetosMundo = new Set();
+    this.pasosSinGuardar = 0;
+    this.dialogoActivo = false;
+
     this.cameras.main.setBackgroundColor(PALETA_HEX.clarisimo);
     this.rng = crearRNG(Math.floor(Math.random() * 0xffffffff));
-
-    if (GameState.haySave()) {
-      GameState.cargar();
-    } else {
-      GameState.iniciarNuevaPartida('Jugador', 'hornero');
-    }
 
     this.map = this.make.tilemap({
       data: mapaPampaNumeros,
@@ -99,6 +101,10 @@ export class OverworldScene extends Phaser.Scene {
       if (!this.dialogoActivo) this.scene.start(SCENE_KEYS.Catalog);
     });
 
+    this.input.keyboard?.on('keydown-L', () => {
+      if (!this.dialogoActivo) this.scene.start(SCENE_KEYS.Libreta);
+    });
+
     this.input.keyboard?.on('keydown-Z', () => {
       if (!this.dialogoActivo) this.intentarInteraccionAdyacente();
     });
@@ -121,6 +127,8 @@ export class OverworldScene extends Phaser.Scene {
     for (const key of ARBOLES) {
       const [x, y] = key.split(',').map(Number);
       this.tilesObjetosMundo.add(key);
+      this.tilesObjetosMundo.add(`${x},${y - 1}`);
+      this.tilesObjetosMundo.add(`${x},${y - 2}`);
       const idx = (x * 7 + y * 13) % 3;
       const img = this.add
         .image(x * TILE_SIZE + TILE_SIZE / 2, y * TILE_SIZE + TILE_SIZE, variantes[idx])
@@ -153,11 +161,9 @@ export class OverworldScene extends Phaser.Scene {
         ? this.add.image(x, y, datos.spriteKey).setOrigin(0, 0).setDepth(y + TILE_SIZE)
         : this.add.rectangle(x, y, TILE_SIZE, TILE_SIZE, COLOR_ENTRENADOR).setOrigin(0, 0).setDepth(y + TILE_SIZE);
 
-      if (datos.flagDerrota && GameState.obtenerFlag(datos.flagDerrota)) {
-        visual.setVisible(false);
-      }
+      const derrotado = !!(datos.flagDerrota && GameState.obtenerFlag(datos.flagDerrota));
 
-      this.marcadores.push({ datos, visual });
+      this.marcadores.push({ datos, visual, derrotado });
     }
   }
 
@@ -195,18 +201,22 @@ export class OverworldScene extends Phaser.Scene {
     }
 
     for (const marcador of this.marcadores) {
-      if (!marcador.visual.visible) continue;
-      if (marcador.datos.modoActivacion !== 'dialogo') continue;
-      if (marcador.datos.flagDerrota && GameState.obtenerFlag(marcador.datos.flagDerrota)) continue;
       const { tileX, tileY } = marcador.datos;
-      if (adyacentes.some((a) => a.x === tileX && a.y === tileY)) {
-        if (marcador.datos.esComercio) {
-          this.mostrarDialogoAlmacenero();
-        } else {
-          this.iniciarBatallaEntrenador(marcador.datos);
-        }
+      if (!adyacentes.some((a) => a.x === tileX && a.y === tileY)) continue;
+
+      if (marcador.derrotado) {
+        this.mostrarDialogoTrainerDerrotado(marcador.datos);
         return;
       }
+
+      if (marcador.datos.modoActivacion !== 'dialogo') continue;
+
+      if (marcador.datos.esVeterinario) {
+        this.mostrarDialogoVeterinaria();
+      } else {
+        this.iniciarBatallaEntrenador(marcador.datos);
+      }
+      return;
     }
   }
 
@@ -233,9 +243,37 @@ export class OverworldScene extends Phaser.Scene {
     const cerrar = () => {
       fondo.destroy();
       texto.destroy();
-      this.dialogoActivo = false;
       this.input.keyboard?.off('keydown-Z', cerrar);
       this.input.keyboard?.off('keydown-X', cerrar);
+
+      const regalo = datos.regaloTrampas;
+      const yaRecibio = regalo && GameState.datos.mundo.eventosVistos.includes(regalo.flag);
+
+      if (regalo && !yaRecibio) {
+        GameState.datos.mundo.eventosVistos.push(regalo.flag);
+        GameState.agregarTrampas(regalo.tipo, regalo.cantidad);
+        GameState.guardar();
+        const trampa = TRAMPAS[regalo.tipo];
+        const msgRegalo = `${datos.nombre} te dio\n${regalo.cantidad} ${trampa.nombre}.`;
+        const fondoRegalo = this.add
+          .rectangle(DIALOG_BOX.x, DIALOG_BOX.y, DIALOG_BOX.w, DIALOG_BOX.h, 0x9bbc0f)
+          .setOrigin(0).setScrollFactor(0).setDepth(1000);
+        const textoRegalo = this.add.text(DIALOG_TEXT_POS.x, DIALOG_TEXT_POS.y, msgRegalo, {
+          fontFamily: FONT, fontSize: '8px', color: PALETA_HEX.oscurisimo,
+          wordWrap: { width: DIALOG_BOX.w - 16 },
+        }).setScrollFactor(0).setDepth(1001);
+        const cerrarRegalo = () => {
+          fondoRegalo.destroy();
+          textoRegalo.destroy();
+          this.dialogoActivo = false;
+          this.input.keyboard?.off('keydown-Z', cerrarRegalo);
+          this.input.keyboard?.off('keydown-X', cerrarRegalo);
+        };
+        this.input.keyboard?.once('keydown-Z', cerrarRegalo);
+        this.input.keyboard?.once('keydown-X', cerrarRegalo);
+      } else {
+        this.dialogoActivo = false;
+      }
     };
 
     this.input.keyboard?.once('keydown-Z', cerrar);
@@ -255,7 +293,7 @@ export class OverworldScene extends Phaser.Scene {
 
     // Verificar línea de visión de entrenadores (tiene prioridad sobre encuentros)
     for (const marcador of this.marcadores) {
-      if (!marcador.visual.visible) continue;
+      if (marcador.derrotado) continue;
       if (marcador.datos.modoActivacion === 'dialogo') continue;
       if (this.enLineaDeVision(tx, ty, marcador.datos)) {
         this.iniciarBatallaEntrenador(marcador.datos);
@@ -265,14 +303,16 @@ export class OverworldScene extends Phaser.Scene {
 
     // Verificar encuentro wild según zoneId y tipo de tile
     const tileData = getTileData(tx, ty);
-    if (tileData && (tileData.terreno === 'pasto_alto' || tileData.terreno === 'monte')) {
-      const resultado = intentarEncuentro(tileData.zoneId, tileData.terreno, this.rng);
+    if (tileData && (tileData.terreno === 'pasto_alto' || tileData.terreno === 'monte' || tileData.terreno === 'orilla' || tileData.terreno === 'orilla-2')) {
+      const zoneId = (tileData.terreno === 'orilla' || tileData.terreno === 'orilla-2') ? 'pampa_orilla' : tileData.zoneId;
+      const tipoTileNorm = tileData.terreno === 'orilla-2' ? 'orilla' : tileData.terreno;
+      const resultado = intentarEncuentro(zoneId, tipoTileNorm, this.rng);
       if (resultado) {
         GameState.marcarVisto(resultado.especieId);
         this.scene.start(SCENE_KEYS.Battle, { tipo: 'wild', ...resultado });
         return;
       }
-      this.debugText.setText(`${tileData.terreno} (${tx},${ty}) zona:${tileData.zoneId}`);
+      this.debugText.setText(`${tileData.terreno} (${tx},${ty}) zona:${zoneId}`);
     } else {
       const nomEspecie = GameState.datos.equipo[0]
         ? ESPECIES[GameState.datos.equipo[0].especieId].nombre
@@ -299,8 +339,6 @@ export class OverworldScene extends Phaser.Scene {
 
   private iniciarBatallaEntrenador(datos: DatosEntrenador): void {
     const comenzar = () => {
-      const marcador = this.marcadores.find((m) => m.datos.id === datos.id);
-      if (marcador) marcador.visual.setVisible(false);
       this.scene.start(SCENE_KEYS.Battle, { tipo: 'entrenador', entrenadorId: datos.id });
     };
 
@@ -331,17 +369,74 @@ export class OverworldScene extends Phaser.Scene {
     }
   }
 
-  // ── Diálogo Almacenero ──────────────────────────────────────────────────────
+  // ── Diálogo trainer derrotado ───────────────────────────────────────────────
 
-  private mostrarDialogoAlmacenero(): void {
+  private mostrarDialogoTrainerDerrotado(datos: DatosEntrenador): void {
     this.dialogoActivo = true;
+    const { DIALOG_BOX, DIALOG_TEXT_POS } = OVERWORLD_LAYOUT;
+
+    const linea = datos.dialogoPostDerrota ?? '...';
+    const fondo = this.add
+      .rectangle(DIALOG_BOX.x, DIALOG_BOX.y, DIALOG_BOX.w, DIALOG_BOX.h, 0x9bbc0f)
+      .setOrigin(0).setScrollFactor(0).setDepth(1000);
+    const texto = this.add.text(
+      DIALOG_TEXT_POS.x, DIALOG_TEXT_POS.y,
+      `${datos.nombre}: ${linea}`,
+      { fontFamily: FONT, fontSize: '8px', color: PALETA_HEX.oscurisimo, wordWrap: { width: DIALOG_BOX.w - 16 } },
+    ).setScrollFactor(0).setDepth(1001);
+
+    const cerrar = () => {
+      fondo.destroy();
+      texto.destroy();
+      this.input.keyboard?.off('keydown-Z', cerrar);
+      this.input.keyboard?.off('keydown-X', cerrar);
+      this.dialogoActivo = false;
+    };
+    this.input.keyboard?.once('keydown-Z', cerrar);
+    this.input.keyboard?.once('keydown-X', cerrar);
+  }
+
+  // ── Diálogo Veterinaria ─────────────────────────────────────────────────────
+
+  private mostrarDialogoVeterinaria(): void {
+    this.dialogoActivo = true;
+    const { DIALOG_BOX, DIALOG_TEXT_POS } = OVERWORLD_LAYOUT;
+
+    // Socorro: si el jugador no tiene ninguna trampa, la bióloga da 3 Comunes antes de curar
+    if (GameState.totalTrampas() === 0) {
+      GameState.agregarTrampas('trampaComun', 3);
+      GameState.guardar();
+      const fondo = this.add
+        .rectangle(DIALOG_BOX.x, DIALOG_BOX.y, DIALOG_BOX.w, DIALOG_BOX.h, 0x9bbc0f)
+        .setOrigin(0).setScrollFactor(0).setDepth(1000);
+      const texto = this.add.text(
+        DIALOG_TEXT_POS.x, DIALOG_TEXT_POS.y,
+        'Veo que te quedaste sin trampas.\nTomá unas para que sigas estudiando la fauna.',
+        { fontFamily: FONT, fontSize: '8px', color: PALETA_HEX.oscurisimo, wordWrap: { width: DIALOG_BOX.w - 16 } },
+      ).setScrollFactor(0).setDepth(1001);
+      const cerrar = () => {
+        fondo.destroy();
+        texto.destroy();
+        this.input.keyboard?.off('keydown-Z', cerrar);
+        this.input.keyboard?.off('keydown-X', cerrar);
+        this.mostrarMenuCuracion();
+      };
+      this.input.keyboard?.once('keydown-Z', cerrar);
+      this.input.keyboard?.once('keydown-X', cerrar);
+      return;
+    }
+
+    this.mostrarMenuCuracion();
+  }
+
+  private mostrarMenuCuracion(): void {
     const { DIALOG_BOX, DIALOG_TEXT_POS, SHOP_OPTION_SI, SHOP_OPTION_NO } = OVERWORLD_LAYOUT;
 
     const fondo = this.add
       .rectangle(DIALOG_BOX.x, DIALOG_BOX.y, DIALOG_BOX.w, DIALOG_BOX.h, 0x9bbc0f)
       .setOrigin(0).setScrollFactor(0).setDepth(1000);
 
-    const texto = this.add.text(DIALOG_TEXT_POS.x, DIALOG_TEXT_POS.y, '¡Bienvenido!\n¿Querés que cure a tus animales?', {
+    const texto = this.add.text(DIALOG_TEXT_POS.x, DIALOG_TEXT_POS.y, '¡Hola! Soy la bióloga del pueblo.\n¿Quieres que cure a tus animales?', {
       fontFamily: FONT, fontSize: '8px', color: PALETA_HEX.oscurisimo,
       wordWrap: { width: DIALOG_BOX.w - 16 },
     }).setScrollFactor(0).setDepth(1001);
@@ -389,7 +484,7 @@ export class OverworldScene extends Phaser.Scene {
       if (seleccion === 0) {
         GameState.curarEquipoCompleto();
         GameState.guardar();
-        mostrarRespuesta('¡Tus animales están\nlistos para seguir!');
+        mostrarRespuesta('¡Listo! Tus animales\nestán en perfecto estado.');
       } else {
         mostrarRespuesta('¡Volvé cuando los necesites!');
       }
@@ -411,7 +506,7 @@ export class OverworldScene extends Phaser.Scene {
   private esBloqueado(tx: number, ty: number): boolean {
     if (tx < 0 || ty < 0 || tx >= this.map.width || ty >= this.map.height) return true;
     if (this.marcadoresCiviles.some((m) => m.datos.tileX === tx && m.datos.tileY === ty)) return true;
-    if (this.marcadores.some((m) => m.visual.visible && m.datos.tileX === tx && m.datos.tileY === ty)) return true;
+    if (this.marcadores.some((m) => m.datos.tileX === tx && m.datos.tileY === ty)) return true;
     if (this.tilesObjetosMundo.has(`${tx},${ty}`)) return true;
     const tile = this.layer.getTileAt(tx, ty);
     if (!tile) return true;

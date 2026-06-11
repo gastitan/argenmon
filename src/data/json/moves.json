@@ -309,7 +309,7 @@
   },
   {
     "id": "colmillo_jabali",
-    "nombre": "Colmillo (Jabalí)",
+    "nombre": "Ataque Colmillo",
     "tipo": "Tierra",
     "categoria": "fisico",
     "poder": 55,
@@ -337,6 +337,28 @@
     "poder": 80,
     "precision": 90,
     "pp": 10,
+    "prioridad": 0,
+    "efecto": null
+  },
+  {
+    "id": "chapoteo",
+    "nombre": "Chapoteo",
+    "tipo": "Agua",
+    "categoria": "fisico",
+    "poder": 45,
+    "precision": 100,
+    "pp": 25,
+    "prioridad": 0,
+    "efecto": null
+  },
+  {
+    "id": "coletazo",
+    "nombre": "Coletazo",
+    "tipo": "Agua",
+    "categoria": "fisico",
+    "poder": 70,
+    "precision": 95,
+    "pp": 15,
     "prioridad": 0,
     "efecto": null
   }

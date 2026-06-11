@@ -26,7 +26,15 @@
         { "especieId": "vizcacha", "peso": 15, "nivelMin": 8, "nivelMax": 12 },
         { "especieId": "nandu",    "peso": 25, "nivelMin": 8, "nivelMax": 12 },
         { "especieId": "peludo",   "peso": 20, "nivelMin": 8, "nivelMax": 12 },
-        { "especieId": "yarara",   "peso": 25, "nivelMin": 8, "nivelMax": 12 }
+        { "especieId": "yarara",   "peso": 25, "nivelMin": 8, "nivelMax": 12 },
+        { "especieId": "zorro",    "peso": 15, "nivelMin": 8, "nivelMax": 12 }
+      ]
+    },
+    "pampa_orilla": {
+      "rate": 0.10,
+      "tipoTile": "orilla",
+      "criaturas": [
+        { "especieId": "coipo", "peso": 100, "nivelMin": 3, "nivelMax": 7 }
       ]
     }
   }

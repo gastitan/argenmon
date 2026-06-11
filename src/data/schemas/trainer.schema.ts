@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { TrampaIdEnum } from './item.schema';
 
 const DireccionEnum = z.enum(['up', 'down', 'left', 'right']);
 
@@ -22,6 +23,15 @@ export const EntrenadorJSONSchema = z.object({
   dialogoPostDerrota: z.string().optional(),
   modoActivacion: z.enum(['vision', 'dialogo']).default('vision'),
   esComercio: z.boolean().default(false),
+  esVeterinario: z.boolean().default(false),
+  recompensaTrampas: z.object({
+    tipo: TrampaIdEnum,
+    cantidad: z.number().int().min(1),
+  }).optional(),
+  recompensaCriatura: z.object({
+    especieId: z.string().min(1),
+    nivel: z.number().int().min(1).max(100),
+  }).optional(),
 });
 
 export type EntrenadorJSON = z.infer<typeof EntrenadorJSONSchema>;

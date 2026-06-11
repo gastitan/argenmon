@@ -360,7 +360,10 @@ export class BattleScene extends Phaser.Scene {
     this.dialogo.setVisible(false);
 
     const deshabilitadas = new Set<OpcionBattle>();
-    if (GameState.datos.equipo.length >= 3) {
+    if (this.config.tipo === 'wild' && GameState.tieneCriaturaEspecie(this.config.especieId as EspecieId)) {
+      deshabilitadas.add('Trampa');
+    }
+    if (this.config.tipo !== 'wild') {
       deshabilitadas.add('Trampa');
     }
 
@@ -388,14 +391,6 @@ export class BattleScene extends Phaser.Scene {
   }
 
   private mostrarTrampas(): void {
-    if (GameState.datos.equipo.length >= 3) {
-      this.mostrarMensajesSecuenciales(
-        ['Equipo lleno. No puedes capturar más criaturas.'],
-        () => this.mostrarMenu(),
-      );
-      return;
-    }
-
     const inv = GameState.datos.inventario;
     const hayTrampas = (Object.values(inv) as number[]).some((n) => n > 0);
     if (!hayTrampas) {
@@ -449,12 +444,15 @@ export class BattleScene extends Phaser.Scene {
     const resultado = this.sistema.estado.resultado;
     const rival = this.sistema.estado.rival;
 
+    let mensajeCaptura = `¡${rival.especie.nombre} fue capturado!`;
     if (resultado === 'captura') {
       const id = rival.especie.id as EspecieId;
-      GameState.marcarCapturado(id);
-      const agregada = GameState.agregarAlEquipo(crearCriaturaGuardada(id, rival.nivel));
-      if (!agregada) {
-        // equipo lleno — futura pantalla de reemplazo
+      const nuevaCriatura = crearCriaturaGuardada(id, rival.nivel);
+      if (GameState.datos.equipo.length < 3) {
+        GameState.agregarAlEquipo(nuevaCriatura);
+      } else {
+        GameState.agregarAlDeposito(nuevaCriatura);
+        mensajeCaptura = `¡${rival.especie.nombre} fue al depósito!`;
       }
     }
 
@@ -470,7 +468,7 @@ export class BattleScene extends Phaser.Scene {
       victoria: '¡Ganaste la batalla!',
       derrota: '¡Te quedaste sin animales!',
       huida: 'Huiste de la batalla.',
-      captura: `¡${rival.especie.nombre} fue capturado!`,
+      captura: mensajeCaptura,
     };
     const msg = (resultado && msgs[resultado]) ?? 'Fin de la batalla.';
 
@@ -480,11 +478,41 @@ export class BattleScene extends Phaser.Scene {
         const postDerrota = datosEntrenadorFin?.dialogoPostDerrota;
         const nombre = datosEntrenadorFin?.nombre;
         const continuar = () => this.procesarXpYNiveles(() => this.guardarYSalir(resultado));
-        if (postDerrota && nombre) {
-          this.dialogo.mostrar(`${nombre}: ${postDerrota}`, continuar);
-        } else {
-          continuar();
+
+        // Encadenar en orden inverso al de ejecución (el último en envolverse corre primero).
+        // Orden de ejecución: postDerrota → trampas → criatura → XP
+        let siguiente = continuar;
+
+        const recompensaCriatura = datosEntrenadorFin?.recompensaCriatura;
+        if (recompensaCriatura && datosEntrenadorFin) {
+          const nuevaCriatura = crearCriaturaGuardada(
+            recompensaCriatura.especieId as Parameters<typeof crearCriaturaGuardada>[0],
+            recompensaCriatura.nivel,
+          );
+          const fuePalEquipo = GameState.agregarAlEquipo(nuevaCriatura);
+          if (!fuePalEquipo) GameState.agregarAlDeposito(nuevaCriatura);
+          const nombreEspecie = ESPECIES[recompensaCriatura.especieId as EspecieId].nombre;
+          const destino = fuePalEquipo ? 'a tu equipo' : 'al depósito';
+          const msgCriatura = `¡${datosEntrenadorFin.nombre} te entregó un ${nombreEspecie}! Fue enviado ${destino}.`;
+          const prev = siguiente;
+          siguiente = () => this.dialogo.mostrar(msgCriatura, prev);
         }
+
+        const recompensa = datosEntrenadorFin?.recompensaTrampas;
+        if (recompensa && datosEntrenadorFin) {
+          GameState.agregarTrampas(recompensa.tipo, recompensa.cantidad);
+          const trampa = TRAMPAS[recompensa.tipo];
+          const msgRecompensa = `${datosEntrenadorFin.nombre} te dio ${recompensa.cantidad} ${trampa.nombre}.`;
+          const prev = siguiente;
+          siguiente = () => this.dialogo.mostrar(msgRecompensa, prev);
+        }
+
+        if (postDerrota && nombre) {
+          const prev = siguiente;
+          siguiente = () => this.dialogo.mostrar(`${nombre}: ${postDerrota}`, prev);
+        }
+
+        siguiente();
       } else {
         this.guardarYSalir(resultado);
       }

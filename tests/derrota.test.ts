@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { GameState, crearCriaturaGuardada } from '@/state/GameState';
-import { RESPAWN_POR_BIOMA } from '@/config';
+import { DATOS_ENTRENADORES } from '@/data/trainers';
 
 // localStorage no existe en Node — stub mínimo para que guardar()/cargar() no rompan
 vi.stubGlobal('localStorage', {
@@ -44,14 +44,14 @@ describe('GameState.respawnTrasDerrota', () => {
     expect(tieneAlgunPP).toBe(true);
   });
 
-  it('reposiciona al jugador en el respawn del bioma pampa', () => {
+  it('reposiciona al jugador en la posición de la veterinaria', () => {
     GameState.datos.posicion = { x: 50, y: 10 };
+    const vet = DATOS_ENTRENADORES.find((t) => t.esVeterinario)!;
 
     GameState.respawnTrasDerrota();
 
-    const respawn = RESPAWN_POR_BIOMA['pampa'];
-    expect(GameState.datos.posicion.x).toBe(respawn.x);
-    expect(GameState.datos.posicion.y).toBe(respawn.y);
+    expect(GameState.datos.posicion.x).toBe(vet.tileX + 1);
+    expect(GameState.datos.posicion.y).toBe(vet.tileY);
   });
 
   it('invariante: al menos una criatura viva tras el respawn', () => {
@@ -82,20 +82,30 @@ describe('GameState.respawnTrasDerrota', () => {
     GameState.respawnTrasDerrota();
     GameState.guardar();
 
-    // guardar() llama localStorage.setItem; verificar que se llamó con HP curado
+    const vet = DATOS_ENTRENADORES.find((t) => t.esVeterinario)!;
     const setItem = vi.mocked(localStorage.setItem);
     const lastCall = setItem.mock.calls.at(-1);
     expect(lastCall).toBeDefined();
     const saved = JSON.parse(lastCall![1]);
     expect(saved.equipo[0].hpActual).toBeGreaterThan(0);
-    expect(saved.posicion).toEqual(RESPAWN_POR_BIOMA['pampa']);
+    expect(saved.posicion).toEqual({ x: vet.tileX + 1, y: vet.tileY });
   });
 });
 
-// ── RESPAWN_POR_BIOMA ──────────────────────────────────────────────────────────
+// ── Veterinaria como punto de respawn ─────────────────────────────────────────
 
-describe('RESPAWN_POR_BIOMA', () => {
-  it('define el punto de respawn para pampa en (2, 15)', () => {
-    expect(RESPAWN_POR_BIOMA['pampa']).toEqual({ x: 2, y: 15 });
+describe('Respawn por veterinaria', () => {
+  it('hay exactamente una veterinaria marcada en DATOS_ENTRENADORES', () => {
+    const vets = DATOS_ENTRENADORES.filter((t) => t.esVeterinario);
+    expect(vets).toHaveLength(1);
+  });
+
+  it('respawnTrasDerrota apunta a la posición de la veterinaria', () => {
+    const vet = DATOS_ENTRENADORES.find((t) => t.esVeterinario)!;
+    GameState.datos.posicion = { x: 50, y: 10 };
+
+    GameState.respawnTrasDerrota();
+
+    expect(GameState.datos.posicion).toEqual({ x: vet.tileX + 1, y: vet.tileY });
   });
 });
